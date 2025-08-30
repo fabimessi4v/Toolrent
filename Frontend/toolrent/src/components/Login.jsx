@@ -17,7 +17,7 @@ const Login = ({ onLogin }) => {
     try {
       const response = await login(username, password);
       if (response.token) {
-        localStorage.setItem("jwt", response.token);
+        localStorage.setItem("jwtToken", response.token); // <-- usa la misma clave que en App.jsx
         onLogin(username); // notifica al parent que el usuario hizo login
       }
     } catch (err) {
@@ -27,7 +27,7 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="flex flex-col gap-6 w-full max-w-sm border px-6 py-8 rounded-md shadow-md bg-background">
         <h1 className="text-2xl font-bold text-center">Login</h1>
 

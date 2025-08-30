@@ -1,47 +1,66 @@
-import React, { useState } from 'react';
-import Login from './components/Login.jsx';
-import CustomerList from './components/CustomerList.jsx';
+import { useState, useEffect } from "react";
+import { Sidebar } from "./components/Sidebar";
+import { Dashboard } from "./components/Dashboard";
+import { ToolsManagement } from "./components/ToolsManagement";
+import { LoansManagement } from "./components/RentalsManagement";
+import { ClientsManagement } from "./components/ClientsManagement";
+import { KardexManagement } from "./components/KardexManagement";
+import { RatesConfiguration } from "./components/RatesConfiguration";
+import CustomerList from "./components/CustomerList";
+import Login from "./components/Login";
+import { logout } from "./services/loginService";
 
-function App() {
+export default function App() {
+  const [currentSection, setCurrentSection] = useState("dashboard");
   const [user, setUser] = useState(null);
-  const [showCustomers, setShowCustomers] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(true);
 
-  const toggleCustomerList = () => {
-    setShowCustomers(prevShow => !prevShow);
+  useEffect(() => {
+    const token = localStorage.getItem("jwtToken");
+    if (token) {
+      setUser("Usuario"); // Opcional: decodificar token
+    }
+  }, []);
+
+  const handleNavigate = (section) => setCurrentSection(section);
+
+  const handleLogin = (username) => setUser(username);
+
+  const handleLogout = () => {
+    logout();
+    setUser(null); // vuelve al login
   };
 
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      <header className="text-center mb-8">
-        <h1 className="text-4xl font-bold">Toolrent</h1>
-        <p className="text-muted-foreground">App de Arriendo de Herramientas</p>
-      </header>
+  const renderContent = () => {
+    switch (currentSection) {
+      case "dashboard": return <Dashboard onNavigate={handleNavigate} onLogout={handleLogout} />;
+      case "tools": return <ToolsManagement onNavigate={handleNavigate} />;
+      case "loans": return <LoansManagement onNavigate={handleNavigate} />;
+      case "clients": return <ClientsManagement onNavigate={handleNavigate} />;
+      case "kardex": return <KardexManagement onNavigate={handleNavigate} />;
+      case "rates": return <RatesConfiguration onNavigate={handleNavigate} />;
+      case "customers": return <CustomerList />;
+      default: return <Dashboard onNavigate={handleNavigate} onLogout={handleLogout} />;
+    }
+  };
 
-      <main className="w-full flex flex-col items-center">
-        {!user ? (
-          <Login onLogin={setUser} />
-        ) : (
-          <>
-            <p className="mb-4">Bienvenido, {user}</p>
-            <div className="mb-4">
-              <button
-                onClick={toggleCustomerList}
-                className="bg-slate-900 text-white hover:bg-slate-800 font-medium rounded-lg text-sm px-5 py-2.5"
-              >
-                {showCustomers ? 'Ocultar Usuarios' : 'Ver Usuarios'}
-              </button>
-            </div>
-            {showCustomers && (
-              <div className="w-full flex justify-center">
-                <CustomerList />
-              </div>
-            )}
-          </>
-        )}
+  // Si no hay usuario, muestra solo el login
+  if (!user) {
+    return <Login onLogin={handleLogin} />; // <-- así está bien, no lo pongas dentro de un div flex
+  }
+
+  return (
+    <div className="min-h-screen bg-background flex">
+      {showSidebar && (
+        <Sidebar
+          currentSection={currentSection}
+          onNavigate={handleNavigate}
+          onLogout={handleLogout}
+        />
+      )}
+      <main className={`p-6 lg:p-8 pt-16 lg:pt-8 ${showSidebar ? "flex-1" : "w-full"}`}>
+        {renderContent()}
       </main>
     </div>
   );
 }
-
-export default App;
-
