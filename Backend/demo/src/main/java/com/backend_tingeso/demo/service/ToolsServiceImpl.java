@@ -26,7 +26,17 @@ public class ToolsServiceImpl implements ToolsService {
 
     @Override
     public Tools createTool(Tools tool) {
-        // save() inserta si no existe o actualiza si ya existe
+        if (tool.getId() == null) {
+            String id = UUID.randomUUID().toString();
+            tool.setId(id);
+            // asignar UUID antes de guardar
+        }
+        if (tool.getName() == null || tool.getName().isBlank() ||
+                tool.getCategory() == null || tool.getCategory().isBlank() ||
+                tool.getReplacementValue() == null) {
+            throw new IllegalArgumentException("Nombre, categoría y valor de reposición son obligatorios");
+        }
+
         return toolsRepository.save(tool);
     }
 

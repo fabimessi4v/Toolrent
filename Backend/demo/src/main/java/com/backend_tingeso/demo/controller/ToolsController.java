@@ -25,9 +25,16 @@ public class ToolsController {
 
     // Endpoint para crear un nuevo Tool
     @PostMapping
-    public ResponseEntity<Tools> createTool(@RequestBody Tools tool) {
-        Tools newTool = toolsService.createTool(tool);
-        return new ResponseEntity<>(newTool, HttpStatus.CREATED);
+    public ResponseEntity<?> createTool(@RequestBody Tools tool) {
+        try {
+            Tools newTool = toolsService.createTool(tool);
+            return new ResponseEntity<>(newTool, HttpStatus.CREATED);
+        } catch (IllegalArgumentException ex) {
+            // Retorna 400 con el mensaje de la excepción
+            return ResponseEntity
+                    .badRequest()
+                    .body(ex.getMessage());
+        }
     }
     // Endpoint para obtener todos los Tools
     @GetMapping
