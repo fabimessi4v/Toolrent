@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getTools } from "../services/toolService";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -20,91 +21,26 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Textarea } from "./ui/textarea";
 
 export function ToolsManagement({ onNavigate }) {
+  const [tools, setTools] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const tools = [
-    {
-      id: "T001",
-      name: "Taladro Percutor Bosch GSB 120",
-      category: "Taladros",
-      brand: "Bosch",
-      model: "GSB 120",
-      status: "Disponible",
-      stock: 3,
-      dailyRentalRate: 450,
-      dailyFineRate: 45,
-      replacementValue: 85000,
-      location: "Bodega A - Sector 2",
-      registrationDate: "2025-01-15",
-      registeredBy: "admin",
-      condition: "excelente"
-    },
-    {
-      id: "T002",
-      name: "Sierra Circular Makita 5007MG",
-      category: "Sierras",
-      brand: "Makita",
-      model: "5007MG",
-      status: "Prestada",
-      stock: 0,
-      dailyRentalRate: 380,
-      dailyFineRate: 38,
-      replacementValue: 65000,
-      location: "Prestada a Juan Pérez",
-      registrationDate: "2025-01-20",
-      registeredBy: "admin",
-      condition: "bueno"
-    },
-    {
-      id: "T003",
-      name: "Soldadora Lincoln Electric",
-      category: "Soldadoras",
-      brand: "Lincoln",
-      model: "AC-225",
-      status: "En reparación",
-      stock: 1,
-      dailyRentalRate: 750,
-      dailyFineRate: 75,
-      replacementValue: 150000,
-      location: "Taller de Reparación",
-      registrationDate: "2025-02-01",
-      registeredBy: "admin",
-      condition: "regular"
-    },
-    {
-      id: "T004",
-      name: "Amoladora DeWalt DWE402",
-      category: "Amoladoras",
-      brand: "DeWalt",
-      model: "DWE402",
-      status: "Disponible",
-      stock: 2,
-      dailyRentalRate: 280,
-      dailyFineRate: 28,
-      replacementValue: 45000,
-      location: "Bodega B - Sector 1",
-      registrationDate: "2025-02-10",
-      registeredBy: "admin",
-      condition: "excelente"
-    },
-    {
-      id: "T005",
-      name: "Martillo Demoledor Makita HM1317C",
-      category: "Martillos",
-      brand: "Makita",
-      model: "HM1317C",
-      status: "Dada de baja",
-      stock: 0,
-      dailyRentalRate: 600,
-      dailyFineRate: 60,
-      replacementValue: 120000,
-      location: "Dada de baja por daño irreparable",
-      registrationDate: "2024-12-01",
-      registeredBy: "admin",
-      condition: "malo"
+  useEffect(() => {
+    async function fetchTools() {
+      setLoading(true);
+      try {
+        const response = await getTools();
+        console.log(response); // Verifica el formato
+        setTools(response.data || []); // Usa solo el array de herramientas
+      } catch (err) {
+        setTools([]);
+      } finally {
+        setLoading(false);
+      }
     }
-  ];
+    fetchTools();
+  }, []);
 
   const categories = ["all", "Taladros", "Sierras", "Soldadoras", "Amoladoras", "Llaves", "Martillos"];
 
@@ -254,72 +190,80 @@ export function ToolsManagement({ onNavigate }) {
       </Card>
 
       {/* Tools Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredTools.map((tool) => (
-          <Card key={tool.id} className="overflow-hidden">
-            <CardContent className="p-0">
-              <div className="aspect-video bg-gray-100 flex items-center justify-center">
-                <Wrench className="h-12 w-12 text-gray-400" />
-              </div>
-              <div className="p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <h3 className="font-semibold mb-1">{tool.name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {tool.brand} - {tool.model}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {getConditionIcon(tool.condition)}
-                  </div>
+      {loading ? (
+        <div className="text-center py-8">Cargando herramientas...</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredTools.map((tool) => (
+            <Card key={tool.id} className="overflow-hidden">
+              <CardContent className="p-0">
+                <div className="aspect-video bg-gray-100 flex items-center justify-center">
+                  <Wrench className="h-12 w-12 text-gray-400" />
                 </div>
-                
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Estado:</span>
-                    {getStatusBadge(tool.status)}
+                <div className="p-4">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1">
+                      <h3 className="font-semibold mb-1">{tool.name}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {tool.brand} - {tool.model}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {getConditionIcon(tool.condition)}
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Stock disponible:</span>
-                    <span className="font-semibold">{tool.stock} unidades</span>
+                  
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Tarifa arriendo:</span>
+                      <span className="font-semibold">
+                        ${tool.rentalPrice ? tool.rentalPrice.toLocaleString() : "0"}/día
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Valor reposición:</span>
+                      <span className="font-semibold">
+                        ${tool.replacementValue ? tool.replacementValue.toLocaleString() : "0"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Estado:</span>
+                      {getStatusBadge(tool.status)}
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Stock disponible:</span>
+                      <span className="font-semibold">{tool.stock} unidades</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Ubicación:</span>
+                      <span className="text-sm">{tool.location}</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Tarifa arriendo:</span>
-                    <span className="font-semibold">${tool.dailyRentalRate.toLocaleString()}/día</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Valor reposición:</span>
-                    <span className="font-semibold">${tool.replacementValue.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Ubicación:</span>
-                    <span className="text-sm">{tool.location}</span>
-                  </div>
-                </div>
 
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Edit3 className="h-4 w-4 mr-2" />
-                    Editar
-                  </Button>
-                  {tool.status !== "Dada de baja" && (
-                    <Button variant="destructive" size="sm" className="flex-1">
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Dar de Baja
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" className="flex-1">
+                      <Edit3 className="h-4 w-4 mr-2" />
+                      Editar
                     </Button>
-                  )}
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Kardex
-                  </Button>
+                    {tool.status !== "Dada de baja" && (
+                      <Button variant="destructive" size="sm" className="flex-1">
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Dar de Baja
+                      </Button>
+                    )}
+                    <Button variant="outline" size="sm" className="flex-1">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Kardex
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
-      {filteredTools.length === 0 && (
+      {filteredTools.length === 0 && !loading && (
         <Card>
           <CardContent className="p-8 text-center">
             <Wrench className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
