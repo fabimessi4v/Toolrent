@@ -14,6 +14,6 @@ import java.util.UUID;
  * El segundo es el tipo de la clave primaria (id) de esa entidad.
  */
 @Repository
-public interface ToolsRepository extends JpaRepository<Tools, UUID> {
+public interface ToolsRepository extends JpaRepository<Tools, String> {
 
 }

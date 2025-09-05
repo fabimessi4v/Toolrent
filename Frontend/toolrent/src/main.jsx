@@ -1,14 +1,31 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+import "./index.css";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { ReactKeycloakProvider } from "@react-keycloak/web";
+import App from "./App";
+import keycloak from "./keycloak"; // tu instancia Keycloak
 
+const eventLogger = (event, error) => {
+  console.log("Keycloak event:", event, error);
+};
 
+const tokenLogger = (tokens) => {
+  console.log("Tokens updated:", tokens);
+};
 
-// Busca el div con id="root" en index.html
-//Todo lo que devuelva <App /> es lo que realmente se pinta en la página, dentro del div#root del index.html.
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <ReactKeycloakProvider
+    authClient={keycloak}
+    initOptions={{
+      onLoad: "login-required",   // fuerza login si no hay sesión
+      pkceMethod: "S256",         // obligatorio para clientes públicos
+      checkLoginIframe: false,    // evita errores de iframe
+    }}
+    onEvent={eventLogger}         // opcional, para debug
+    onTokens={tokenLogger}        // opcional, para debug
+  >
     <App />
-  </StrictMode>,
-)
+  </ReactKeycloakProvider>
+);
+
+

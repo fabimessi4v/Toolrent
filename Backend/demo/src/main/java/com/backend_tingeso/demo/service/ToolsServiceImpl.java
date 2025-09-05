@@ -76,8 +76,8 @@ public class ToolsServiceImpl implements ToolsService {
 
         try {
             UUID uuid = UUID.fromString(id);
-            if (toolsRepository.existsById(uuid)) {
-                toolsRepository.deleteById(uuid);
+            if (toolsRepository.existsById(id)) {
+                toolsRepository.deleteById(id);
                 return true;
             } else {
                 return false;

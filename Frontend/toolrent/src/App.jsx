@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useKeycloak } from "@react-keycloak/web";
+import { useState } from "react";
 import { Sidebar } from "./components/Sidebar";
 import { Dashboard } from "./components/Dashboard";
 import { ToolsManagement } from "./components/ToolsManagement";
@@ -7,34 +8,49 @@ import { ClientsManagement } from "./components/ClientsManagement";
 import { KardexManagement } from "./components/KardexManagement";
 import { RatesConfiguration } from "./components/RatesConfiguration";
 import CustomerList from "./components/CustomerList";
-import Login from "./components/Login";
-import { logout } from "./services/loginService";
 
 export default function App() {
+  const { keycloak, initialized } = useKeycloak();
+
+  // Debug Keycloak state
+  console.log("Keycloak instance:", keycloak);
+  console.log("Initialized:", initialized);
+  console.log("Authenticated:", keycloak?.authenticated);
+
   const [currentSection, setCurrentSection] = useState("dashboard");
-  const [user, setUser] = useState(null);
   const [showSidebar, setShowSidebar] = useState(true);
 
-  useEffect(() => {
-    const token = localStorage.getItem("jwtToken");
-    if (token) {
-      setUser("Usuario"); // Opcional: decodificar token
-    }
-  }, []);
+if (!initialized) {
+  return <div>Cargando Keycloak...</div>; // Espera hasta que termine de inicializar
+}
+
+  if (!keycloak.authenticated) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <h1 className="mb-4">No autenticado</h1>
+        <button
+          className="px-4 py-2 bg-blue-600 text-white rounded"
+          onClick={() => keycloak.login()}
+        >
+          Iniciar sesión
+        </button>
+      </div>
+    );
+  }
 
   const handleNavigate = (section) => setCurrentSection(section);
-
-  const handleLogin = (username) => setUser(username);
-
-  const handleLogout = () => {
-    logout();
-    setUser(null); // vuelve al login
-  };
+  const handleLogout = () => keycloak.logout();
 
   const renderContent = () => {
     switch (currentSection) {
       case "dashboard": return <Dashboard onNavigate={handleNavigate} onLogout={handleLogout} />;
-      case "tools": return <ToolsManagement onNavigate={handleNavigate} />;
+      case "tools":
+        if (keycloak.hasRealmRole("ADMIN") || keycloak.hasResourceRole("ADMIN", "toolrent-frontend")) {
+          return <ToolsManagement onNavigate={handleNavigate} />;}
+        else if (keycloak.hasRealmRole("EMPLOYEE") || keycloak.hasResourceRole("EMPLOYEE", "toolrent-frontend")) {
+          return <EmployeeDashboard onNavigate={handleNavigate} />;}
+          else {
+              return <div>No tienes acceso a esta sección.</div>;}
       case "loans": return <LoansManagement onNavigate={handleNavigate} />;
       case "clients": return <ClientsManagement onNavigate={handleNavigate} />;
       case "kardex": return <KardexManagement onNavigate={handleNavigate} />;
@@ -43,11 +59,6 @@ export default function App() {
       default: return <Dashboard onNavigate={handleNavigate} onLogout={handleLogout} />;
     }
   };
-
-  // Si no hay usuario, muestra solo el login
-  if (!user) {
-    return <Login onLogin={handleLogin} />; // <-- así está bien, no lo pongas dentro de un div flex
-  }
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -59,7 +70,16 @@ export default function App() {
         />
       )}
       <main className={`p-6 lg:p-8 pt-16 lg:pt-8 ${showSidebar ? "flex-1" : "w-full"}`}>
+        <h1>
+          Bienvenido {keycloak.tokenParsed?.preferred_username}
+        </h1>
         {renderContent()}
+        <button
+          className="mt-4 px-4 py-2 bg-red-600 text-white rounded"
+          onClick={handleLogout}
+        >
+          Cerrar sesión
+        </button>
       </main>
     </div>
   );

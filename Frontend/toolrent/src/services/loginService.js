@@ -29,3 +29,23 @@ export const login = async (username, password) => {
 export const logout = () => {
   localStorage.removeItem('jwtToken');
 };
+
+const handleLogout = () => {
+  keycloak.logout();
+  localStorage.removeItem("jwtToken");
+  setAuthenticated(false);
+};
+
+if (!authenticated) {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center">
+      <h1 className="mb-4">No autenticado</h1>
+      <button
+        className="px-4 py-2 bg-blue-600 text-white rounded"
+        onClick={() => keycloak.login()}
+      >
+        Iniciar sesión
+      </button>
+    </div>
+  );
+}
