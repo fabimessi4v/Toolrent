@@ -14,8 +14,10 @@ import java.util.UUID;
 @Table(name = "users")
 
 public class Users {
+    @Column(name = "external_id", unique = true)
+    private String externalId;
     @Id
-    private UUID id;
+    private String id;
     @Column(name = "username")
     private String username;
     @Column(name = "password")
@@ -26,11 +28,10 @@ public class Users {
     @Column(name = "createdAt", updatable = false) // Cambiar según el nombre real de tu columna
     private LocalDateTime createdAt;
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
-
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -64,5 +65,13 @@ public class Users {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
     }
 }

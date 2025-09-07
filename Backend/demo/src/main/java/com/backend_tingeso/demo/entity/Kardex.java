@@ -12,7 +12,7 @@ import java.util.UUID;
 @Table(name = "kardex")
 public class Kardex {
     @Id
-    private UUID id;
+    private String id;
     // Relación ManyToOne: Una herramienta puede tener muchos movimientos (kardex)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "tool_id", nullable = false)
@@ -22,23 +22,25 @@ public class Kardex {
     @JoinColumn(name = "user_id", nullable = false)
     private Users users;
     // Relación ManyToOne: Un prestamo puede generar varios movimientos en el kardex
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "loans_id", nullable = false)
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "loans_id", nullable = true)
     private Loans loans;
     private String type;
     @Column(name = "quantity")
     private Integer quantity;
     @Column(name = "movement_date")
     private Date movementDate;
+    @Column(name = "comments")
+    private String comments;
     @CreationTimestamp
     @Column(name = "createdAt", updatable = false) // Cambiar según el nombre real de tu columna
     private LocalDateTime createdAt;
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -96,5 +98,11 @@ public class Kardex {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+    public String getComments() {
+        return comments;
+    }
+    public void setComments(String comments) {
+        this.comments = comments;
     }
 }

@@ -44,13 +44,7 @@ if (!initialized) {
   const renderContent = () => {
     switch (currentSection) {
       case "dashboard": return <Dashboard onNavigate={handleNavigate} onLogout={handleLogout} />;
-      case "tools":
-        if (keycloak.hasRealmRole("ADMIN") || keycloak.hasResourceRole("ADMIN", "toolrent-frontend")) {
-          return <ToolsManagement onNavigate={handleNavigate} />;}
-        else if (keycloak.hasRealmRole("EMPLOYEE") || keycloak.hasResourceRole("EMPLOYEE", "toolrent-frontend")) {
-          return <EmployeeDashboard onNavigate={handleNavigate} />;}
-          else {
-              return <div>No tienes acceso a esta sección.</div>;}
+      case "tools": return <ToolsManagement onNavigate={handleNavigate} />;
       case "loans": return <LoansManagement onNavigate={handleNavigate} />;
       case "clients": return <ClientsManagement onNavigate={handleNavigate} />;
       case "kardex": return <KardexManagement onNavigate={handleNavigate} />;

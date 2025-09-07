@@ -10,7 +10,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * Esta clase contiene la lógica real. Implementa la interfaz y usa el ToolsRepository para interactuar con la base de datos.
  *
@@ -24,7 +25,7 @@ public class ToolsServiceImpl implements ToolsService {
     private final ToolsRepository toolsRepository;
     private final KardexService kardexService;
     private final AuthService authService;
-
+    private static final Logger log = LoggerFactory.getLogger(ToolsServiceImpl.class);
     // Spring automáticamente nos "pasa" una instancia de ToolRepository
     public  ToolsServiceImpl(ToolsRepository toolRepository, KardexService kardexService, AuthService authService) {
         this.toolsRepository = toolRepository;
@@ -56,7 +57,18 @@ public class ToolsServiceImpl implements ToolsService {
         validarEstado(tool.getStatus());
         // el nuevo registro de una herramienta, genera movimiento en el kardex
         Tools savedTool = toolsRepository.save(tool);
-        kardexService.createKardex(savedTool, authService.getCurrentUser(), "Registro nuevo");
+
+        // Obtener usuario actual
+        Users currentUser = authService.getCurrentUser();
+        if (currentUser == null) {
+            throw new IllegalStateException("No se pudo obtener el usuario autenticado");
+        }
+
+        log.info("Usuario obtenido: ID={}, username={}", currentUser.getId(), currentUser.getUsername()); // ✅ Debug
+
+        // Generar movimiento en el kardex
+        kardexService.createKardex(savedTool, currentUser, null, "Registro nuevo", 1, "");
+
         return savedTool;
     }
 

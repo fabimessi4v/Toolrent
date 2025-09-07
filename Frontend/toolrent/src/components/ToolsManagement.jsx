@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getTools } from "../services/toolService";
+import { getTools, createTool, deleteTool } from "../services/toolService";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -19,20 +19,29 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "./ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Textarea } from "./ui/textarea";
+import keycloak from "../keycloak";
 
 export function ToolsManagement({ onNavigate }) {
   const [tools, setTools] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [form, setForm] = useState({
+    name: "",
+    category: "",
+    rentalPrice: "",
+    replacementValue: "",
+    stock: "",
+  });
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     async function fetchTools() {
       setLoading(true);
       try {
         const response = await getTools();
-        console.log(response); // Verifica el formato
-        setTools(response.data || []); // Usa solo el array de herramientas
+        console.log(response);
+        setTools(response.data || []);
       } catch (err) {
         setTools([]);
       } finally {
@@ -80,6 +89,142 @@ export function ToolsManagement({ onNavigate }) {
     }
   };
 
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setForm((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleCategoryChange = (value) => {
+    setForm((prev) => ({ ...prev, category: value }));
+  };
+
+  const validarEstado = (estado) => {
+    const estadosPermitidos = ["Disponible", "Prestada", "En reparación", "Dada de baja"];
+    return estadosPermitidos.includes(estado) ? estado : "disponible";
+  };
+
+  const handleStatusChange = (value) => {
+    setForm((prev) => ({ ...prev, status: value }));
+  };
+
+  const handleAddTool = async () => {
+    if (!form.name?.trim() || !form.category?.trim()) {
+      alert("Nombre y categoría son obligatorios");
+      return;
+    }
+    if (!form.replacementValue || isNaN(form.replacementValue)) {
+      alert("El valor de reposición es obligatorio y debe ser un número");
+      return;
+    }
+
+    setAdding(true);
+    try {
+      const payload = {
+        name: form.name.trim(),
+        category: form.category.trim(),
+        replacementValue: Number(form.replacementValue),
+        rentalPrice: form.rentalPrice ? Number(form.rentalPrice) : 0,
+        stock: form.stock ? parseInt(form.stock) : 0,
+        status: validarEstado(form.status || "disponible"),
+      };
+      console.log("Payload enviado:", payload);
+
+      await createTool(payload);
+
+      setForm({
+        name: "",
+        category: "",
+        replacementValue: "",
+        rentalPrice: "",
+        stock: "",
+        status: ""
+      });
+
+      setLoading(true);
+      const response = await getTools();
+      setTools(response.data || []);
+      setLoading(false);
+    } catch (err) {
+      alert("Error al agregar herramienta: " + (err.response?.data?.message || err.message));
+      console.error("Error backend:", err.response?.data);
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  // Función para verificar acceso de administrador - CORREGIDA
+  const hasAdminAccess = () => {
+    try {
+      const token = keycloak?.tokenParsed;
+      
+      if (!token || !keycloak?.authenticated) {
+        console.log("❌ Usuario no autenticado");
+        return false;
+      }
+
+      // Buscar específicamente en el cliente "toolrent-frontend"
+      const toolrentFrontendRoles = token?.resource_access?.["toolrent-frontend"]?.roles || [];
+      
+      // Verificar si tiene el rol "ADMIN" (en mayúsculas como está en Keycloak)
+      const hasAdminRole = toolrentFrontendRoles.includes("ADMIN");
+      
+      console.log("🔍 Verificación de roles admin:", {
+        username: token?.preferred_username,
+        email: token?.email,
+        toolrentFrontendRoles,
+        hasAdminRole,
+        fullResourceAccess: token?.resource_access
+      });
+
+      if (hasAdminRole) {
+        console.log("✅ Usuario tiene rol ADMIN en toolrent-frontend");
+      } else {
+        console.log("❌ Usuario NO tiene rol ADMIN en toolrent-frontend");
+      }
+
+      return hasAdminRole;
+      
+    } catch (error) {
+      console.error("❌ Error verificando acceso admin:", error);
+      return false;
+    }
+  };
+
+  // Función para verificar si es empleado (opcional, por si la necesitas después)
+  const hasEmployeeAccess = () => {
+    try {
+      const token = keycloak?.tokenParsed;
+      
+      if (!token || !keycloak?.authenticated) {
+        return false;
+      }
+
+      const toolrentFrontendRoles = token?.resource_access?.["toolrent-frontend"]?.roles || [];
+      return toolrentFrontendRoles.includes("EMPLEADO");
+      
+    } catch (error) {
+      console.error("Error verificando acceso empleado:", error);
+      return false;
+    }
+  };
+
+  const handleDeleteTool = async (id) => {
+    if (!hasAdminAccess()) {
+      alert("Solo el administrador puede dar de baja herramientas.");
+      return;
+    }
+    if (!window.confirm("¿Seguro que quieres dar de baja esta herramienta?")) return;
+    try {
+      await deleteTool(id);
+      setLoading(true);
+      const response = await getTools();
+      setTools(response.data || []);
+      setLoading(false);
+    } catch (err) {
+      alert("Error al dar de baja: " + (err.response?.data || err.message));
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -103,58 +248,56 @@ export function ToolsManagement({ onNavigate }) {
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="tool-name">Nombre de la herramienta</Label>
-                <Input id="tool-name" placeholder="Ej: Taladro Percutor Bosch" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="brand">Marca</Label>
-                  <Input id="brand" placeholder="Bosch" />
-                </div>
-                <div>
-                  <Label htmlFor="model">Modelo</Label>
-                  <Input id="model" placeholder="GSB 120" />
-                </div>
+                <Label htmlFor="name">Nombre de la herramienta</Label>
+                <Input id="name" value={form.name} onChange={handleInputChange} placeholder="Ej: Taladro Percutor Bosch" />
               </div>
               <div>
                 <Label htmlFor="category">Categoría</Label>
-                <Select>
+                <Select value={form.category} onValueChange={handleCategoryChange}>
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar categoría" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="taladros">Taladros</SelectItem>
-                    <SelectItem value="sierras">Sierras</SelectItem>
-                    <SelectItem value="soldadoras">Soldadoras</SelectItem>
-                    <SelectItem value="amoladoras">Amoladoras</SelectItem>
+                    <SelectItem value="Manual">Manual</SelectItem>
+                    <SelectItem value="Electrica">Electrica</SelectItem>
+                    <SelectItem value="Equipo de Seguridad">Equipo de Seguridad</SelectItem>
+                    <SelectItem value="Soldadura">Soldadura</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="rental-rate">Tarifa arriendo/día ($)</Label>
-                  <Input id="rental-rate" type="number" placeholder="450" />
-                </div>
-                <div>
-                  <Label htmlFor="fine-rate">Tarifa multa/día ($)</Label>
-                  <Input id="fine-rate" type="number" placeholder="45" />
+                  <Label htmlFor="rentalPrice">Tarifa arriendo/día ($)</Label>
+                  <Input id="rentalPrice" type="number" value={form.rentalPrice} onChange={handleInputChange} placeholder="450" />
                 </div>
               </div>
               <div>
-                <Label htmlFor="replacement-value">Valor de reposición ($)</Label>
-                <Input id="replacement-value" type="number" placeholder="85000" />
+                <Label htmlFor="replacementValue">Valor de reposición ($)</Label>
+                <Input id="replacementValue" type="number" value={form.replacementValue} onChange={handleInputChange} placeholder="85000" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="stock">Stock inicial</Label>
-                  <Input id="stock" type="number" placeholder="1" min="1" />
-                </div>
-                <div>
-                  <Label htmlFor="location">Ubicación</Label>
-                  <Input id="location" placeholder="Bodega A - Sector 1" />
+                  <Input id="stock" type="number" value={form.stock} onChange={handleInputChange} placeholder="0" min="0" />
                 </div>
               </div>
-              <Button className="w-full">Agregar Herramienta</Button>
+               <div>
+                <Label htmlFor="status">Estado</Label>
+                <Select value={form.status} onValueChange={handleStatusChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Disponible">Disponible</SelectItem>
+                    <SelectItem value="Prestada">Prestada</SelectItem>
+                    <SelectItem value="En reparación">En reparación</SelectItem>
+                    <SelectItem value="Dada de baja">Dada de baja</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button className="w-full" onClick={handleAddTool} disabled={adding}>
+                {adding ? "Agregando..." : "Agregar Herramienta"}
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -245,8 +388,14 @@ export function ToolsManagement({ onNavigate }) {
                       <Edit3 className="h-4 w-4 mr-2" />
                       Editar
                     </Button>
-                    {tool.status !== "Dada de baja" && (
-                      <Button variant="destructive" size="sm" className="flex-1">
+                    {/* Solo muestra el botón "Dar de Baja" si es ADMIN Y la herramienta no está dada de baja */}
+                    {tool.status !== "Dada de baja" && hasAdminAccess() && (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => handleDeleteTool(tool.id)}
+                      >
                         <Trash2 className="h-4 w-4 mr-2" />
                         Dar de Baja
                       </Button>
@@ -279,6 +428,32 @@ export function ToolsManagement({ onNavigate }) {
             </Button>
           </CardContent>
         </Card>
+      )}
+
+      {/* Debug info actualizado */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="mt-4 p-4 bg-gray-100 text-xs border rounded">
+          <strong>🔍 Debug Info:</strong>
+          <br />
+          Authenticated: {keycloak?.authenticated ? '✅ Sí' : '❌ No'}
+          <br />
+          Has Admin Access: {hasAdminAccess() ? '✅ Sí' : '❌ No'}
+          <br />
+          Has Employee Access: {hasEmployeeAccess() ? '✅ Sí' : '❌ No'}
+          <br />
+          Username: {keycloak?.tokenParsed?.preferred_username || 'No username'}
+          <br />
+          Email: {keycloak?.tokenParsed?.email || 'No email'}
+          <br />
+          Toolrent-frontend roles: {JSON.stringify(keycloak?.tokenParsed?.resource_access?.["toolrent-frontend"]?.roles || [])}
+          <br />
+          <details className="mt-2">
+            <summary className="cursor-pointer font-bold">Ver resource_access completo</summary>
+            <pre className="mt-2 p-2 bg-white border rounded text-xs overflow-auto max-h-40">
+              {JSON.stringify(keycloak?.tokenParsed?.resource_access, null, 2)}
+            </pre>
+          </details>
+        </div>
       )}
     </div>
   );
