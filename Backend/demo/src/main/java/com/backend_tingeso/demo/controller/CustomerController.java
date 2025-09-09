@@ -21,15 +21,26 @@ public class CustomerController {
             this.customerService = customerService;
         }
 
-        @PostMapping
-        public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
-            Customer newCustomer = customerService.createCustomer(customer);
-            return new ResponseEntity<>(newCustomer, HttpStatus.CREATED);
-        }
+
 
         @GetMapping
         public List<Customer> getAllCustomers() {
             return customerService.getAllCustomers();
         }
-
+    @PostMapping
+    public ResponseEntity<?> createCustomer(@RequestBody Customer customer) {
+        System.out.println("DEBUG: Recibiendo petición para crear cliente: " + customer);
+        try {
+            Customer createdCustomer = customerService.createCustomer(customer);
+            System.out.println("DEBUG: Cliente creado: " + createdCustomer);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdCustomer);
+        } catch (IllegalArgumentException e) {
+            System.out.println("ERROR: Datos inválidos al crear cliente: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            System.out.println("ERROR: Exception inesperada al crear cliente: " + e.getMessage());
+            e.printStackTrace(); // Esto imprime el stacktrace en consola
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear el cliente.");
+        }
     }
+}

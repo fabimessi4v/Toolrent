@@ -11,6 +11,6 @@ import org.springframework.stereotype.Repository;
  * El segundo es el tipo de la clave primaria (id) de esa entidad.
  */
 @Repository
-public interface CustomerRepository extends JpaRepository<Customer, Integer> {
+public interface CustomerRepository extends JpaRepository<Customer, String> {
 
 }

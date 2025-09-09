@@ -2,7 +2,7 @@ package com.backend_tingeso.demo.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.Date;
 
 @Entity
 @Table(name = "customers")
@@ -10,7 +10,7 @@ public class Customer {
 
 
     @Id
-    private UUID id;
+    private String id;
     private String name;
 
     @Column(unique = true, nullable = false)
@@ -23,13 +23,12 @@ public class Customer {
 
     private String status;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
-
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
     public String getName() {
@@ -75,7 +74,8 @@ public class Customer {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    } }
+    }
+
+}

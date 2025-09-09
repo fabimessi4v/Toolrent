@@ -12,7 +12,7 @@ import java.util.UUID;
 @Table(name = "loans")
 public class Loans {
     @Id
-    private UUID id;
+    private String id;
     // Relación ManyToOne: Un usuario tiene muchos prestamos
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "client_id", nullable = false)
@@ -39,11 +39,10 @@ public class Loans {
     @Column(name = "createdAt", updatable = false) // Cambiar según el nombre real de tu columna
     private LocalDateTime createdAt;
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
-
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 

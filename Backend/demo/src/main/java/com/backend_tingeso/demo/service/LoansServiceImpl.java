@@ -5,12 +5,13 @@ import com.backend_tingeso.demo.repository.FeeRepository;
 import com.backend_tingeso.demo.repository.KardexRepository;
 import com.backend_tingeso.demo.repository.LoansRepository;
 import com.backend_tingeso.demo.repository.ToolsRepository;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
+@Service
 public class LoansServiceImpl implements LoansService {
     private final LoansRepository loansRepository;
     private final KardexRepository kardexRepository;
@@ -29,7 +30,7 @@ public class LoansServiceImpl implements LoansService {
         }
         // 1. Construir el objeto Loans
         Loans loan = new Loans();
-        loan.setId(UUID.randomUUID());
+        loan.setId(String.valueOf(UUID.randomUUID()));
         loan.setClient(user);
         loan.setTool(tool);
         loan.setCustomer(customer);
@@ -43,11 +44,14 @@ public class LoansServiceImpl implements LoansService {
 
         // 3. Crear registro en el Kardex
         Kardex kardex = new Kardex();
+        kardex.setId(UUID.randomUUID().toString());
         kardex.setCreatedAt(LocalDateTime.now());
         kardex.setType("LOAN");
         kardex.setTool(tool);
         kardex.setUsers(user);
         kardex.setLoans(nuevoPrestamo);
+        kardex.setMovementDate(new Date());
+        kardex.setQuantity(1);
         kardexRepository.save(kardex);
 
         // 4. Retornar el préstamo creado

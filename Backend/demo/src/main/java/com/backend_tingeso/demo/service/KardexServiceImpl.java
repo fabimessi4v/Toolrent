@@ -43,7 +43,7 @@ public class KardexServiceImpl implements KardexService {
         log.info("Creando kardex para usuario ID: {}, username: {}", user.getId(), user.getUsername());
         Kardex kardex = new Kardex();
         // Si tu ID es String, convierto el UUID a String
-        kardex.setId(String.valueOf(UUID.fromString(UUID.randomUUID().toString())));
+        kardex.setId(UUID.randomUUID().toString());
         kardex.setTool(tool);
         kardex.setUsers(user);
         kardex.setLoans(loan); // loan puede ser nulo

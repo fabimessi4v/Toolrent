@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -17,96 +17,25 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Label } from "./ui/label";
 
+// IMPORTA TU SERVICIO
+import { getAllCustomers } from "../services/customerService.js";
+
 export function ClientsManagement({ onNavigate }) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [clients, setClients] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const clients = [
-    {
-      id: "C001",
-      name: "Juan Pérez",
-      rut: "12.345.678-9",
-      email: "juan.perez@email.com",
-      phone: "+56 9 1234 5678",
-      address: "Av. Libertador 1234, Santiago",
-      registrationDate: "2025-01-15",
-      totalLoans: 8,
-      activeLoans: 1,
-      overdueLoans: 0,
-      status: "Activo",
-      unpaidFines: 0,
-      replacementDebts: 0,
-      lastLoanDate: "2025-08-26",
-      notes: "Cliente preferencial"
-    },
-    {
-      id: "C002",
-      name: "María González",
-      rut: "11.222.333-4", 
-      email: "maria.gonzalez@email.com",
-      phone: "+56 9 8765 4321",
-      address: "Los Robles 567, Las Condes",
-      registrationDate: "2025-02-20",
-      totalLoans: 5,
-      activeLoans: 1,
-      overdueLoans: 0,
-      status: "Activo",
-      unpaidFines: 0,
-      replacementDebts: 0,
-      lastLoanDate: "2025-08-25",
-      notes: ""
-    },
-    {
-      id: "C003",
-      name: "Carlos Ruiz",
-      rut: "13.444.555-6",
-      email: "carlos.ruiz@email.com",
-      phone: "+56 9 5555 1234",
-      address: "Santa Rosa 890, Ñuñoa",
-      registrationDate: "2025-03-10",
-      totalLoans: 12,
-      activeLoans: 0,
-      overdueLoans: 1,
-      status: "Restringido",
-      unpaidFines: 75,
-      replacementDebts: 0,
-      lastLoanDate: "2025-08-24",
-      notes: "Préstamo vencido desde 2025-08-28"
-    },
-    {
-      id: "C004",
-      name: "Ana López",
-      rut: "14.666.777-8",
-      email: "ana.lopez@email.com",
-      phone: "+56 9 9999 8888",
-      address: "Pedro de Valdivia 345, Providencia",
-      registrationDate: "2025-01-05",
-      totalLoans: 15,
-      activeLoans: 0,
-      overdueLoans: 0,
-      status: "Activo",
-      unpaidFines: 0,
-      replacementDebts: 0,
-      lastLoanDate: "2025-08-24",
-      notes: "Cliente excelente, siempre devuelve a tiempo"
-    },
-    {
-      id: "C005",
-      name: "Pedro Sánchez",
-      rut: "15.888.999-0",
-      email: "pedro.sanchez@email.com",
-      phone: "+56 9 7777 6666",
-      address: "Maipú 445, Centro",
-      registrationDate: "2024-12-01",
-      totalLoans: 3,
-      activeLoans: 0,
-      overdueLoans: 0,
-      status: "Restringido",
-      unpaidFines: 0,
-      replacementDebts: 120000,
-      lastLoanDate: "2025-08-15",
-      notes: "Debe valor de reposición de Martillo Demoledor"
-    }
-  ];
+  useEffect(() => {
+    getAllCustomers()
+      .then(response => {
+        setClients(response.data); // Asume que response.data es un array
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error("Error al obtener clientes:", error);
+        setLoading(false);
+      });
+  }, []);
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -121,9 +50,9 @@ export function ClientsManagement({ onNavigate }) {
 
   const filteredClients = clients.filter(client => 
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.rut.includes(searchTerm) ||
-    client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.phone.includes(searchTerm)
+    client.rut?.includes(searchTerm) ||
+    client.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.phone?.includes(searchTerm)
   );
 
   return (
@@ -233,7 +162,7 @@ export function ClientsManagement({ onNavigate }) {
               <div>
                 <p className="text-sm text-muted-foreground">Arriendos Activos</p>
                 <p className="text-2xl font-semibold">
-                  {clients.reduce((sum, c) => sum + c.activeLoans, 0)}
+                  {clients.reduce((sum, c) => sum + (c.activeLoans || 0), 0)}
                 </p>
               </div>
             </div>
@@ -257,89 +186,97 @@ export function ClientsManagement({ onNavigate }) {
       </Card>
 
       {/* Clients List */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredClients.map((client) => (
-          <Card key={client.id}>
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    {client.name}
-                    {getStatusBadge(client.status)}
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Cliente desde {new Date(client.registrationDate).toLocaleDateString('es-CL')}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <Edit3 className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">{client.email}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">{client.phone}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">{client.address}</span>
-                </div>
-              </div>
-
-              <div className="mt-4 pt-4 border-t">
-                <div className="grid grid-cols-2 gap-4">
+      {loading ? (
+        <Card>
+          <CardContent className="p-8 text-center">
+            <User className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="font-semibold mb-2">Cargando clientes...</h3>
+            <p className="text-muted-foreground mb-4">
+              Por favor espera mientras se obtiene la información.
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {filteredClients.map((client) => (
+            <Card key={client.id}>
+              <CardHeader>
+                <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Arriendos totales</p>
-                    <p className="font-semibold">{client.totalLoans}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Arriendos activos</p>
-                    <p className="font-semibold">{client.activeLoans}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Multas impagas</p>
-                    <p className={`font-semibold ${
-                      client.unpaidFines > 0 ? 'text-red-600' : 'text-green-600'
-                    }`}>
-                      ${client.unpaidFines.toLocaleString()}
+                    <CardTitle className="flex items-center gap-2">
+                      {client.name}
+                      {getStatusBadge(client.status)}
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Cliente desde {client.registrationDate ? new Date(client.registrationDate).toLocaleDateString('es-CL') : ""}
                     </p>
                   </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Reposiciones</p>
-                    <p className={`font-semibold ${
-                      client.replacementDebts > 0 ? 'text-red-600' : 'text-green-600'
-                    }`}>
-                      ${client.replacementDebts.toLocaleString()}
-                    </p>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm">
+                      <Edit3 className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-              </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">{client.email}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">{client.phone}</span>
+                  </div>
+                </div>
 
-              <div className="mt-4 flex gap-2">
-                <Button variant="outline" size="sm" className="flex-1">
-                  Ver Historial
-                </Button>
-                <Button variant="outline" size="sm" className="flex-1">
-                  Nuevo Arriendo
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                <div className="mt-4 pt-4 border-t">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Arriendos totales</p>
+                      <p className="font-semibold">{client.totalLoans ?? 0}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Arriendos activos</p>
+                      <p className="font-semibold">{client.activeLoans ?? 0}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Multas impagas</p>
+                      <p className={`font-semibold ${
+                        (client.unpaidFines ?? 0) > 0 ? 'text-red-600' : 'text-green-600'
+                      }`}>
+                        ${client.unpaidFines?.toLocaleString() ?? "0"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Reposiciones</p>
+                      <p className={`font-semibold ${
+                        (client.replacementDebts ?? 0) > 0 ? 'text-red-600' : 'text-green-600'
+                      }`}>
+                        ${client.replacementDebts?.toLocaleString() ?? "0"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
-      {filteredClients.length === 0 && (
+                <div className="mt-4 flex gap-2">
+                  <Button variant="outline" size="sm" className="flex-1">
+                    Ver Historial
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1">
+                    Nuevo Arriendo
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {!loading && filteredClients.length === 0 && (
         <Card>
           <CardContent className="p-8 text-center">
             <User className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
