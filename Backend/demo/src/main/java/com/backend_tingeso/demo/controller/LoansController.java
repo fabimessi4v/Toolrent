@@ -9,12 +9,14 @@ import com.backend_tingeso.demo.repository.CustomerRepository;
 import com.backend_tingeso.demo.repository.ToolsRepository;
 import com.backend_tingeso.demo.service.AuthService;
 import com.backend_tingeso.demo.service.LoansService;
+import com.backend_tingeso.demo.service.LoansServiceImpl;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -88,4 +90,48 @@ public class LoansController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
+    @GetMapping
+    public ResponseEntity<List<LoansServiceImpl.LoansDTO>> getAllLoans() {
+        try {
+            List<LoansServiceImpl.LoansDTO> loansList = loansService.getLoans();
+            return ResponseEntity.ok(loansList);
+        } catch (Exception ex) {
+            log.error("Error fetching loans: ", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    @PutMapping("/{loanId}/return")
+    public ResponseEntity<?> returnLoan(@PathVariable String loanId) {
+        try {
+            Date returnDate = new Date(); // fecha actual
+            Loans updatedLoan = loansService.registerReturn(loanId, returnDate);
+
+            // Mapeo a DTO (puedes extraer a un método si quieres)
+            LoansServiceImpl.LoansDTO dto = new LoansServiceImpl.LoansDTO(
+                    updatedLoan.getId(),
+                    updatedLoan.getTool() != null ? updatedLoan.getTool().getName() : null,
+                    updatedLoan.getCustomer() != null ? updatedLoan.getCustomer().getName() : null,
+                    updatedLoan.getClient() != null ? updatedLoan.getClient().getUsername() : null,
+                    updatedLoan.getDeliveryDate(),
+                    updatedLoan.getDueDate(),
+                    updatedLoan.getReturnDate(),
+                    updatedLoan.getStatus(),
+                    updatedLoan.getFine()
+            );
+
+            return ResponseEntity.ok(dto);
+
+        } catch (IllegalArgumentException ex) {
+            // Si el préstamo no existe, responde 404 y con mensaje legible
+            return ResponseEntity.status(404).body(
+                    java.util.Collections.singletonMap("message", ex.getMessage())
+            );
+        } catch (Exception ex) {
+            // Otros errores
+            return ResponseEntity.status(400).body(
+                    java.util.Collections.singletonMap("message", ex.getMessage())
+            );
+        }
+    }
+
 }

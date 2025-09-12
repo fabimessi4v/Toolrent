@@ -4,6 +4,7 @@ package com.backend_tingeso.demo.entity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
@@ -14,22 +15,22 @@ public class Kardex {
     @Id
     private String id;
     // Relación ManyToOne: Una herramienta puede tener muchos movimientos (kardex)
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "tool_id", nullable = false)
     private Tools tool;
     // Relación ManyToOne: Un usuario registrar muchos movimientos en el kardex
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private Users users;
     // Relación ManyToOne: Un prestamo puede generar varios movimientos en el kardex
-    @ManyToOne(optional = true)
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
     @JoinColumn(name = "loans_id", nullable = true)
     private Loans loans;
     private String type;
     @Column(name = "quantity")
     private Integer quantity;
     @Column(name = "movement_date")
-    private Date movementDate;
+    private LocalDate movementDate;
     @Column(name = "comments")
     private String comments;
     @CreationTimestamp
@@ -84,11 +85,10 @@ public class Kardex {
         this.quantity = quantity;
     }
 
-    public Date getMovementDate() {
+    public LocalDate getMovementDate() {
         return movementDate;
     }
-
-    public void setMovementDate(Date movementDate) {
+    public void setMovementDate(LocalDate movementDate) {
         this.movementDate = movementDate;
     }
 

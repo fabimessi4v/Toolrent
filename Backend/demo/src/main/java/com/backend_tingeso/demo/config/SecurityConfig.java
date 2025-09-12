@@ -48,6 +48,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/tools", "/api/v1/tools/**").authenticated()
                         .requestMatchers("/api/v1/loans", "/api/v1/loans/**").authenticated()
                         .requestMatchers("/api/v1/customers", "/api/v1/customers/**").authenticated()
+                        .requestMatchers("/api/v1/kardex", "/api/v1/kardex/**").authenticated()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
                 )

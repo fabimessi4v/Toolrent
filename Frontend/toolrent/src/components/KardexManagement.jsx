@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -6,7 +6,6 @@ import { Badge } from "./ui/badge";
 import { 
   Search, 
   Filter, 
-  Calendar,
   Package,
   ArrowUp,
   ArrowDown,
@@ -16,20 +15,27 @@ import {
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { getAllKardex } from "../services/kardexService"; // ajusta la ruta si es diferente
 
 export function KardexManagement({ onNavigate }) {
+  const [movements, setMovements] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("all");
   const [selectedTool, setSelectedTool] = useState("all");
 
-  const movements = [
-    { id: "M001", date: "2025-08-28", time: "09:30:00", type: "Ingreso", toolId: "T001", toolName: "Taladro Percutor Bosch GSB 120", quantity: 3, previousStock: 0, newStock: 3, description: "Registro inicial de herramienta", registeredBy: "admin", relatedDocument: "Compra #C001" },
-    { id: "M002", date: "2025-08-26", time: "09:00:00", type: "Préstamo", toolId: "T001", toolName: "Taladro Percutor Bosch GSB 120", quantity: -1, previousStock: 3, newStock: 2, description: "Préstamo a Juan Pérez", registeredBy: "empleado1", relatedDocument: "Préstamo #P001" },
-    { id: "M003", date: "2025-08-25", time: "14:30:00", type: "Préstamo", toolId: "T002", toolName: "Sierra Circular Makita 5007MG", quantity: -1, previousStock: 1, newStock: 0, description: "Préstamo a María González", registeredBy: "empleado1", relatedDocument: "Préstamo #P002" },
-    { id: "M004", date: "2025-08-24", time: "16:00:00", type: "Devolución", toolId: "T004", toolName: "Amoladora DeWalt DWE402", quantity: 1, previousStock: 1, newStock: 2, description: "Devolución de Ana López - Estado: Bueno", registeredBy: "empleado2", relatedDocument: "Préstamo #P004" },
-    { id: "M005", date: "2025-08-22", time: "11:15:00", type: "Reparación", toolId: "T003", toolName: "Soldadora Lincoln Electric", quantity: 0, previousStock: 1, newStock: 1, description: "Cambio de estado a En reparación", registeredBy: "admin", relatedDocument: "Orden de Trabajo #OT001" },
-    { id: "M006", date: "2025-08-20", time: "08:45:00", type: "Baja", toolId: "T005", toolName: "Martillo Demoledor Makita HM1317C", quantity: -1, previousStock: 1, newStock: 0, description: "Baja por daño irreparable - Cliente: Pedro Sánchez", registeredBy: "admin", relatedDocument: "Préstamo #P005" }
-  ];
+  useEffect(() => {
+    setLoading(true);
+    getAllKardex()
+      .then(response => {
+        setMovements(response.data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error("Error al obtener kardex:", error);
+        setLoading(false);
+      });
+  }, []);
 
   const getMovementTypeIcon = (type) => {
     switch (type) {
@@ -54,16 +60,17 @@ export function KardexManagement({ onNavigate }) {
   };
 
   const filteredMovements = movements.filter(m => {
-    const matchesSearch = m.toolName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          m.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          m.registeredBy.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          m.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      (m.toolName ?? "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (m.comments ?? "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (m.userName ?? "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (m.id ?? "").toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = selectedType === "all" || m.type === selectedType;
-    const matchesTool = selectedTool === "all" || m.toolId === selectedTool;
+    const matchesTool = selectedTool === "all" || m.toolName === selectedTool;
     return matchesSearch && matchesType && matchesTool;
   });
 
-  const uniqueTools = [...new Set(movements.map(m => ({ id: m.toolId, name: m.toolName })))];
+  const uniqueTools = [...new Set(movements.map(m => m.toolName))].map(name => ({ name }));
 
   return (
     <div className="space-y-6">
@@ -123,7 +130,9 @@ export function KardexManagement({ onNavigate }) {
               <SelectTrigger className="w-64"><Package className="h-4 w-4 mr-2" /><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas las herramientas</SelectItem>
-                {uniqueTools.map(tool => <SelectItem key={tool.id} value={tool.id}>{tool.name}</SelectItem>)}
+                {uniqueTools.map(tool => (
+                  <SelectItem key={tool.name} value={tool.name}>{tool.name}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -138,15 +147,12 @@ export function KardexManagement({ onNavigate }) {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Fecha/Hora</TableHead>
+                  <TableHead>Fecha</TableHead>
                   <TableHead>Tipo</TableHead>
                   <TableHead>Herramienta</TableHead>
                   <TableHead>Cantidad</TableHead>
-                  <TableHead>Stock Anterior</TableHead>
-                  <TableHead>Stock Nuevo</TableHead>
                   <TableHead>Descripción</TableHead>
                   <TableHead>Usuario</TableHead>
-                  <TableHead>Documento</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -154,21 +160,18 @@ export function KardexManagement({ onNavigate }) {
                   <TableRow key={m.id}>
                     <TableCell>
                       <div>
-                        <p className="font-medium">{m.date}</p>
-                        <p className="text-sm text-muted-foreground">{m.time}</p>
+                        <p className="font-medium">{m.movementDate}</p>
                       </div>
                     </TableCell>
-                    <TableCell className="flex items-center gap-2">{getMovementTypeIcon(m.type)}{getMovementTypeBadge(m.type)}</TableCell>
+                    <TableCell className="flex items-center gap-2">
+                      {getMovementTypeIcon(m.type)}{getMovementTypeBadge(m.type)}
+                    </TableCell>
                     <TableCell>
                       <p className="font-medium">{m.toolName}</p>
-                      <p className="text-sm text-muted-foreground">#{m.toolId}</p>
                     </TableCell>
                     <TableCell className={`font-semibold ${m.quantity > 0 ? 'text-green-600' : m.quantity < 0 ? 'text-red-600' : 'text-gray-600'}`}>{m.quantity > 0 ? '+' : ''}{m.quantity}</TableCell>
-                    <TableCell>{m.previousStock}</TableCell>
-                    <TableCell className="font-semibold">{m.newStock}</TableCell>
-                    <TableCell className="max-w-xs text-sm">{m.description}</TableCell>
-                    <TableCell className="text-sm">{m.registeredBy}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{m.relatedDocument}</TableCell>
+                    <TableCell className="max-w-xs text-sm">{m.comments}</TableCell>
+                    <TableCell className="text-sm">{m.userName}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -185,6 +188,11 @@ export function KardexManagement({ onNavigate }) {
           )}
         </CardContent>
       </Card>
+      {loading && (
+        <div className="flex justify-center items-center py-8">
+          <p>Cargando movimientos...</p>
+        </div>
+      )}
     </div>
   );
 }

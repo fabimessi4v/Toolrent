@@ -1,9 +1,8 @@
 import axios from 'axios';
 import keycloak from '../keycloak'; // asegúrate de la ruta correcta
-
-// Ajusta el puerto/baseURL según tu backend
+// Asegúrate de que tu API de Spring Boot corre en el puerto 8080
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8081/api/v1',
+  baseURL: 'http://localhost:8081/api/v1', 
   headers: {
     'Content-Type': 'application/json'
   }
@@ -20,17 +19,7 @@ apiClient.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
-
-// Obtener todos los préstamos
-export const getAllLoans = () => {
-  return apiClient.get('/loans');
-};
-
-// Crear un nuevo préstamo
-export const createLoan = (loanData) => {
-  return apiClient.post('/loans', loanData);
-};
-// Devolver un préstamo
-export const returnLoan = (loanId) => {
-  return apiClient.put(`/loans/${loanId}/return`);
+// Función que usará tu lista para obtener los datos
+export const getAllKardex = () => {
+  return apiClient.get('/kardex');
 };

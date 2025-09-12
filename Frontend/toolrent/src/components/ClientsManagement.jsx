@@ -9,7 +9,6 @@ import {
   User,
   Phone,
   Mail,
-  MapPin,
   Calendar,
   Edit3,
   Trash2
@@ -18,16 +17,31 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "./ui/label";
 
 // IMPORTA TU SERVICIO
-import { getAllCustomers } from "../services/customerService.js";
+import { getAllCustomers, createCustomer } from "../services/customerService.js";
 
 export function ClientsManagement({ onNavigate }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Estados para crear cliente
+  const [newClient, setNewClient] = useState({
+    name: "",
+    rut: "",
+    phone: "",
+    email: "",
+    status: "Activo"
+  });
+  const [creating, setCreating] = useState(false);
+  const [error, setError] = useState(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  // Logs para saber qué pasa en la petición de clientes
   useEffect(() => {
+    console.log("Obteniendo clientes...");
     getAllCustomers()
       .then(response => {
+        console.log("Clientes recibidos:", response.data);
         setClients(response.data); // Asume que response.data es un array
         setLoading(false);
       })
@@ -36,6 +50,43 @@ export function ClientsManagement({ onNavigate }) {
         setLoading(false);
       });
   }, []);
+
+  // Maneja el cambio en los inputs del formulario
+  const handleInputChange = (e) => {
+    setNewClient({
+      ...newClient,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  // Maneja el submit del formulario para crear cliente
+  const handleCreateClient = async (e) => {
+    e.preventDefault();
+    setCreating(true);
+    setError(null);
+    console.log("Creando cliente:", newClient);
+    try {
+      const createResponse = await createCustomer(newClient);
+      console.log("Respuesta al crear cliente:", createResponse);
+      // Actualiza la lista de clientes
+      const response = await getAllCustomers();
+      console.log("Clientes actualizados tras crear:", response.data);
+      setClients(response.data);
+      setNewClient({
+        name: "",
+        rut: "",
+        phone: "",
+        email: "",
+        status: "Activo"
+      });
+      setDialogOpen(false);
+    } catch (err) {
+      setError("Error al crear el cliente");
+      console.error("Error al crear cliente:", err);
+    } finally {
+      setCreating(false);
+    }
+  };
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -49,7 +100,7 @@ export function ClientsManagement({ onNavigate }) {
   };
 
   const filteredClients = clients.filter(client => 
-    client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     client.rut?.includes(searchTerm) ||
     client.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     client.phone?.includes(searchTerm)
@@ -65,9 +116,9 @@ export function ClientsManagement({ onNavigate }) {
             Administra la información de tus clientes
           </p>
         </div>
-        <Dialog>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="gap-2">
+            <Button className="gap-2" onClick={() => setDialogOpen(true)}>
               <Plus className="h-4 w-4" />
               Agregar Cliente
             </Button>
@@ -76,34 +127,66 @@ export function ClientsManagement({ onNavigate }) {
             <DialogHeader>
               <DialogTitle>Nuevo Cliente</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
+            <form className="space-y-4" onSubmit={handleCreateClient}>
               <div>
                 <Label htmlFor="client-name">Nombre completo *</Label>
-                <Input id="client-name" placeholder="Juan Pérez" required />
+                <Input
+                  id="client-name"
+                  name="name"
+                  placeholder="Juan Pérez"
+                  required
+                  value={newClient.name}
+                  onChange={handleInputChange}
+                  disabled={creating}
+                />
               </div>
               <div>
                 <Label htmlFor="client-rut">RUT *</Label>
-                <Input id="client-rut" placeholder="12.345.678-9" required />
+                <Input
+                  id="client-rut"
+                  name="rut"
+                  placeholder="12.345.678-9"
+                  required
+                  value={newClient.rut}
+                  onChange={handleInputChange}
+                  disabled={creating}
+                />
               </div>
               <div>
                 <Label htmlFor="client-phone">Teléfono *</Label>
-                <Input id="client-phone" placeholder="+56 9 1234 5678" required />
+                <Input
+                  id="client-phone"
+                  name="phone"
+                  placeholder="+56 9 1234 5678"
+                  required
+                  value={newClient.phone}
+                  onChange={handleInputChange}
+                  disabled={creating}
+                />
               </div>
               <div>
                 <Label htmlFor="client-email">Email *</Label>
-                <Input id="client-email" type="email" placeholder="juan@email.com" required />
-              </div>
-              <div>
-                <Label htmlFor="client-address">Dirección</Label>
-                <Input id="client-address" placeholder="Av. Libertador 1234" />
+                <Input
+                  id="client-email"
+                  name="email"
+                  type="email"
+                  placeholder="juan@email.com"
+                  required
+                  value={newClient.email}
+                  onChange={handleInputChange}
+                  disabled={creating}
+                />
               </div>
               <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
                 <p className="text-sm text-blue-800">
                   <strong>Estado inicial:</strong> Activo (puede solicitar préstamos)
                 </p>
               </div>
-              <Button className="w-full">Agregar Cliente</Button>
-            </div>
+              {error && <p className="text-red-600 text-sm">{error}</p>}
+              <Button className="w-full" type="submit" disabled={creating}>
+                {creating ? "Agregando..." : "Agregar Cliente"}
+              </Button>
+            </form>
           </DialogContent>
         </Dialog>
       </div>

@@ -7,10 +7,14 @@ import com.backend_tingeso.demo.repository.LoansRepository;
 import com.backend_tingeso.demo.repository.ToolsRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
 @Service
 public class LoansServiceImpl implements LoansService {
     private final LoansRepository loansRepository;
@@ -20,6 +24,46 @@ public class LoansServiceImpl implements LoansService {
         this.loansRepository = loansRepository;
         this.kardexRepository = kardexRepository;
         this.toolsRepository = toolsRepository;
+    }
+    // DTO para préstamo
+    public static class LoansDTO {
+        public String id;
+        public String toolName;
+        public String customerName;
+        public String userName;
+        public Date deliveryDate;
+        public Date dueDate;
+        public Date returnDate;
+        public String status;
+        public Float fine;
+
+        public LoansDTO(String id, String toolName, String customerName, String userName,
+                        Date deliveryDate, Date dueDate, Date returnDate, String status, Float fine) {
+            this.id = id;
+            this.toolName = toolName;
+            this.customerName = customerName;
+            this.userName = userName;
+            this.deliveryDate = deliveryDate;
+            this.dueDate = dueDate;
+            this.returnDate = returnDate;
+            this.status = status;
+            this.fine = fine;
+        }
+    }
+
+    // Mapear entidad Loans a DTO
+    private LoansDTO toDTO(Loans loan) {
+        return new LoansDTO(
+                loan.getId(),
+                loan.getTool() != null ? loan.getTool().getName() : null,
+                loan.getCustomer() != null ? loan.getCustomer().getName() : null,
+                loan.getClient() != null ? loan.getClient().getUsername() : null,
+                loan.getDeliveryDate(),
+                loan.getDueDate(),
+                loan.getReturnDate(),
+                loan.getStatus(),
+                loan.getFine()// Si tienes campo de comentarios
+        );
     }
 
 
@@ -50,7 +94,7 @@ public class LoansServiceImpl implements LoansService {
         kardex.setTool(tool);
         kardex.setUsers(user);
         kardex.setLoans(nuevoPrestamo);
-        kardex.setMovementDate(new Date());
+        kardex.setMovementDate(java.time.LocalDate.now());
         kardex.setQuantity(1);
         kardexRepository.save(kardex);
 
@@ -73,36 +117,34 @@ public class LoansServiceImpl implements LoansService {
     }
 
     @Override
-    public Loans registerReturn(Long loanId, Date returnDate) {
-        // 1. Buscar el préstamo
+    public Loans registerReturn(String loanId, Date returnDate) {
         Loans loan = loansRepository.findById(loanId)
                 .orElseThrow(() -> new IllegalArgumentException("El préstamo no existe"));
 
-        // 2. Actualizar estado y fecha de devolución
         loan.setStatus("RETURNED");
         loan.setReturnDate(returnDate);
         loansRepository.save(loan);
 
-        // 3. Actualizar stock de la herramienta
         Tools tool = loan.getTool();
         tool.setStock(tool.getStock() + 1);
         toolsRepository.save(tool);
 
-        // 4. Registrar movimiento en Kardex
         Kardex kardex = new Kardex();
+        kardex.setId(UUID.randomUUID().toString());
         kardex.setCreatedAt(LocalDateTime.now());
+        kardex.setMovementDate(LocalDate.now());
         kardex.setType("RETURN");
         kardex.setTool(tool);
         kardex.setUsers(loan.getClient());
-        kardex.setLoans(loan);
+        kardex.setQuantity(1);
         kardexRepository.save(kardex);
 
-        // 5. Retornar el préstamo actualizado
         return loan;
     }
 
+
     @Override
-    public double calculateLateFee(Long loanId, Date actualReturnDate) {
+    public double calculateLateFee(String loanId, Date actualReturnDate) {
         // 1. Buscar el préstamo
         Loans loan = loansRepository.findById(loanId)
                 .orElseThrow(() -> new IllegalArgumentException("El préstamo no existe"));
@@ -123,5 +165,13 @@ public class LoansServiceImpl implements LoansService {
 
         // 3. Calcular multa
         return diasAtraso * multaTarifa.getValue();
+    }
+
+    @Override
+    public List<LoansDTO> getLoans() {
+        return loansRepository.findAll()
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 }
