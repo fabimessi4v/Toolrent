@@ -8,8 +8,8 @@ import java.util.Optional;
 
 
 @Repository
-public interface FeeRepository extends JpaRepository<Fee, Long> {
-    static Optional<Fee> findByType(String type) {
-        return null;
-    }
+public interface FeeRepository extends JpaRepository<Fee, String> {
+
+    // Buscar una tarifa global por su tipo
+    Optional<Fee> findByType(String type);
 }

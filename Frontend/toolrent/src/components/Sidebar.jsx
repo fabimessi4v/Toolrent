@@ -21,8 +21,9 @@ export function Sidebar({ currentSection, onNavigate, onLogout }) {
     { id: "reports", label: "Reportes", icon: BarChart3, description: "Análisis y reportes" },
   ];
 
+  // Solo cambia el id de configuración a rates para navegar correctamente
   const bottomMenuItems = [
-    { id: "settings", label: "Configuración", icon: Settings, description: "Ajustes del sistema" }
+    { id: "rates", label: "Configuración", icon: Settings, description: "Ajustes del sistema" }
   ];
 
   return (
@@ -71,6 +72,7 @@ export function Sidebar({ currentSection, onNavigate, onLogout }) {
             <div className="space-y-2 mb-4">
               {bottomMenuItems.map((item) => {
                 const Icon = item.icon;
+                // Cambia el isActive para rates
                 const isActive = currentSection === item.id;
                 return (
                   <Button

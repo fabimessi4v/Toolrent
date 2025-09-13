@@ -10,43 +10,19 @@ import java.util.UUID;
 @Table(name = "fee")
 public class Fee {
     @Id
-    private UUID id;
-    // Relación ManyToOne: Un usuario tiene muchos cargos
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "customers_id", nullable = false)
-    private Customer client;
-    // Relación ManyToOne: Un prestamo puede tener muchos cargos
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "loans_id", nullable = false)
-    private Loans loans;
+    private String id;
     private String type;
     private Integer value;
     @CreationTimestamp
     @Column(name = "createdAt", updatable = false) // Cambiar según el nombre real de tu columna
     private LocalDateTime createdAt;
+    private String updated_by;
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
-
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
-    }
-
-    public Customer getClient() {
-        return client;
-    }
-
-    public void setClient(Customer client) {
-        this.client = client;
-    }
-
-    public Loans getLoans() {
-        return loans;
-    }
-
-    public void setLoans(Loans loans) {
-        this.loans = loans;
     }
 
     public String getType() {
@@ -71,5 +47,11 @@ public class Fee {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+    public String getUpdated_by() {
+        return updated_by;
+    }
+    public void setUpdated_by(String updated_by) {
+        this.updated_by = updated_by;
     }
 }

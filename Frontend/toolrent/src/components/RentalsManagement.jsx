@@ -128,45 +128,55 @@ export function LoansManagement({ onNavigate }) {
   };
 
   // Crear préstamo llamando al backend
-  const handleCreateLoan = async () => {
-    if (!form.clientId || !form.toolId || !form.startDate || !form.endDate) {
-      alert("Completa todos los campos requeridos.");
-      return;
-    }
-    setCreating(true);
+ // Crear préstamo llamando al backend
+const handleCreateLoan = async () => {
+  if (!form.clientId || !form.toolId || !form.startDate || !form.endDate) {
+    alert("Completa todos los campos requeridos.");
+    return;
+  }
+  setCreating(true);
 
-    try {
-      const payload = {
-        toolId: form.toolId,
-        customerId: form.clientId,
-        deliveryDate: form.startDate,
-        dueDate: form.endDate
-      };
-      const response = await createLoan(payload);
-      alert("Préstamo creado con éxito");
-      setLoans(prev => [...prev, response.data]);
-      setDialogOpen(false);
-      setForm({ clientId: "", toolId: "", startDate: "", endDate: "", notes: "" });
-    } catch (e) {
-      alert("Error al crear préstamo: " + (e.response?.data || e.message));
-    } finally {
-      setCreating(false);
-    }
-  };
-
+  try {
+    const payload = {
+      toolId: form.toolId,
+      customerId: form.clientId,
+      deliveryDate: form.startDate,
+      dueDate: form.endDate
+    };
+    await createLoan(payload);
+    alert("Préstamo creado con éxito");
+    // En lugar de añadir la respuesta, recargamos la lista completa
+    fetchLoans();
+    setDialogOpen(false);
+    setForm({ clientId: "", toolId: "", startDate: "", endDate: "", notes: "" });
+  } catch (e) {
+    alert("Error al crear préstamo: " + (e.response?.data || e.message));
+  } finally {
+    setCreating(false);
+  }
+};
   // Acción para devolver préstamo
-  const handleReturnLoan = async (loanId) => {
-    try {
-      await returnLoan(loanId);
-      alert("Préstamo devuelto correctamente");
-      fetchLoans(); // Recargar la lista actualizada
-    } catch (e) {
-      alert("Error al devolver préstamo: " + 
-  (typeof e.response?.data === "string"
-    ? e.response.data
-    : e.response?.data?.message || e.message));
+ // Acción para devolver préstamo
+const handleReturnLoan = async (loanId) => {
+  try {
+    const response = await returnLoan(loanId);
+    const loanDevuelto = response.data;
+    
+    // Mensaje personalizado basado en si hay multa o no
+    if (loanDevuelto.fine && loanDevuelto.fine > 0) {
+      alert(`Préstamo devuelto correctamente.\nMulta por atraso: $${loanDevuelto.fine.toLocaleString()}`);
+    } else {
+      alert("Préstamo devuelto correctamente. No hay multa.");
     }
-  };
+    
+    fetchLoans(); // Recargar la lista actualizada
+  } catch (e) {
+    alert("Error al devolver préstamo: " + 
+      (typeof e.response?.data === "string"
+        ? e.response.data
+        : e.response?.data?.message || e.message));
+  }
+};
 
   if (!keycloak?.authenticated) {
     return (

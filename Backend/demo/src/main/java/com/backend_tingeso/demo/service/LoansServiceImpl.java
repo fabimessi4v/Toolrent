@@ -20,10 +20,12 @@ public class LoansServiceImpl implements LoansService {
     private final LoansRepository loansRepository;
     private final KardexRepository kardexRepository;
     private final ToolsRepository toolsRepository;
-    public LoansServiceImpl(LoansRepository loansRepository, KardexRepository kardexRepository, ToolsRepository toolsRepository) {
+    private final FeeRepository FeeRepository;
+    public LoansServiceImpl(LoansRepository loansRepository, KardexRepository kardexRepository, ToolsRepository toolsRepository, com.backend_tingeso.demo.repository.FeeRepository feeRepository) {
         this.loansRepository = loansRepository;
         this.kardexRepository = kardexRepository;
         this.toolsRepository = toolsRepository;
+        FeeRepository = feeRepository;
     }
     // DTO para préstamo
     public static class LoansDTO {
@@ -51,8 +53,8 @@ public class LoansServiceImpl implements LoansService {
         }
     }
 
-    // Mapear entidad Loans a DTO
-    private LoansDTO toDTO(Loans loan) {
+    // Mapear entidad Loans a DTO (ahora es público)
+    public LoansDTO toDTO(Loans loan) {
         return new LoansDTO(
                 loan.getId(),
                 loan.getTool() != null ? loan.getTool().getName() : null,
@@ -62,10 +64,9 @@ public class LoansServiceImpl implements LoansService {
                 loan.getDueDate(),
                 loan.getReturnDate(),
                 loan.getStatus(),
-                loan.getFine()// Si tienes campo de comentarios
+                loan.getFine()
         );
     }
-
 
     @Override
     public Loans registerLoan(Users user, Tools tool, Customer customer, Date deliveryDate, Date dueDate) {
@@ -123,6 +124,10 @@ public class LoansServiceImpl implements LoansService {
 
         loan.setStatus("RETURNED");
         loan.setReturnDate(returnDate);
+        // Calcular multa y guardar en el préstamo
+        float multa = (float) calculateLateFee(loanId, returnDate);
+        loan.setFine(multa);
+
         loansRepository.save(loan);
 
         Tools tool = loan.getTool();
@@ -141,7 +146,6 @@ public class LoansServiceImpl implements LoansService {
 
         return loan;
     }
-
 
     @Override
     public double calculateLateFee(String loanId, Date actualReturnDate) {

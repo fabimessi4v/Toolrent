@@ -3,6 +3,7 @@ package com.backend_tingeso.demo.entity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -35,9 +36,8 @@ public class Loans {
     private String status;
     @Column(name = "fine")
     private Float fine;
-    @CreationTimestamp
-    @Column(name = "createdAt", updatable = false) // Cambiar según el nombre real de tu columna
-    private LocalDateTime createdAt;
+    @Column(name = "createdAt", updatable = false)
+    private java.sql.Timestamp createdAt; // No uses LocalDateTime para columna TIMESTAMP si tienes problemas
 
     public String getId() {
         return id;
@@ -110,11 +110,11 @@ public class Loans {
         this.fine = fine;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 }
