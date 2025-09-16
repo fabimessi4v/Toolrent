@@ -5,6 +5,7 @@ import com.backend_tingeso.demo.service.CustomerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.backend_tingeso.demo.dto.CustomerDTO;
 
 import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173")
@@ -43,4 +44,10 @@ public class CustomerController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear el cliente.");
         }
     }
+    // Nuevo endpoint: Listar clientes con cálculos (DTO)
+    @GetMapping("/dto")
+    public List<CustomerDTO> getAllCustomersWithCalculations() {
+        return customerService.getAllCustomersWithCalculations();
+    }
+
 }

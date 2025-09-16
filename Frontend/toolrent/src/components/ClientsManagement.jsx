@@ -16,8 +16,8 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Label } from "./ui/label";
 
-// IMPORTA TU SERVICIO
-import { getAllCustomers, createCustomer } from "../services/customerService.js";
+// IMPORTA EL SERVICIO CORRECTO
+import { getAllCustomersDTO, createCustomer } from "../services/customerService.js";
 
 export function ClientsManagement({ onNavigate }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -38,11 +38,11 @@ export function ClientsManagement({ onNavigate }) {
 
   // Logs para saber qué pasa en la petición de clientes
   useEffect(() => {
-    console.log("Obteniendo clientes...");
-    getAllCustomers()
+    console.log("Obteniendo clientes DTO...");
+    getAllCustomersDTO()
       .then(response => {
-        console.log("Clientes recibidos:", response.data);
-        setClients(response.data); // Asume que response.data es un array
+        console.log("Clientes recibidos (DTO):", response.data);
+        setClients(response.data); // Asume que response.data es un array DTO
         setLoading(false);
       })
       .catch(error => {
@@ -68,8 +68,8 @@ export function ClientsManagement({ onNavigate }) {
     try {
       const createResponse = await createCustomer(newClient);
       console.log("Respuesta al crear cliente:", createResponse);
-      // Actualiza la lista de clientes
-      const response = await getAllCustomers();
+      // Actualiza la lista de clientes usando el DTO
+      const response = await getAllCustomersDTO();
       console.log("Clientes actualizados tras crear:", response.data);
       setClients(response.data);
       setNewClient({
@@ -245,6 +245,7 @@ export function ClientsManagement({ onNavigate }) {
               <div>
                 <p className="text-sm text-muted-foreground">Arriendos Activos</p>
                 <p className="text-2xl font-semibold">
+                  {/* sumamos los activeLoans de cada cliente DTO */}
                   {clients.reduce((sum, c) => sum + (c.activeLoans || 0), 0)}
                 </p>
               </div>
@@ -331,15 +332,8 @@ export function ClientsManagement({ onNavigate }) {
                       <p className={`font-semibold ${
                         (client.unpaidFines ?? 0) > 0 ? 'text-red-600' : 'text-green-600'
                       }`}>
-                        ${client.unpaidFines?.toLocaleString() ?? "0"}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Reposiciones</p>
-                      <p className={`font-semibold ${
-                        (client.replacementDebts ?? 0) > 0 ? 'text-red-600' : 'text-green-600'
-                      }`}>
-                        ${client.replacementDebts?.toLocaleString() ?? "0"}
+                        {/* Muestra 1 si tiene multa, 0 si no */}
+                        {client.unpaidFines ?? "0"}
                       </p>
                     </div>
                   </div>

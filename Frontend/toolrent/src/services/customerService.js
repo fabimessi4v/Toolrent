@@ -28,3 +28,8 @@ export const getAllCustomers = () => {
 export const createCustomer = (customerData) => {
   return apiClient.post('/customers', customerData);
 };
+
+// Función para obtener datos del DTO
+export const getAllCustomersDTO = () => {
+  return apiClient.get('/customers/dto');
+};

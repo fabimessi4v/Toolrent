@@ -1,14 +1,18 @@
 package com.backend_tingeso.demo.service;
 
 
+import com.backend_tingeso.demo.dto.CustomerDTO;
 import com.backend_tingeso.demo.entity.Customer;
+import com.backend_tingeso.demo.entity.Loans;
 import com.backend_tingeso.demo.repository.CustomerRepository;
+import com.backend_tingeso.demo.repository.LoansRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Esta clase contiene la lógica real. Implementa la interfaz y usa el CustomerRepository para interactuar con la base de datos.
@@ -18,10 +22,12 @@ import java.util.UUID;
 @Service
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
+    private final LoansRepository loanRepository;
 
     // Spring automáticamente nos "pasa" una instancia de CustomerRepository.
-    public CustomerServiceImpl(CustomerRepository customerRepository) {
+    public CustomerServiceImpl(CustomerRepository customerRepository, LoansRepository loanRepository) {
         this.customerRepository = customerRepository;
+        this.loanRepository = loanRepository;
     }
 
 
@@ -48,6 +54,62 @@ public class CustomerServiceImpl implements CustomerService {
 
         // Si usas JPA/Hibernate, el método save retorna el objeto persistido con el ID generado
         return customerRepository.save(customer);
+    }
+
+    @Override
+    public List<CustomerDTO> getAllCustomersWithCalculations() {
+        // Busca todos los clientes en la base de datos
+        List<Customer> customers = customerRepository.findAll();
+
+        // Por cada cliente, crea un DTO y calcula sus valores extra
+        return customers.stream().map(customer -> {
+            CustomerDTO dto = new CustomerDTO();
+
+            // Copia los datos básicos del cliente al DTO
+            dto.setId(customer.getId());
+            dto.setName(customer.getName());
+            dto.setEmail(customer.getEmail());
+            dto.setPhone(customer.getPhone());
+            dto.setStatus(customer.getStatus());
+
+            // Obtiene todos los préstamos (loans) asociados al cliente
+            List<Loans> loans = loanRepository.findByCustomerId(customer.getId());
+            // Total de préstamos
+            dto.setTotalLoans(loans.size());
+            // Préstamos activos
+            dto.setActiveLoans((int) loans.stream().filter(l -> l.getStatus().equals("ACTIVE")).count());
+            // Revisar si alguno de los préstamos tiene una multa asociada (fine != null)
+            boolean hasFine = loans.stream().anyMatch(loan -> loan.getFine() != null);
+            // Si tiene multa, asigna 1, si no, 0
+            dto.setUnpaidFines(hasFine ? 1 : 0);
+
+            // Devuelve el DTO para este cliente
+            return dto;
+        }).collect(Collectors.toList()); // Convierte el stream de DTOs en una lista
+    }
+
+    @Override
+    public CustomerDTO getCustomerDTOById(String customerId) {
+        Customer customer = customerRepository.findById(customerId).orElse(null);
+        if (customer == null) return null;
+
+        CustomerDTO dto = new CustomerDTO();
+        dto.setId(customer.getId());
+        dto.setName(customer.getName());
+        dto.setEmail(customer.getEmail());
+        dto.setPhone(customer.getPhone());
+        dto.setStatus(customer.getStatus());
+
+        // Préstamos y cálculos
+        List<Loans> loans = loanRepository.findByCustomerId(customer.getId());
+        dto.setTotalLoans(loans.size());
+        dto.setActiveLoans((int) loans.stream().filter(l -> l.getStatus().equals("ACTIVE")).count());
+
+        // Multa impaga: 1 si tiene multa, 0 si no
+        boolean hasFine = loans.stream().anyMatch(loan -> loan.getFine() != null);
+        dto.setUnpaidFines(hasFine ? 1 : 0);
+
+        return dto;
     }
 
 }

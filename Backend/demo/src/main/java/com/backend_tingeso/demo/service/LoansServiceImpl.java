@@ -1,5 +1,6 @@
 package com.backend_tingeso.demo.service;
 
+import com.backend_tingeso.demo.dto.CustomerDTO;
 import com.backend_tingeso.demo.entity.*;
 import com.backend_tingeso.demo.repository.FeeRepository;
 import com.backend_tingeso.demo.repository.KardexRepository;
@@ -21,11 +22,13 @@ public class LoansServiceImpl implements LoansService {
     private final KardexRepository kardexRepository;
     private final ToolsRepository toolsRepository;
     private final FeeRepository FeeRepository;
-    public LoansServiceImpl(LoansRepository loansRepository, KardexRepository kardexRepository, ToolsRepository toolsRepository, com.backend_tingeso.demo.repository.FeeRepository feeRepository) {
+    private final CustomerService customerService;
+    public LoansServiceImpl(LoansRepository loansRepository, KardexRepository kardexRepository, ToolsRepository toolsRepository, com.backend_tingeso.demo.repository.FeeRepository feeRepository, CustomerService customerService) {
         this.loansRepository = loansRepository;
         this.kardexRepository = kardexRepository;
         this.toolsRepository = toolsRepository;
         FeeRepository = feeRepository;
+        this.customerService = customerService;
     }
     // DTO para préstamo
     public static class LoansDTO {
@@ -70,6 +73,12 @@ public class LoansServiceImpl implements LoansService {
 
     @Override
     public Loans registerLoan(Users user, Tools tool, Customer customer, Date deliveryDate, Date dueDate) {
+        // Primero, obtener el DTO del customer
+        CustomerDTO customerDTO = customerService.getCustomerDTOById(customer.getId());
+        if (customerDTO.getUnpaidFines() == 1) {
+            // Si tiene multa impaga, lanzar excepción
+            throw new IllegalStateException("El cliente tiene multas impagas y no puede solicitar un nuevo préstamo.");
+        }
         if (!validateAvailability(tool.getId().toString())) {
             throw new IllegalStateException("La herramienta no tiene stock disponible para préstamo.");
         }
@@ -121,6 +130,10 @@ public class LoansServiceImpl implements LoansService {
     public Loans registerReturn(String loanId, Date returnDate) {
         Loans loan = loansRepository.findById(loanId)
                 .orElseThrow(() -> new IllegalArgumentException("El préstamo no existe"));
+        // Validar que la fecha de devolución no sea anterior a la de entrega
+        if (returnDate.before(loan.getDeliveryDate())) {
+            throw new IllegalArgumentException("La fecha de devolución no puede ser anterior a la fecha de entrega.");
+        }
 
         loan.setStatus("RETURNED");
         loan.setReturnDate(returnDate);
@@ -178,4 +191,6 @@ public class LoansServiceImpl implements LoansService {
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
+
+
 }

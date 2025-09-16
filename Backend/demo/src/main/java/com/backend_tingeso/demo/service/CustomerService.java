@@ -1,5 +1,6 @@
 package com.backend_tingeso.demo.service;
 import com.backend_tingeso.demo.entity.Customer;
+import com.backend_tingeso.demo.dto.CustomerDTO;
 
 import java.util.List;
 
@@ -11,4 +12,7 @@ import java.util.List;
 public interface CustomerService {
     List<Customer> getAllCustomers();
     Customer createCustomer(Customer customer);
+    // Nuevo método para obtener clientes con sus datos calculados
+    List<CustomerDTO> getAllCustomersWithCalculations();
+    CustomerDTO getCustomerDTOById(String customerId);
 }
