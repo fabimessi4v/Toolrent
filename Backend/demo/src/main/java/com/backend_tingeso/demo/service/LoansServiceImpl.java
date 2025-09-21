@@ -82,6 +82,10 @@ public class LoansServiceImpl implements LoansService {
         if (!validateAvailability(tool.getId().toString())) {
             throw new IllegalStateException("La herramienta no tiene stock disponible para préstamo.");
         }
+        // Validar que la fecha de devolución no sea anterior a la de entrega
+        if (dueDate.before(deliveryDate)) {
+            throw new IllegalArgumentException("La fecha de devolución no puede ser anterior a la fecha de entrega.");
+        }
         // 1. Construir el objeto Loans
         Loans loan = new Loans();
         loan.setId(String.valueOf(UUID.randomUUID()));

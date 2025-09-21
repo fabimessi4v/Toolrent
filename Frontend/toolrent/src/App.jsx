@@ -8,7 +8,7 @@ import { ClientsManagement } from "./components/ClientsManagement";
 import { KardexManagement } from "./components/KardexManagement";
 import { RatesConfiguration } from "./components/RatesConfiguration";
 import CustomerList from "./components/CustomerList";
-
+import { ReportsManagement } from "./components/ReportsManagement";
 export default function App() {
   const { keycloak, initialized } = useKeycloak();
 
@@ -50,6 +50,7 @@ if (!initialized) {
       case "kardex": return <KardexManagement onNavigate={handleNavigate} />;
       case "rates": return <RatesConfiguration onNavigate={handleNavigate} />;
       case "customers": return <CustomerList />;
+      case "reports": return <ReportsManagement onNavigate={handleNavigate} />;
       default: return <Dashboard onNavigate={handleNavigate} onLogout={handleLogout} />;
     }
   };

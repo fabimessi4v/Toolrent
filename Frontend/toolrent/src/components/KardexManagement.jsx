@@ -21,7 +21,8 @@ export function KardexManagement({ onNavigate }) {
   const [movements, setMovements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState("all");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [selectedTool, setSelectedTool] = useState("all");
 
   useEffect(() => {
@@ -59,15 +60,25 @@ export function KardexManagement({ onNavigate }) {
     }
   };
 
+  // FILTRO actualizado con rango de fechas
   const filteredMovements = movements.filter(m => {
     const matchesSearch =
       (m.toolName ?? "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       (m.comments ?? "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       (m.userName ?? "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       (m.id ?? "").toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = selectedType === "all" || m.type === selectedType;
+
     const matchesTool = selectedTool === "all" || m.toolName === selectedTool;
-    return matchesSearch && matchesType && matchesTool;
+
+    // Filtrado por rango de fechas
+    const movDate = m.movementDate ? new Date(m.movementDate) : null;
+    const fromDate = startDate ? new Date(startDate) : null;
+    const toDate = endDate ? new Date(endDate) : null;
+    let matchesDate = true;
+    if (fromDate && movDate && movDate < fromDate) matchesDate = false;
+    if (toDate && movDate && movDate > toDate) matchesDate = false;
+
+    return matchesSearch && matchesTool && matchesDate;
   });
 
   const uniqueTools = [...new Set(movements.map(m => m.toolName))].map(name => ({ name }));
@@ -80,9 +91,6 @@ export function KardexManagement({ onNavigate }) {
           <h1>Kardex y Movimientos</h1>
           <p className="text-muted-foreground">Historial completo de movimientos del inventario</p>
         </div>
-        <Button variant="outline" className="gap-2">
-          <FileText className="h-4 w-4" /> Exportar Reporte
-        </Button>
       </div>
 
       {/* Summary Cards */}
@@ -106,26 +114,23 @@ export function KardexManagement({ onNavigate }) {
       <Card>
         <CardContent className="p-4">
           <div className="flex gap-4 items-center">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder="Buscar movimientos..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Select value={selectedType} onValueChange={setSelectedType}>
-              <SelectTrigger className="w-48"><Filter className="h-4 w-4 mr-2" /><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos los tipos</SelectItem>
-                <SelectItem value="Ingreso">Ingresos</SelectItem>
-                <SelectItem value="Préstamo">Préstamos</SelectItem>
-                <SelectItem value="Devolución">Devoluciones</SelectItem>
-                <SelectItem value="Reparación">Reparaciones</SelectItem>
-                <SelectItem value="Baja">Bajas</SelectItem>
-              </SelectContent>
-            </Select>
+            {/* Fecha inicio */}
+            <Input
+              type="date"
+              value={startDate}
+              onChange={e => setStartDate(e.target.value)}
+              className="w-40"
+              placeholder="Fecha inicio"
+            />
+            {/* Fecha fin */}
+            <Input
+              type="date"
+              value={endDate}
+              onChange={e => setEndDate(e.target.value)}
+              className="w-40"
+              placeholder="Fecha fin"
+            />
+            {/* Herramienta */}
             <Select value={selectedTool} onValueChange={setSelectedTool}>
               <SelectTrigger className="w-64"><Package className="h-4 w-4 mr-2" /><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -183,7 +188,7 @@ export function KardexManagement({ onNavigate }) {
               <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="font-semibold mb-2">No se encontraron movimientos</h3>
               <p className="text-muted-foreground mb-4">No hay movimientos que coincidan con los filtros aplicados.</p>
-              <Button variant="outline" onClick={() => { setSearchTerm(""); setSelectedType("all"); setSelectedTool("all"); }}>Limpiar filtros</Button>
+              <Button variant="outline" onClick={() => { setSearchTerm(""); setStartDate(""); setEndDate(""); setSelectedTool("all"); }}>Limpiar filtros</Button>
             </div>
           )}
         </CardContent>
