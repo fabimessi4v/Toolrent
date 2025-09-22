@@ -1,12 +1,14 @@
 package com.backend_tingeso.demo.service;
 
 
+import com.backend_tingeso.demo.dto.ToolRankingDTO;
 import com.backend_tingeso.demo.entity.Tools;
 import com.backend_tingeso.demo.entity.Users;
 import com.backend_tingeso.demo.repository.ToolsRepository;
 import com.backend_tingeso.demo.repository.UsersRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -98,4 +100,37 @@ public class ToolsServiceImpl implements ToolsService {
             return false;
         }
     }
+    public List<ToolRankingDTO> getToolRanking() {
+        // Ejecuta la consulta nativa y obtiene el resultado en bruto
+        List<Object[]> results = toolsRepository.findToolRankingNative();
+
+        // Lista que contendrá los DTOs convertidos
+        List<ToolRankingDTO> ranking = new ArrayList<>();
+
+        // Itera cada fila del resultado
+        for (Object[] row : results) {
+            // Construye el DTO con cada campo convertido en su tipo correspondiente
+            ranking.add(new ToolRankingDTO(
+                    (String) row[0], // id
+                    (String) row[1], // name
+                    (String) row[2], // category
+
+                    // totalLoans (long), default 0 si es null
+                    row[3] != null ? ((Number) row[3]).longValue() : 0L,
+
+                    // activeLoans (long), default 0 si es null
+                    row[4] != null ? ((Number) row[4]).longValue() : 0L,
+
+                    // totalRevenue (double), default 0.0 si es null
+                    row[5] != null ? ((Number) row[5]).doubleValue() : 0.0,
+
+                    // totalFines (double), default 0.0 si es null
+                    row[6] != null ? ((Number) row[6]).doubleValue() : 0.0
+            ));
+        }
+
+        // Devuelve la lista ya transformada a DTOs
+        return ranking;
+    }
+
 }

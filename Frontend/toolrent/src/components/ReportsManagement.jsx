@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getAllLoans } from "../services/loansService";
+import { getAllCustomersDTO } from "../services/customerService";
+import { getToolsRanking } from "../services/toolService"; // <-- Importa el endpoint real
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -6,192 +9,90 @@ import { Label } from "./ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Badge } from "./ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Calendar, Download, Filter, BarChart3, AlertTriangle, TrendingUp } from "lucide-react";
+import { Filter, Download, BarChart3, AlertTriangle, TrendingUp } from "lucide-react";
 
 export function ReportsManagement({ onNavigate }) {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [activeTab, setActiveTab] = useState("active-loans");
 
-  // Mock data - RF6.1: Préstamos activos
-  const mockActiveLoans = [
-    {
-      id: "L001",
-      clientName: "Juan Pérez",
-      clientRut: "12.345.678-9",
-      toolName: "Taladro Bosch Professional",
-      loanDate: "2024-01-15",
-      returnDate: "2024-01-20",
-      status: "atrasado",
-      daysOverdue: 5,
-      dailyRate: 5000,
-      penalty: 2500
-    },
-    {
-      id: "L002", 
-      clientName: "María González",
-      clientRut: "98.765.432-1",
-      toolName: "Sierra Circular Makita",
-      loanDate: "2024-01-18",
-      returnDate: "2024-01-25",
-      status: "vigente",
-      dailyRate: 8000
-    },
-    {
-      id: "L003",
-      clientName: "Carlos Silva",
-      clientRut: "11.222.333-4",
-      toolName: "Amoladora Angular",
-      loanDate: "2024-01-10",
-      returnDate: "2024-01-17",
-      status: "atrasado",
-      daysOverdue: 8,
-      dailyRate: 4000,
-      penalty: 3200
-    },
-    {
-      id: "L004",
-      clientName: "Ana López",
-      clientRut: "55.666.777-8",
-      toolName: "Martillo Demoledor",
-      loanDate: "2024-01-19",
-      returnDate: "2024-01-26",
-      status: "vigente",
-      dailyRate: 12000
-    },
-    {
-      id: "L005",
-      clientName: "Roberto Martinez",
-      clientRut: "44.555.666-7",
-      toolName: "Nivel Láser",
-      loanDate: "2024-01-12",
-      returnDate: "2024-01-19",
-      status: "atrasado",
-      daysOverdue: 3,
-      dailyRate: 6000,
-      penalty: 1800
-    }
-  ];
+  // Préstamos activos (datos reales)
+  const [activeLoans, setActiveLoans] = useState([]);
+  const [loadingLoans, setLoadingLoans] = useState(true);
 
-  // Mock data - RF6.2: Clientes con atrasos
-  const mockClientsWithOverdue = [
-    {
-      id: "C001",
-      name: "Juan Pérez",
-      rut: "12.345.678-9",
-      phone: "+56 9 1234 5678",
-      email: "juan.perez@email.com",
-      overdueLoans: 1,
-      totalPenalty: 2500,
-      oldestOverdueDate: "2024-01-15",
-      status: "restringido"
-    },
-    {
-      id: "C003",
-      name: "Carlos Silva", 
-      rut: "11.222.333-4",
-      phone: "+56 9 8765 4321",
-      email: "carlos.silva@email.com",
-      overdueLoans: 2,
-      totalPenalty: 4500,
-      oldestOverdueDate: "2024-01-10",
-      status: "restringido"
-    },
-    {
-      id: "C005",
-      name: "Roberto Martinez",
-      rut: "44.555.666-7",
-      phone: "+56 9 5555 7777",
-      email: "roberto.martinez@email.com",
-      overdueLoans: 1,
-      totalPenalty: 1800,
-      oldestOverdueDate: "2024-01-12",
-      status: "activo"
-    }
-  ];
+  // Clientes con atrasos (DTO datos reales)
+  const [overdueClients, setOverdueClients] = useState([]);
+  const [loadingClients, setLoadingClients] = useState(true);
 
-  // Mock data - RF6.3: Ranking de herramientas más prestadas
-  const mockToolRanking = [
-    {
-      id: "T001",
-      toolName: "Taladro Bosch Professional",
-      category: "Herramientas Eléctricas",
-      totalLoans: 45,
-      activeLoans: 3,
-      totalRevenue: 225000,
-      averageLoanDays: 4.2,
-      popularityScore: 95
-    },
-    {
-      id: "T002",
-      toolName: "Sierra Circular Makita",
-      category: "Herramientas de Corte",
-      totalLoans: 38,
-      activeLoans: 2,
-      totalRevenue: 304000,
-      averageLoanDays: 5.1,
-      popularityScore: 88
-    },
-    {
-      id: "T003",
-      toolName: "Martillo Demoledor",
-      category: "Herramientas Pesadas",
-      totalLoans: 32,
-      activeLoans: 1,
-      totalRevenue: 384000,
-      averageLoanDays: 3.8,
-      popularityScore: 82
-    },
-    {
-      id: "T004",
-      toolName: "Amoladora Angular",
-      category: "Herramientas Eléctricas",
-      totalLoans: 28,
-      activeLoans: 2,
-      totalRevenue: 112000,
-      averageLoanDays: 3.2,
-      popularityScore: 75
-    },
-    {
-      id: "T005",
-      toolName: "Nivel Láser",
-      category: "Instrumentos de Medición",
-      totalLoans: 25,
-      activeLoans: 1,
-      totalRevenue: 150000,
-      averageLoanDays: 4.8,
-      popularityScore: 68
-    },
-    {
-      id: "T006",
-      toolName: "Soldadora Inverter",
-      category: "Equipos de Soldadura",
-      totalLoans: 22,
-      activeLoans: 0,
-      totalRevenue: 264000,
-      averageLoanDays: 6.2,
-      popularityScore: 62
-    }
-  ];
+  // Ranking de herramientas (real)
+  const [toolRanking, setToolRanking] = useState([]);
+  const [loadingRanking, setLoadingRanking] = useState(true);
 
+  // Efecto para cargar préstamos
+  useEffect(() => {
+    setLoadingLoans(true);
+    getAllLoans()
+      .then(response => {
+        setActiveLoans(response.data);
+        setLoadingLoans(false);
+      })
+      .catch(error => {
+        console.error("Error cargando préstamos:", error);
+        setLoadingLoans(false);
+      });
+  }, []);
+
+  // Efecto para cargar clientes con atrasos (DTO)
+  useEffect(() => {
+    setLoadingClients(true);
+    getAllCustomersDTO()
+      .then(response => {
+        // Filtra solo clientes con préstamos activos o multas impagas
+        const withOverdue = response.data.filter(
+          c => Number(c.unpaidFines) > 0 || Number(c.activeLoans) > 0
+        );
+        setOverdueClients(withOverdue);
+        setLoadingClients(false);
+      })
+      .catch(error => {
+        console.error("Error cargando clientes DTO:", error);
+        setLoadingClients(false);
+      });
+  }, []);
+
+  // Efecto para cargar ranking de herramientas (real)
+  useEffect(() => {
+    setLoadingRanking(true);
+    getToolsRanking()
+      .then(response => {
+        setToolRanking(response.data);
+        setLoadingRanking(false);
+      })
+      .catch(error => {
+        console.error("Error cargando ranking:", error);
+        setLoadingRanking(false);
+      });
+  }, []);
+
+  // Filtrado por fecha para préstamos activos y clientes con atrasos (si tienes campo de fecha)
   const filterDataByDate = (data, dateField) => {
     if (!dateFrom && !dateTo) return data;
-    
     return data.filter(item => {
       const itemDate = new Date(item[dateField]);
       const fromDate = dateFrom ? new Date(dateFrom) : new Date('1900-01-01');
       const toDate = dateTo ? new Date(dateTo) : new Date('2100-12-31');
-      
       return itemDate >= fromDate && itemDate <= toDate;
     });
   };
 
   const getStatusBadge = (status) => {
-    switch (status) {
-      case "vigente":
+    if (!status) return <Badge variant="secondary">-</Badge>;
+    switch (status.toLowerCase()) {
+      case "active":
         return <Badge variant="secondary" className="bg-green-100 text-green-800">Vigente</Badge>;
-      case "atrasado":
+      case "returned":
+        return <Badge variant="secondary" className="bg-blue-100 text-blue-800">Devuelto</Badge>;
+      case "late":
         return <Badge variant="destructive">Atrasado</Badge>;
       case "activo":
         return <Badge variant="secondary" className="bg-blue-100 text-blue-800">Activo</Badge>;
@@ -210,17 +111,20 @@ export function ReportsManagement({ onNavigate }) {
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return "-";
     return new Date(dateString).toLocaleDateString('es-CL');
   };
 
   const exportData = (reportType) => {
-    // Implementación básica de exportación
     console.log(`Exportando reporte: ${reportType}`);
-    // Aquí se implementaría la lógica real de exportación a Excel/PDF
   };
 
-  const filteredActiveLoans = filterDataByDate(mockActiveLoans, 'loanDate');
-  const filteredClientsWithOverdue = filterDataByDate(mockClientsWithOverdue, 'oldestOverdueDate');
+  // Filtrado por fecha para préstamos activos
+  const filteredActiveLoans = filterDataByDate(activeLoans, "deliveryDate");
+
+  // Filtrado por fecha para clientes con atrasos (si tienes algún campo de fecha)
+  // Si quieres filtrar clientes por fecha de creación, usa el campo "createdAt". Si no, usa la lista completa.
+  const filteredOverdueClients = filterDataByDate(overdueClients, "createdAt");
 
   return (
     <div className="space-y-6">
@@ -299,144 +203,139 @@ export function ReportsManagement({ onNavigate }) {
           </TabsTrigger>
         </TabsList>
 
-        {/* RF6.1: Préstamos Activos */}
+        {/* Préstamos Activos */}
         <TabsContent value="active-loans">
           <Card>
             <CardHeader>
               <CardTitle>Préstamos Activos y su Estado</CardTitle>
               <p className="text-muted-foreground">
-                Lista completa de préstamos vigentes y atrasados con detalles de multas
+                Lista completa de préstamos vigentes y devueltos con detalles de multas
               </p>
             </CardHeader>
             <CardContent>
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Cliente</TableHead>
-                      <TableHead>Herramienta</TableHead>
-                      <TableHead>Fecha Préstamo</TableHead>
-                      <TableHead>Fecha Devolución</TableHead>
-                      <TableHead>Estado</TableHead>
-                      <TableHead>Días Atraso</TableHead>
-                      <TableHead>Tarifa Diaria</TableHead>
-                      <TableHead>Multa</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredActiveLoans.map((loan) => (
-                      <TableRow key={loan.id}>
-                        <TableCell className="font-medium">{loan.id}</TableCell>
-                        <TableCell>
-                          <div>
-                            <div>{loan.clientName}</div>
-                            <div className="text-sm text-muted-foreground">{loan.clientRut}</div>
-                          </div>
-                        </TableCell>
-                        <TableCell>{loan.toolName}</TableCell>
-                        <TableCell>{formatDate(loan.loanDate)}</TableCell>
-                        <TableCell>{formatDate(loan.returnDate)}</TableCell>
-                        <TableCell>{getStatusBadge(loan.status)}</TableCell>
-                        <TableCell>
-                          {loan.daysOverdue ? (
-                            <span className="text-red-600 font-medium">
-                              {loan.daysOverdue} días
-                            </span>
-                          ) : (
-                            <span className="text-green-600">-</span>
-                          )}
-                        </TableCell>
-                        <TableCell>{formatCurrency(loan.dailyRate)}</TableCell>
-                        <TableCell>
-                          {loan.penalty ? (
-                            <span className="text-red-600 font-medium">
-                              {formatCurrency(loan.penalty)}
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground">-</span>
-                          )}
-                        </TableCell>
+              {loadingLoans ? (
+                <div className="text-center py-8">Cargando préstamos...</div>
+              ) : (
+                <div className="rounded-md border overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>ID</TableHead>
+                        <TableHead>Herramienta</TableHead>
+                        <TableHead>Cliente</TableHead>
+                        <TableHead>Usuario</TableHead>
+                        <TableHead>Fecha Préstamo</TableHead>
+                        <TableHead>Fecha Vencimiento</TableHead>
+                        <TableHead>Fecha Devolución</TableHead>
+                        <TableHead>Estado</TableHead>
+                        <TableHead>Multa</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredActiveLoans.map((loan) => (
+                        <TableRow key={loan.id}>
+                          <TableCell className="font-medium">{loan.id}</TableCell>
+                          <TableCell>{loan.toolName}</TableCell>
+                          <TableCell>{loan.customerName}</TableCell>
+                          <TableCell>{loan.userName}</TableCell>
+                          <TableCell>{formatDate(loan.deliveryDate)}</TableCell>
+                          <TableCell>{formatDate(loan.dueDate)}</TableCell>
+                          <TableCell>{formatDate(loan.returnDate)}</TableCell>
+                          <TableCell>{getStatusBadge(loan.status)}</TableCell>
+                          <TableCell>
+                            {loan.fine ? (
+                              <span className="text-red-600 font-medium">
+                                {formatCurrency(loan.fine)}
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
               <div className="mt-4 text-sm text-muted-foreground">
-                Total de préstamos: {filteredActiveLoans.length} | 
-                Atrasados: {filteredActiveLoans.filter(l => l.status === 'atrasado').length} |
-                Vigentes: {filteredActiveLoans.filter(l => l.status === 'vigente').length}
+                Total de préstamos: {filteredActiveLoans.length}
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* RF6.2: Clientes con Atrasos */}
+        {/* Clientes con Atrasos */}
         <TabsContent value="overdue-clients">
           <Card>
             <CardHeader>
               <CardTitle>Clientes con Atrasos</CardTitle>
               <p className="text-muted-foreground">
-                Lista de clientes que tienen préstamos atrasados y sus multas acumuladas
+                Clientes con préstamos activos o multas impagas
               </p>
             </CardHeader>
             <CardContent>
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Cliente</TableHead>
-                      <TableHead>RUT</TableHead>
-                      <TableHead>Contacto</TableHead>
-                      <TableHead>Préstamos Atrasados</TableHead>
-                      <TableHead>Multa Total</TableHead>
-                      <TableHead>Atraso Más Antiguo</TableHead>
-                      <TableHead>Estado</TableHead>
-                      <TableHead>Acciones</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredClientsWithOverdue.map((client) => (
-                      <TableRow key={client.id}>
-                        <TableCell className="font-medium">{client.name}</TableCell>
-                        <TableCell>{client.rut}</TableCell>
-                        <TableCell>
-                          <div>
-                            <div>{client.phone}</div>
-                            <div className="text-sm text-muted-foreground">{client.email}</div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="destructive">{client.overdueLoans}</Badge>
-                        </TableCell>
-                        <TableCell className="text-red-600 font-medium">
-                          {formatCurrency(client.totalPenalty)}
-                        </TableCell>
-                        <TableCell>{formatDate(client.oldestOverdueDate)}</TableCell>
-                        <TableCell>{getStatusBadge(client.status)}</TableCell>
-                        <TableCell>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => onNavigate('clients')}
-                          >
-                            Ver Detalle
-                          </Button>
-                        </TableCell>
+              {loadingClients ? (
+                <div className="text-center py-8">Cargando clientes...</div>
+              ) : (
+                <div className="rounded-md border overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Cliente</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Teléfono</TableHead>
+                        <TableHead>Estado</TableHead>
+                        <TableHead>Préstamos Totales</TableHead>
+                        <TableHead>Préstamos Activos</TableHead>
+                        <TableHead>Multas Impagas</TableHead>
+                        <TableHead>Acciones</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredOverdueClients.map((client) => (
+                        <TableRow key={client.id}>
+                          <TableCell className="font-medium">{client.name}</TableCell>
+                          <TableCell>{client.email}</TableCell>
+                          <TableCell>{client.phone}</TableCell>
+                          <TableCell>{getStatusBadge(client.status)}</TableCell>
+                          <TableCell>
+                            <Badge variant="secondary">{client.totalLoans}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={client.activeLoans > 0 ? "destructive" : "secondary"}>
+                              {client.activeLoans}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {Number(client.unpaidFines) > 0 ? (
+                              <Badge variant="destructive">{client.unpaidFines}</Badge>
+                            ) : (
+                              <span className="text-muted-foreground">0</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => onNavigate && onNavigate('clients')}
+                            >
+                              Ver Detalle
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
               <div className="mt-4 text-sm text-muted-foreground">
-                Total clientes con atrasos: {filteredClientsWithOverdue.length} |
-                Multas acumuladas: {formatCurrency(filteredClientsWithOverdue.reduce((sum, client) => sum + client.totalPenalty, 0))}
+                Total clientes con atrasos: {filteredOverdueClients.length}
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* RF6.3: Ranking de Herramientas */}
+        {/* Ranking de Herramientas */}
         <TabsContent value="tool-ranking">
           <Card>
             <CardHeader>
@@ -447,69 +346,59 @@ export function ReportsManagement({ onNavigate }) {
             </CardHeader>
             <CardContent>
               <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Ranking</TableHead>
-                      <TableHead>Herramienta</TableHead>
-                      <TableHead>Categoría</TableHead>
-                      <TableHead>Total Préstamos</TableHead>
-                      <TableHead>Préstamos Activos</TableHead>
-                      <TableHead>Ingresos Totales</TableHead>
-                      <TableHead>Promedio Días</TableHead>
-                      <TableHead>Score Popularidad</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {mockToolRanking.map((tool, index) => (
-                      <TableRow key={tool.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium ${
-                              index === 0 ? 'bg-yellow-100 text-yellow-800' :
-                              index === 1 ? 'bg-gray-100 text-gray-800' :
-                              index === 2 ? 'bg-orange-100 text-orange-800' :
-                              'bg-blue-100 text-blue-800'
-                            }`}>
-                              {index + 1}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-medium">{tool.toolName}</TableCell>
-                        <TableCell>{tool.category}</TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">{tool.totalLoans}</Badge>
-                        </TableCell>
-                        <TableCell>
-                          {tool.activeLoans > 0 ? (
-                            <Badge variant="default">{tool.activeLoans}</Badge>
-                          ) : (
-                            <span className="text-muted-foreground">0</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-green-600 font-medium">
-                          {formatCurrency(tool.totalRevenue)}
-                        </TableCell>
-                        <TableCell>{tool.averageLoanDays} días</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                              <div 
-                                className="bg-blue-600 h-2 rounded-full" 
-                                style={{ width: `${tool.popularityScore}%` }}
-                              ></div>
-                            </div>
-                            <span className="text-sm font-medium">{tool.popularityScore}%</span>
-                          </div>
-                        </TableCell>
+                {loadingRanking ? (
+                  <div className="text-center py-8">Cargando ranking...</div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Ranking</TableHead>
+                        <TableHead>Herramienta</TableHead>
+                        <TableHead>Categoría</TableHead>
+                        <TableHead>Total Préstamos</TableHead>
+                        <TableHead>Préstamos Activos</TableHead>
+                        <TableHead>Ingresos Totales</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {toolRanking.map((tool, index) => (
+                        <TableRow key={tool.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium ${
+                                index === 0 ? 'bg-yellow-100 text-yellow-800' :
+                                index === 1 ? 'bg-gray-100 text-gray-800' :
+                                index === 2 ? 'bg-orange-100 text-orange-800' :
+                                'bg-blue-100 text-blue-800'
+                              }`}>
+                                {index + 1}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="font-medium">{tool.name}</TableCell>
+                          <TableCell>{tool.category}</TableCell>
+                          <TableCell>
+                            <Badge variant="secondary">{tool.totalLoans}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            {tool.activeLoans > 0 ? (
+                              <Badge variant="default">{tool.activeLoans}</Badge>
+                            ) : (
+                              <span className="text-muted-foreground">0</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-green-600 font-medium">
+                            {formatCurrency(tool.totalRevenue)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
               </div>
               <div className="mt-4 text-sm text-muted-foreground">
-                Total herramientas analizadas: {mockToolRanking.length} |
-                Ingresos totales: {formatCurrency(mockToolRanking.reduce((sum, tool) => sum + tool.totalRevenue, 0))}
+                Total herramientas analizadas: {toolRanking.length} |
+                Ingresos totales: {formatCurrency(toolRanking.reduce((sum, tool) => sum + (tool.totalRevenue || 0), 0))}
               </div>
             </CardContent>
           </Card>

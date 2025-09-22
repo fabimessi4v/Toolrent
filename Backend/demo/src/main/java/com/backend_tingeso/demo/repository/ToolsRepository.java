@@ -4,8 +4,10 @@ package com.backend_tingeso.demo.repository;
 import com.backend_tingeso.demo.entity.Customer;
 import com.backend_tingeso.demo.entity.Tools;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -15,5 +17,18 @@ import java.util.UUID;
  */
 @Repository
 public interface ToolsRepository extends JpaRepository<Tools, String> {
-
+    @Query(
+            value = "SELECT " +
+                    "t.id, t.name, t.category, " +
+                    "COUNT(l.id) AS totalLoans, " +
+                    "SUM(CASE WHEN l.status = 'ACTIVE' THEN 1 ELSE 0 END) AS activeLoans, " +
+                    "SUM(t.rental_price * DATEDIFF(l.due_date, l.delivery_date)) AS totalRevenue, " +
+                    "SUM(l.fine) AS totalFines " +
+                    "FROM tools t " +
+                    "LEFT JOIN loans l ON l.tool_id = t.id " +
+                    "GROUP BY t.id, t.name, t.category " +
+                    "ORDER BY totalLoans DESC",
+            nativeQuery = true
+    )
+    List<Object[]> findToolRankingNative();
 }

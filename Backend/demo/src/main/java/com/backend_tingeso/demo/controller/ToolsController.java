@@ -1,5 +1,6 @@
 package com.backend_tingeso.demo.controller;
 
+import com.backend_tingeso.demo.dto.ToolRankingDTO;
 import com.backend_tingeso.demo.entity.Tools;
 import com.backend_tingeso.demo.service.ToolsService;
 import org.slf4j.Logger;
@@ -62,5 +63,10 @@ public class ToolsController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Tool no encontrado o ID inválido");
         }
+    }
+    // Endpoint para obtener el ranking de herramientas
+    @GetMapping("/ranking")
+    public List<ToolRankingDTO> getToolRanking() {
+        return toolsService.getToolRanking();
     }
 }

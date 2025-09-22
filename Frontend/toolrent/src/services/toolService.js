@@ -36,3 +36,7 @@ export const createTool = (toolsData) => {
 export const deleteTool = (id) => {
   return apiClient.delete(`/tools/${id}`);
 };
+// Función para obtener el ranking de herramientas
+export const getToolsRanking = () => {
+  return apiClient.get('/tools/ranking');
+};
