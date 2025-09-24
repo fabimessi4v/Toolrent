@@ -106,8 +106,10 @@ public class CustomerServiceImpl implements CustomerService {
         dto.setActiveLoans((int) loans.stream().filter(l -> l.getStatus().equals("ACTIVE")).count());
 
         // Multa impaga: 1 si tiene multa, 0 si no
-        boolean hasFine = loans.stream().anyMatch(loan -> loan.getFine() != null);
-        dto.setUnpaidFines(hasFine ? 1 : 0);
+        boolean hasUnpaidFine = loans.stream()
+                .anyMatch(loan -> loan.getFine() != null && loan.getFine() > 0 &&
+                        (loan.getStatus().equals("ACTIVE") || loan.getStatus().equals("OVERDUE")));
+        dto.setUnpaidFines(hasUnpaidFine ? 1 : 0);
 
         return dto;
     }

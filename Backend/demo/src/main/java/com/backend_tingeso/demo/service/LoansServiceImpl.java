@@ -79,6 +79,11 @@ public class LoansServiceImpl implements LoansService {
             // Si tiene multa impaga, lanzar excepción
             throw new IllegalStateException("El cliente tiene multas impagas y no puede solicitar un nuevo préstamo.");
         }
+        // Validar cantidad de préstamos activos
+        int prestamosActivos = loansRepository.countActiveLoansByCustomerId(customer.getId());
+        if (prestamosActivos >= 5) {
+            throw new IllegalStateException("El cliente ya tiene 5 préstamos activos y no puede solicitar uno nuevo.");
+        }
         if (!validateAvailability(tool.getId().toString())) {
             throw new IllegalStateException("La herramienta no tiene stock disponible para préstamo.");
         }

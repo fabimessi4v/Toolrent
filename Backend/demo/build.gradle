@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.4'
 	id 'io.spring.dependency-management' version '1.1.7'
-	id 'org.hibernate.orm' version '6.2.6.Final'  // plugin para Hibernate reverse engineering
+	id 'org.hibernate.orm' version '6.2.6.Final'
 }
 
 group = 'com.backend_tingeso'
@@ -20,22 +20,24 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'mysql:mysql-connector-java:8.0.33'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'mysql:mysql-connector-java:8.0.33'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	implementation 'org.keycloak:keycloak-spring-boot-starter:20.0.3'
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server' // <-- OAuth2 / JWT
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // <-- si quieres login OAuth2
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.mockito:mockito-core:5.2.0' // <--- Mockito actualizado
+	testImplementation 'net.bytebuddy:byte-buddy:1.12.22' // <--- Byte Buddy actualizado
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
-
 
 tasks.named('test') {
 	useJUnitPlatform()
+	// <--- JVM args para permitir el agente en Java 17+
+	jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED'
 }

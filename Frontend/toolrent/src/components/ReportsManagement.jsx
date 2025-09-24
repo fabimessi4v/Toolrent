@@ -131,7 +131,7 @@ export function ReportsManagement({ onNavigate }) {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1>Reportes y Análisis</h1>
+          <h1 class="font-sans text-3xl">Reportes y Análisis</h1>
           <p className="text-muted-foreground">
             Visualiza estadísticas, genera reportes y analiza el desempeño del sistema
           </p>

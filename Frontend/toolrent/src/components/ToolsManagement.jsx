@@ -230,7 +230,7 @@ export function ToolsManagement({ onNavigate }) {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1>Gestión de Herramientas</h1>
+          <h1 class="font-sans text-3xl">Gestión de Herramientas</h1>
           <p className="text-muted-foreground">
             Administra tu inventario de herramientas
           </p>

@@ -89,7 +89,7 @@ export function Dashboard({ onNavigate }) {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1>Dashboard</h1>
+          <h1 class="font-sans text-3xl">Dashboard</h1>
           <p className="text-muted-foreground">
             Resumen general del sistema de préstamos
           </p>

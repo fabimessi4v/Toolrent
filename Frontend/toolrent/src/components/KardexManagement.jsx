@@ -88,7 +88,7 @@ export function KardexManagement({ onNavigate }) {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1>Kardex y Movimientos</h1>
+          <h1 class="font-sans text-3xl">Kardex y Movimientos</h1>
           <p className="text-muted-foreground">Historial completo de movimientos del inventario</p>
         </div>
       </div>

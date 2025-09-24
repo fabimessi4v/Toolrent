@@ -7,6 +7,9 @@ export default {
   ],
   theme: {
   	extend: {
+		 fontFamily: {
+        sans: ['Metropolis', 'ui-sans-serif', 'system-ui'], // <--- Aquí agregamos Metropolis
+      },
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',

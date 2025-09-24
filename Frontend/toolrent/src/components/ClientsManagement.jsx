@@ -111,7 +111,7 @@ export function ClientsManagement({ onNavigate }) {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1>Gestión de Clientes</h1>
+          <h1 class="font-sans text-3xl">Gestión de Clientes</h1>
           <p className="text-muted-foreground">
             Administra la información de tus clientes
           </p>

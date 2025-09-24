@@ -192,7 +192,7 @@ const handleReturnLoan = async (loanId) => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1>Gestión de Préstamos</h1>
+          <h1 class="font-sans text-3xl">Gestión de Préstamos</h1>
           <p className="text-muted-foreground">Administra todos los préstamos de herramientas</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
