@@ -3,7 +3,7 @@ import Keycloak from 'keycloak-js';
 
 // Configuración de Keycloak
 const keycloakConfig = {
-  url: 'http://localhost:8080/',       // URL de tu servidor Keycloak
+  url: 'https://toolrent.duckdns.org/keycloak',       // URL de tu servidor Keycloak
   realm: 'toolrent',                   // Nombre de tu realm
   clientId: 'toolrent-frontend',       // ID de tu cliente
 };

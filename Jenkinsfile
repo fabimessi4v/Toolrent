@@ -1,0 +1,71 @@
+pipeline {
+    agent any
+    
+    environment {
+        DOCKERHUB_NAMESPACE = 'fabimessidev'
+        IMAGE_TAG = "v${BUILD_NUMBER}"
+    }
+    
+    stages {
+        stage('🏗️ Build & Push Images') {
+            parallel {
+                stage('Frontend') {
+                    steps {
+                        dir('frontend') {
+                            script {
+                                def image = docker.build("${DOCKERHUB_NAMESPACE}/toolrent:frontend-${IMAGE_TAG}")
+                                docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
+                                    image.push("frontend-${IMAGE_TAG}")
+                                    image.push("frontend-latest")
+                                }
+                                echo "✅ Frontend image pushed to DockerHub"
+                            }
+                        }
+                    }
+                }
+                
+                stage('Backend') {
+                    steps {
+                        dir('backend') {
+                            script {
+                                def image = docker.build("${DOCKERHUB_NAMESPACE}/toolrent:backend-${IMAGE_TAG}")
+                                docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
+                                    image.push("backend-${IMAGE_TAG}")
+                                    image.push("backend-latest")
+                                }
+                                echo "✅ Backend image pushed to DockerHub"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('🚀 Deploy') {
+            steps {
+                sshagent(['vps-ssh-credentials']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no fabiluisibarra@167.71.175.50 "
+                            cd ~/toolrent &&
+                            docker compose pull &&
+                            docker compose up -d &&
+                            echo 'Deployment completed successfully!'
+                        "
+                    '''
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo '✅ Pipeline completed successfully!'
+        }
+        failure {
+            echo '❌ Pipeline failed!'
+        }
+        always {
+            sh 'docker system prune -f'
+        }
+    }
+}
