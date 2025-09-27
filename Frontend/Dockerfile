@@ -1,16 +1,16 @@
 # Etapa 1: Construcción del frontend con Node.js
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copia los archivos de dependencias
-COPY package*.json ./
+# Copia los archivos de dependencias desde la subcarpeta toolrent/
+COPY toolrent/package*.json ./
 
 # Instala las dependencias
 RUN npm ci
 
-# Copia el resto del código fuente
-COPY . .
+# Copia el resto del código fuente desde la subcarpeta toolrent/
+COPY toolrent/. .
 
 # Compila la aplicación (genera la carpeta dist)
 RUN npm run build
