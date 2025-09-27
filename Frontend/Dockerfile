@@ -1,16 +1,28 @@
-# 1. Imagen base
-# Empezamos con una imagen ligera de Nginx.
+# Etapa 1: Construcción del frontend con Node.js
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Copia los archivos de dependencias
+COPY package*.json ./
+
+# Instala las dependencias
+RUN npm ci
+
+# Copia el resto del código fuente
+COPY . .
+
+# Compila la aplicación (genera la carpeta dist)
+RUN npm run build
+
+# Etapa 2: Imagen ligera de Nginx para servir los archivos estáticos
 FROM nginx:stable-alpine
 
-# 2. Copiar los archivos compilados
-# Copia el contenido de tu carpeta local 'dist' al directorio
-# por defecto de Nginx dentro del contenedor.
-COPY dist/ /usr/share/nginx/html
+# Copia el resultado del build (dist/) al directorio por defecto de Nginx
+COPY --from=builder /app/dist/ /usr/share/nginx/html
 
-# 3. Exponer el puerto
-# Informa a Docker que el contenedor escuchará en el puerto 80.
+# Exponer el puerto 80 para servir la web
 EXPOSE 80
 
-# 4. Comando de inicio
-# Inicia Nginx en primer plano para mantener el contenedor activo.
+# Comando de inicio
 CMD ["nginx", "-g", "daemon off;"]
