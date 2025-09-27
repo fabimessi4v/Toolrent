@@ -10,7 +10,7 @@ pipeline {
             parallel {
                 stage('Frontend') {
                     steps {
-                        dir('frontend') {
+                        dir('Frontend') {
                             script {
                                 def image = docker.build("${DOCKERHUB_NAMESPACE}/toolrent:frontend-v1")
                                 docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
@@ -25,7 +25,7 @@ pipeline {
                 
                 stage('Backend') {
                     steps {
-                        dir('backend') {
+                        dir('Backend') {
                             script {
                                 def image = docker.build("${DOCKERHUB_NAMESPACE}/toolrent:backend-v1")
                                 docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
