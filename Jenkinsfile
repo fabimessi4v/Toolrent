@@ -39,21 +39,6 @@ pipeline {
                 }
             }
         }
-        
-        stage('🚀 Deploy') {
-            steps {
-                sshagent(['vps-ssh-credentials']) {
-                    sh '''
-                        ssh -o StrictHostKeyChecking=no fabiluisibarra@167.71.175.50 "
-                            cd ~/toolrent &&
-                            docker compose pull &&
-                            docker compose up -d &&
-                            echo 'Deployment completed successfully!'
-                        "
-                    '''
-                }
-            }
-        }
     }
     
     post {
