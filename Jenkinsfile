@@ -3,7 +3,6 @@ pipeline {
     
     environment {
         DOCKERHUB_NAMESPACE = 'fabimessidev'
-        IMAGE_TAG = "v${BUILD_NUMBER}"
     }
     
     stages {
@@ -13,9 +12,9 @@ pipeline {
                     steps {
                         dir('frontend') {
                             script {
-                                def image = docker.build("${DOCKERHUB_NAMESPACE}/toolrent:frontend-${IMAGE_TAG}")
+                                def image = docker.build("${DOCKERHUB_NAMESPACE}/toolrent:frontend-v1")
                                 docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
-                                    image.push("frontend-${IMAGE_TAG}")
+                                    image.push("frontend-v1")
                                     image.push("frontend-latest")
                                 }
                                 echo "✅ Frontend image pushed to DockerHub"
@@ -28,9 +27,9 @@ pipeline {
                     steps {
                         dir('backend') {
                             script {
-                                def image = docker.build("${DOCKERHUB_NAMESPACE}/toolrent:backend-${IMAGE_TAG}")
+                                def image = docker.build("${DOCKERHUB_NAMESPACE}/toolrent:backend-v1")
                                 docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
-                                    image.push("backend-${IMAGE_TAG}")
+                                    image.push("backend-v1")
                                     image.push("backend-latest")
                                 }
                                 echo "✅ Backend image pushed to DockerHub"
