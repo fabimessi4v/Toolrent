@@ -3,7 +3,7 @@ import keycloak from '../keycloak'; // asegúrate de la ruta correcta
 
 // Ajusta el puerto/baseURL según tu backend
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8081/api/v1',
+  baseURL: 'https://toolrent.duckdns.org/api/v1',
   headers: {
     'Content-Type': 'application/json'
   }

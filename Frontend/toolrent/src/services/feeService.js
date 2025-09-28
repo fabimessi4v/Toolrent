@@ -2,7 +2,7 @@ import axios from 'axios';
 import keycloak from '../keycloak'; // asegúrate de la ruta correcta
 // Asegúrate de que tu API de Spring Boot corre en el puerto 8080
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8081/api/v1', 
+  baseURL: 'https://toolrent.duckdns.org/api/v1', 
   headers: {
     'Content-Type': 'application/json'
   }

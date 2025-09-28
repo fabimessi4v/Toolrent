@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Cliente Axios para tu API de Spring Boot
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8081/api/v1',
+  baseURL: 'https://toolrent.duckdns.org/api/v1',
   headers: {
     'Content-Type': 'application/json'
   }
