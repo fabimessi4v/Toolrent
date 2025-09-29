@@ -345,7 +345,7 @@ export function ToolsManagement({ onNavigate }) {
                     <img
                       src={tool.tool_imageUrl}
                       alt={tool.name}
-                      className="object-cover w-full h-full"
+                      className="object-contain w-full h-full"
                       style={{ maxHeight: "100%", maxWidth: "100%" }}
                     />
                   ) : (
