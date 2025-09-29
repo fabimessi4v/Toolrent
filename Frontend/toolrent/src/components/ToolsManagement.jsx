@@ -341,7 +341,15 @@ export function ToolsManagement({ onNavigate }) {
             <Card key={tool.id} className="overflow-hidden">
               <CardContent className="p-0">
                 <div className="aspect-video bg-gray-100 flex items-center justify-center">
-                  <Wrench className="h-12 w-12 text-gray-400" />
+                  {tool.tool_imageUrl ? (
+                    <img
+                      src={tool.tool_imageUrl}
+                      alt={tool.name}
+                      className="object-cover w-full h-full"
+                      style={{ maxHeight: "100%", maxWidth: "100%" }}
+                    />
+                  ) : (
+                  <Wrench className="h-12 w-12 text-gray-400" />)}
                 </div>
                 <div className="p-4">
                   <div className="flex items-start justify-between mb-2">
