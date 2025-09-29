@@ -66,7 +66,7 @@ if (!initialized) {
       )}
       <main className={`p-6 lg:p-8 pt-16 lg:pt-8 ${showSidebar ? "flex-1" : "w-full"}`}>
         <h1>
-          Bienvenido {keycloak.tokenParsed?.preferred_username}
+          Bienvenido a Toolrent: {keycloak.tokenParsed?.preferred_username}
         </h1>
         {renderContent()}
         <button
