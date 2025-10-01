@@ -138,15 +138,6 @@ export function Sidebar({ currentSection, onNavigate, onLogout }) {
               </div>
 
               <div className="bg-gray-50 rounded-lg p-3">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                    <span className="text-primary-foreground text-sm font-medium">JD</span>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Juan Director</p>
-                    <p className="text-xs text-muted-foreground">Administrador</p>
-                  </div>
-                </div>
                 <Button
                   variant="ghost"
                   size="sm"
