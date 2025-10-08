@@ -30,7 +30,7 @@ pipeline {
                                 echo "🏃 Ejecutando pruebas unitarias y build del Backend (Gradle)..."
                                 // Esto corre tests y construye el JAR
                                 sh 'chmod +x gradlew'
-                                sh './gradlew build'
+                                sh './gradlew --no-daemon build'
                             }
                             // Ahora sí, construye y sube la imagen Docker
                             script {
