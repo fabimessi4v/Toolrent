@@ -1,10 +1,10 @@
 pipeline {
     agent any
-    
+
     environment {
         DOCKERHUB_NAMESPACE = 'fabimessidev'
     }
-    
+
     stages {
         stage('🏗️ Build & Push Images') {
             parallel {
@@ -22,10 +22,17 @@ pipeline {
                         }
                     }
                 }
-                
+
                 stage('Backend') {
                     steps {
                         dir('Backend') {
+                            script {
+                                echo "🏃 Ejecutando pruebas unitarias y build del Backend (Gradle)..."
+                                // Esto corre tests y construye el JAR
+                                sh './gradlew build'
+                                // Si NO tienes gradlew, usa: sh 'gradle build'
+                            }
+                            // Ahora sí, construye y sube la imagen Docker
                             script {
                                 def image = docker.build("${DOCKERHUB_NAMESPACE}/toolrent:backend-v1")
                                 docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
@@ -40,7 +47,7 @@ pipeline {
             }
         }
     }
-    
+
     post {
         success {
             echo '✅ Pipeline completed successfully!'
