@@ -29,8 +29,8 @@ pipeline {
                             script {
                                 echo "🏃 Ejecutando pruebas unitarias y build del Backend (Gradle)..."
                                 // Esto corre tests y construye el JAR
+                                sh 'chmod +x gradlew'
                                 sh './gradlew build'
-                                // Si NO tienes gradlew, usa: sh 'gradle build'
                             }
                             // Ahora sí, construye y sube la imagen Docker
                             script {
