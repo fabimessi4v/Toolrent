@@ -56,6 +56,9 @@ pipeline {
             echo '❌ Pipeline failed!'
         }
         always {
+            // Archiva el reporte de pruebas unitarias del backend
+            archiveArtifacts artifacts: 'Backend/build/reports/tests/**/*', allowEmptyArchive: true
+            // Limpieza de Docker
             sh 'docker system prune -f'
         }
     }
