@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 public class SecurityConfig {
 
     private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
-    private final String jwkSetUri = "http://localhost:8080/realms/toolrent/protocol/openid-connect/certs";
+    private final String jwkSetUri = "https://toolrent.duckdns.org/keycloak/realms/toolrent/protocol/openid-connect/certs";
 
     @Bean
     public JwtDecoder jwtDecoder() {
@@ -66,7 +66,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedOrigins(List.of("http://localhost:5173","https://toolrent.duckdns.org"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

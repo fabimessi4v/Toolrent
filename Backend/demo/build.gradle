@@ -3,6 +3,7 @@ plugins {
 	id 'org.springframework.boot' version '3.5.4'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'org.hibernate.orm' version '6.2.6.Final'
+	id 'jacoco'
 }
 
 group = 'com.backend_tingeso'
@@ -40,4 +41,15 @@ tasks.named('test') {
 	useJUnitPlatform()
 	// <--- JVM args para permitir el agente en Java 17+
 	jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED'
+}
+jar {
+	archiveFileName = "toolrent-backend.jar"
+	manifest {
+		attributes(
+			'Main-Class': 'com.backend_tingeso.demo.DemoApplication'
+		)
+	}
+}
+bootJar {
+	archiveFileName = "toolrent-backend.jar"
 }

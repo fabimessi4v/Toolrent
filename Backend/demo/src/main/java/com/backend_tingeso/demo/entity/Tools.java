@@ -32,6 +32,8 @@ public class Tools {
     @CreationTimestamp
     @Column(name = "createdAt", updatable = false) // Cambiar según el nombre real de tu columna
     private LocalDateTime createdAt;
+    @Column(name = "tool_image_url")
+    private String tool_imageUrl;
 
     public String getId() {
         return id;
@@ -95,5 +97,11 @@ public class Tools {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+    public String getTool_imageUrl() {
+        return tool_imageUrl;
+    }
+    public void setTool_imageUrl(String tool_imageUrl) {
+        this.tool_imageUrl = tool_imageUrl;
     }
 }

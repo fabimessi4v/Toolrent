@@ -91,6 +91,9 @@ public class LoansServiceImpl implements LoansService {
         if (dueDate.before(deliveryDate)) {
             throw new IllegalArgumentException("La fecha de devolución no puede ser anterior a la fecha de entrega.");
         }
+        // Descontar el stock
+        tool.setStock(tool.getStock() - 1); // Resta 1 al campo de stock
+        toolsRepository.save(tool); // Guarda el nuevo valor en la base de datos
         // 1. Construir el objeto Loans
         Loans loan = new Loans();
         loan.setId(String.valueOf(UUID.randomUUID()));

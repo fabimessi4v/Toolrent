@@ -34,7 +34,7 @@ class ToolsServiceImplTest {
 
     @Test
     void createTool_validaDatosYGuardaTool() {
-        // Arrange
+        // Arrange (Data preparation)
         Tools tool = new Tools();
         tool.setName("Martillo");
         tool.setCategory("Manuales");
@@ -52,7 +52,7 @@ class ToolsServiceImplTest {
         // Act
         Tools result = toolsService.createTool(tool);
 
-        // Assert
+        // Assert (Result verification)
         assertNotNull(result.getId());
         verify(kardexService).createKardex(any(Tools.class), eq(user), isNull(), eq("Registro nuevo"), eq(1), eq(""));
     }
@@ -118,6 +118,44 @@ class ToolsServiceImplTest {
 
         boolean result = toolsService.deleteTool("id-invalido");
         assertFalse(result);
+    }
+    @Test
+    void getToolRanking_devuelveListaDeDTOsCorrecta() {
+        // Arrange: Simula el resultado de la consulta nativa
+        List<Object[]> mockResults = new ArrayList<>();
+        mockResults.add(new Object[]{
+                "id1", "Martillo", "Manuales",
+                5L, 2L, 1000.0, 100.0
+        });
+        mockResults.add(new Object[]{
+                "id2", "Sierra", "Eléctricas",
+                null, null, null, null
+        });
+
+        when(toolsRepository.findToolRankingNative()).thenReturn(mockResults);
+
+        // Act: Llama al método
+        List<ToolRankingDTO> ranking = toolsService.getToolRanking();
+
+        // Assert: Verifica que los resultados sean correctos
+        assertEquals(2, ranking.size());
+        ToolRankingDTO tool1 = ranking.get(0);
+        assertEquals("id1", tool1.getId());
+        assertEquals("Martillo", tool1.getName());
+        assertEquals("Manuales", tool1.getCategory());
+        assertEquals(5L, tool1.getTotalLoans());
+        assertEquals(2L, tool1.getActiveLoans());
+        assertEquals(1000.0, tool1.getTotalRevenue());
+        assertEquals(0.0, tool1.getTotalFines());
+
+        ToolRankingDTO tool2 = ranking.get(1);
+        assertEquals("id2", tool2.getId());
+        assertEquals("Sierra", tool2.getName());
+        assertEquals("Eléctricas", tool2.getCategory());
+        assertEquals(0L, tool2.getTotalLoans());
+        assertEquals(0L, tool2.getActiveLoans());
+        assertEquals(0.0, tool2.getTotalRevenue());
+        assertEquals(0.0, tool2.getTotalFines());
     }
     
 }
