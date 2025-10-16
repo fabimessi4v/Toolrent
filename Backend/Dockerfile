@@ -5,7 +5,7 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 
 # Copia el JAR generado al contenedor (mismo nivel que Dockerfile)
-COPY toolrent-backend.jar toolrent-backend.jar
+COPY build/libs/*.jar toolrent-backend.jar
 
 # Expone el puerto (por ejemplo, 8080)
 EXPOSE 8080
