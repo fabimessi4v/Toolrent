@@ -30,6 +30,7 @@ pipeline {
                                 echo "🏃 Ejecutando pruebas unitarias y build del Backend (Gradle)..."
                                 // Esto corre tests y construye el JAR
                                 sh 'chmod +x gradlew'
+                                sh './gradlew clean'
                                 sh './gradlew --no-daemon build -Dspring.profiles.active=test'
                             }
                             // Ahora sí, construye y sube la imagen Docker
