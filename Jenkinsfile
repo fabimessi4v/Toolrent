@@ -32,6 +32,9 @@ pipeline {
                                 sh 'chmod +x gradlew'
                                 sh './gradlew clean'
                                 sh './gradlew --no-daemon build -Dspring.profiles.active=test'
+                                sh 'ls -lah build/libs/'
+                                sh 'file build/libs/*.jar'
+                                sh 'jar tf build/libs/*.jar | head -20'
                                 echo "✅ Backend tests and build completed"
                             }
                         }
