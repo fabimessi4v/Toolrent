@@ -25,7 +25,7 @@ pipeline {
 
                 stage('Backend') {
                     steps {
-                        dir('Backend') {
+                        dir('Backend/demo') {
                             script {
                                 echo "🏃 Ejecutando pruebas unitarias y build del Backend (Gradle)..."
                                 // Esto corre tests y construye el JAR
@@ -35,7 +35,7 @@ pipeline {
                             }
                             // Ahora sí, construye y sube la imagen Docker
                             script {
-                                def image = docker.build("${DOCKERHUB_NAMESPACE}/toolrent:backend-v1")
+                                def image = docker.build("${DOCKERHUB_NAMESPACE}/toolrent:backend-v1", "Backend")
                                 docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
                                     image.push("backend-v1")
                                     image.push("backend-latest")
