@@ -35,7 +35,7 @@ pipeline {
                             }
                             // Ahora sí, construye y sube la imagen Docker
                             script {
-                                def image = docker.build("${DOCKERHUB_NAMESPACE}/toolrent:backend-v1", "Backend")
+                                def image = docker.build("${DOCKERHUB_NAMESPACE}/toolrent:backend-v1")
                                 docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
                                     image.push("backend-v1")
                                     image.push("backend-latest")
