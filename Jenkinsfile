@@ -25,16 +25,21 @@ pipeline {
 
                 stage('Backend') {
                     steps {
+                        // ✅ PASO 1: Build del código (en Backend/demo)
                         dir('Backend/demo') {
                             script {
                                 echo "🏃 Ejecutando pruebas unitarias y build del Backend (Gradle)..."
-                                // Esto corre tests y construye el JAR
                                 sh 'chmod +x gradlew'
                                 sh './gradlew clean'
                                 sh './gradlew --no-daemon build -Dspring.profiles.active=test'
+                                echo "✅ Backend tests and build completed"
                             }
-                            // Ahora sí, construye y sube la imagen Docker
+                        }
+                        
+                        // ✅ PASO 2: Build Docker (en Backend, donde está el Dockerfile)
+                        dir('Backend') {
                             script {
+                                echo "🐳 Building Docker image..."
                                 def image = docker.build("${DOCKERHUB_NAMESPACE}/toolrent:backend-v1")
                                 docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
                                     image.push("backend-v1")
@@ -57,9 +62,7 @@ pipeline {
             echo '❌ Pipeline failed!'
         }
         always {
-            // Archiva el reporte de pruebas unitarias del backend
-            archiveArtifacts artifacts: 'Backend/build/reports/tests/**/*', allowEmptyArchive: true
-            // Limpieza de Docker
+            archiveArtifacts artifacts: 'Backend/demo/build/reports/tests/**/*', allowEmptyArchive: true
             sh 'docker system prune -f'
         }
     }
