@@ -15,7 +15,7 @@ export function Dashboard({ onNavigate }) {
   const stats = [
     {
       title: "Herramientas Totales",
-      value: "157",
+      value: "250",
       change: "+12%",
       icon: Wrench,
       color: "text-blue-600"
