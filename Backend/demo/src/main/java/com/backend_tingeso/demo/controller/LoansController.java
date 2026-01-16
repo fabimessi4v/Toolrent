@@ -8,6 +8,7 @@ import com.backend_tingeso.demo.entity.Users;
 import com.backend_tingeso.demo.repository.CustomerRepository;
 import com.backend_tingeso.demo.repository.LoansRepository;
 import com.backend_tingeso.demo.repository.ToolsRepository;
+import com.backend_tingeso.demo.repository.UsersRepository;
 import com.backend_tingeso.demo.service.AuthService;
 import com.backend_tingeso.demo.service.LoansService;
 import com.backend_tingeso.demo.service.LoansServiceImpl;
@@ -32,18 +33,20 @@ public class LoansController {
     private final CustomerRepository customerRepository;
     private final AuthService authService;
     private final LoansRepository loansRepository;
+    private final UsersRepository usersRepository;
 
     public LoansController(
             LoansService loansService,
             ToolsRepository toolsRepository,
             CustomerRepository customerRepository,
-            AuthService authService, LoansRepository loansRepository
-    ) {
+            AuthService authService, LoansRepository loansRepository,
+            UsersRepository usersRepository) {
         this.loansService = loansService;
         this.toolsRepository = toolsRepository;
         this.customerRepository = customerRepository;
         this.authService = authService;
         this.loansRepository = loansRepository;
+        this.usersRepository = usersRepository;
     }
 
     // DTO para solicitud de préstamo (sin userId)
@@ -56,27 +59,22 @@ public class LoansController {
 
     @PostMapping
     public ResponseEntity<?> createLoan(@RequestBody LoanRequestDto loanRequest) {
-        log.info("=== CONTROLLER REACHED FOR LOAN ===");
-        log.info("Received loan DTO: {}", loanRequest);
+        log.info("=== MODO DESARROLLO: Saltando Seguridad ===");
 
         try {
-            // Obtén usuario autenticado desde AuthService (lo crea si no existe)
-            Users user = authService.getCurrentUser();
-            if (user == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body("Usuario autenticado no encontrado en base de datos");
-            }
+            // 1. SIMULACIÓN: En lugar de buscar el usuario real, buscamos uno fijo de tu BD
+            // Asegúrate de que el ID 1 o el email existan en tu tabla 'users'
+            Users user = usersRepository.findById("user-dev-001")
+                    .orElseThrow(() -> new RuntimeException("Usuario de prueba no encontrado"));
 
             Optional<Tools> toolOpt = toolsRepository.findById(loanRequest.toolId);
             Optional<Customer> customerOpt = customerRepository.findById(loanRequest.customerId);
 
             if (!toolOpt.isPresent()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Herramienta no encontrada: " + loanRequest.toolId);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Herramienta no encontrada");
             }
             if (!customerOpt.isPresent()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Cliente no encontrado: " + loanRequest.customerId);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cliente no encontrado");
             }
 
             Loans newLoan = loansService.registerLoan(
@@ -87,7 +85,6 @@ public class LoansController {
                     loanRequest.dueDate
             );
 
-            log.info("Loan created successfully");
             return new ResponseEntity<>(newLoan, HttpStatus.CREATED);
 
         } catch (Exception ex) {

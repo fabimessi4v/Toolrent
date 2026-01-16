@@ -1,11 +1,11 @@
 package com.backend_tingeso.demo.service;
 
-
 import com.backend_tingeso.demo.dto.ToolRankingDTO;
 import com.backend_tingeso.demo.entity.Tools;
 import com.backend_tingeso.demo.entity.Users;
 import com.backend_tingeso.demo.repository.ToolsRepository;
 import com.backend_tingeso.demo.repository.UsersRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,6 +14,8 @@ import java.util.Set;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.server.ResponseStatusException;
+
 /**
  * Esta clase contiene la lógica real. Implementa la interfaz y usa el ToolsRepository para interactuar con la base de datos.
  *
@@ -131,6 +133,14 @@ public class ToolsServiceImpl implements ToolsService {
 
         // Devuelve la lista ya transformada a DTOs
         return ranking;
+    }
+
+    @Override
+    public Tools updateToolStatus(String id, String newStatus) {
+        Tools tool = toolsRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Herramienta no encontrada"));
+        tool.setStatus(newStatus); // Cambia de "ACTIVE" a "dada de baja"
+        return toolsRepository.save(tool);
     }
 
 }

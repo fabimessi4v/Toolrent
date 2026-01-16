@@ -1,6 +1,7 @@
 package com.backend_tingeso.demo.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -17,14 +18,17 @@ public class Kardex {
     // Relación ManyToOne: Una herramienta puede tener muchos movimientos (kardex)
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "tool_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Limpia ruido de Hibernate
     private Tools tool;
     // Relación ManyToOne: Un usuario registrar muchos movimientos en el kardex
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Limpia ruido de Hibernate
     private Users users;
     // Relación ManyToOne: Un prestamo puede generar varios movimientos en el kardex
     @ManyToOne(fetch = FetchType.EAGER, optional = true)
     @JoinColumn(name = "loans_id", nullable = true)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Limpia ruido de Hibernate
     private Loans loans;
     private String type;
     @Column(name = "quantity")

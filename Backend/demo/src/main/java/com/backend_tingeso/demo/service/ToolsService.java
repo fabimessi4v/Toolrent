@@ -21,4 +21,6 @@ public interface ToolsService {
     boolean deleteTool(String id);
     // Obtener ranking de herramientas
     List<ToolRankingDTO> getToolRanking();
+    //Actualizar estado de  herramienta
+    Tools updateToolStatus(String id, String newStatus);
 }

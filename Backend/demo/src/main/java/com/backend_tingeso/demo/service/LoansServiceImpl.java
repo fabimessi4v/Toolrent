@@ -91,6 +91,10 @@ public class LoansServiceImpl implements LoansService {
         if (dueDate.before(deliveryDate)) {
             throw new IllegalArgumentException("La fecha de devolución no puede ser anterior a la fecha de entrega.");
         }
+        // Validar que la el status de la herramienta sea "AVAILABLE"
+        if (!"AVAILABLE".equalsIgnoreCase(tool.getStatus())) {
+            throw new IllegalArgumentException("La herramienta no está disponible para préstamo.");
+        }
         // Descontar el stock
         tool.setStock(tool.getStock() - 1); // Resta 1 al campo de stock
         toolsRepository.save(tool); // Guarda el nuevo valor en la base de datos

@@ -69,4 +69,16 @@ public class ToolsController {
     public List<ToolRankingDTO> getToolRanking() {
         return toolsService.getToolRanking();
     }
+
+    //Endpoint para actualizar estado de herramienta
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateToolStatus(@PathVariable String id, @RequestParam String newStatus) {
+        try {
+            Tools updatedTool = toolsService.updateToolStatus(id, newStatus);
+            return ResponseEntity.ok(updatedTool);
+        } catch (IllegalArgumentException e) {
+            log.error("Error updating tool status: ", e);
+            return ResponseEntity.badRequest().body(e.getMessage());
+}
+    }
 }

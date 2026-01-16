@@ -22,6 +22,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -157,5 +158,24 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+
+    private AbstractAuthenticationToken mockAuthentication() {
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub", "dev-user-123");
+        claims.put("preferred_username", "devuser");
+        claims.put("email", "dev@local.test");
+
+        Jwt jwt = new Jwt(
+                "mock-token",
+                Instant.now(),
+                Instant.now().plusSeconds(3600),
+                Map.of("alg", "none"),
+                claims
+        );
+
+        return new JwtAuthenticationToken(jwt);
     }
 }
