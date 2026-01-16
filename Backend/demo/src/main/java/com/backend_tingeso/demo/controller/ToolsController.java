@@ -16,7 +16,6 @@ import java.util.List;
 @RequestMapping("/api/v1/tools")
 public class ToolsController {
 
-    // CORRECCIÓN: Usar SLF4J Logger en lugar de JUnit Logger
     private static final Logger log = LoggerFactory.getLogger(ToolsController.class);
     private final ToolsService toolsService;
 
