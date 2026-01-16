@@ -1,7 +1,11 @@
 package com.backend_tingeso.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -15,15 +19,19 @@ public class Loans {
     @Id
     private String id;
     // Relación ManyToOne: Un usuario tiene muchos prestamos
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JsonIgnoreProperties
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "client_id", nullable = false)
     private Users client;
     // Relación ManyToOne: Una herramienta puede estar en muchos prestamos
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JsonIgnoreProperties
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "tool_id", nullable = false)
     private Tools tool;
     // Relación ManyToOne: Un cliente tiene muchos prestamos
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JsonIgnoreProperties
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "customers_id", nullable = false)
     private Customer customer;
     @Column(name = "delivery_date")

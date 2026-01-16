@@ -39,27 +39,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable()) // Desactivar CSRF para poder hacer POST sin tokens
                 .authorizeHttpRequests(auth -> auth
-                        // Endpoints que requieren rol específico
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/empleado/**").hasRole("EMPLEADO")
-                        .requestMatchers("/api/v1/tools", "/api/v1/tools/**").authenticated()
-                        .requestMatchers("/api/v1/loans", "/api/v1/loans/**").authenticated()
-                        .requestMatchers("/api/v1/customers", "/api/v1/customers/**").authenticated()
-                        .requestMatchers("/api/v1/kardex", "/api/v1/kardex/**").authenticated()
-                        .requestMatchers("/api/v1/fee", "/api/v1/fee/**").authenticated()
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(this::convertRoles))
-                )
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                        .anyRequest().permitAll() // Permitir TODO
                 );
-
         return http.build();
     }
 
