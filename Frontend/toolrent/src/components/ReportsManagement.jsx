@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { getAllLoans } from "../services/loansService";
-import { getAllCustomersDTO } from "../services/customerService";
-import { getToolsRanking } from "../services/toolService"; // <-- Importa el endpoint real
+import { getAllLoans } from "../services/serviceWrapper";
+import { getAllCustomersDTO } from "../services/serviceWrapper";
+import { getToolsRanking } from "../services/serviceWrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -166,8 +166,8 @@ export function ReportsManagement({ onNavigate }) {
                 onChange={(e) => setDateTo(e.target.value)}
               />
             </div>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => {
                 setDateFrom("");
                 setDateTo("");
@@ -175,7 +175,7 @@ export function ReportsManagement({ onNavigate }) {
             >
               Limpiar Filtros
             </Button>
-            <Button 
+            <Button
               onClick={() => exportData(activeTab)}
               className="flex items-center gap-2"
             >
@@ -314,8 +314,8 @@ export function ReportsManagement({ onNavigate }) {
                             )}
                           </TableCell>
                           <TableCell>
-                            <Button 
-                              size="sm" 
+                            <Button
+                              size="sm"
                               variant="outline"
                               onClick={() => onNavigate && onNavigate('clients')}
                             >
@@ -365,12 +365,11 @@ export function ReportsManagement({ onNavigate }) {
                         <TableRow key={tool.id}>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium ${
-                                index === 0 ? 'bg-yellow-100 text-yellow-800' :
-                                index === 1 ? 'bg-gray-100 text-gray-800' :
-                                index === 2 ? 'bg-orange-100 text-orange-800' :
-                                'bg-blue-100 text-blue-800'
-                              }`}>
+                              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium ${index === 0 ? 'bg-yellow-100 text-yellow-800' :
+                                  index === 1 ? 'bg-gray-100 text-gray-800' :
+                                    index === 2 ? 'bg-orange-100 text-orange-800' :
+                                      'bg-blue-100 text-blue-800'
+                                }`}>
                                 {index + 1}
                               </div>
                             </div>

@@ -1,4 +1,5 @@
 import { useKeycloak } from "@react-keycloak/web";
+import { useMockKeycloak } from "./auth/MockAuthProvider";
 import { useState } from "react";
 import { Sidebar } from "./components/Sidebar";
 import { Dashboard } from "./components/Dashboard";
@@ -9,20 +10,32 @@ import { KardexManagement } from "./components/KardexManagement";
 import { RatesConfiguration } from "./components/RatesConfiguration";
 import CustomerList from "./components/CustomerList";
 import { ReportsManagement } from "./components/ReportsManagement";
-export default function App() {
-  const { keycloak, initialized } = useKeycloak();
 
-  // Debug Keycloak state
-  console.log("Keycloak instance:", keycloak);
+// Hook dinámico: usa el real o el mock según el modo
+const useAuth = () => {
+  const USE_KEYCLOAK = import.meta.env.VITE_USE_KEYCLOAK === 'true';
+
+  if (USE_KEYCLOAK) {
+    return useKeycloak(); // Hook real de Keycloak
+  } else {
+    return useMockKeycloak(); // Hook mock para desarrollo
+  }
+};
+
+export default function App() {
+  const { keycloak, initialized } = useAuth();
+
+  // Debug auth state
+  console.log("Auth instance:", keycloak);
   console.log("Initialized:", initialized);
   console.log("Authenticated:", keycloak?.authenticated);
 
   const [currentSection, setCurrentSection] = useState("dashboard");
   const [showSidebar, setShowSidebar] = useState(true);
 
-if (!initialized) {
-  return <div>Cargando Keycloak...</div>; // Espera hasta que termine de inicializar
-}
+  if (!initialized) {
+    return <div>Cargando autenticación...</div>; // Espera hasta que termine de inicializar
+  }
 
   if (!keycloak.authenticated) {
     return (

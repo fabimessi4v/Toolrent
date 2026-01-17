@@ -3,9 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
-import { 
-  Search, 
-  Plus, 
+import {
+  Search,
+  Plus,
   User,
   Phone,
   Mail,
@@ -16,8 +16,8 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Label } from "./ui/label";
 
-// IMPORTA EL SERVICIO CORRECTO
-import { getAllCustomersDTO, createCustomer } from "../services/customerService.js";
+// IMPORTA EL SERVICIO CON WRAPPER
+import { getAllCustomersDTO, createCustomer } from "../services/serviceWrapper.js";
 
 export function ClientsManagement({ onNavigate }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -99,7 +99,7 @@ export function ClientsManagement({ onNavigate }) {
     }
   };
 
-  const filteredClients = clients.filter(client => 
+  const filteredClients = clients.filter(client =>
     client.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     client.rut?.includes(searchTerm) ||
     client.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -256,10 +256,10 @@ export function ClientsManagement({ onNavigate }) {
 
       {/* Search */}
       <Card>
-        <CardContent className="p-4">
+        <CardContent className="p-4 pt-6">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
+            <Input
               placeholder="Buscar clientes..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -329,9 +329,8 @@ export function ClientsManagement({ onNavigate }) {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Multas impagas</p>
-                      <p className={`font-semibold ${
-                        (client.unpaidFines ?? 0) > 0 ? 'text-red-600' : 'text-green-600'
-                      }`}>
+                      <p className={`font-semibold ${(client.unpaidFines ?? 0) > 0 ? 'text-red-600' : 'text-green-600'
+                        }`}>
                         {/* Muestra 1 si tiene multa, 0 si no */}
                         {client.unpaidFines ?? "0"}
                       </p>
