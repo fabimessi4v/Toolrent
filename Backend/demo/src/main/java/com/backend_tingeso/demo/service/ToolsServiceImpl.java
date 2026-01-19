@@ -15,6 +15,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.server.ResponseStatusException;
+import com.backend_tingeso.demo.entity.enums.MovementType;
 
 /**
  * Esta clase contiene la lógica real. Implementa la interfaz y usa el ToolsRepository para interactuar con la base de datos.
@@ -71,7 +72,7 @@ public class ToolsServiceImpl implements ToolsService {
         log.info("Usuario obtenido: ID={}, username={}", currentUser.getId(), currentUser.getUsername()); // ✅ Debug
 
         // Generar movimiento en el kardex
-        kardexService.createKardex(savedTool, currentUser, null, "Registro nuevo", 1, "");
+        kardexService.createKardex(savedTool, currentUser, null, MovementType.ENTRADA, 1, "");
 
         return savedTool;
     }
