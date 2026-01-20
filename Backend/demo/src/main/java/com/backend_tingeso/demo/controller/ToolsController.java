@@ -28,18 +28,18 @@ public class ToolsController {
 
     // Endpoint para crear un nuevo Tool
     @PostMapping
-    public ResponseEntity<?> createTool(@RequestBody Tools tool) {
+    public ResponseEntity<Tools> createTool(@RequestBody Tools tool) {
+
         log.info("=== CONTROLLER REACHED ===");
         log.info("Received tool: {}", tool);
 
-        try {
-            Tools newTool = toolsService.createTool(tool);
-            log.info("Tool created successfully");
-            return new ResponseEntity<>(newTool, HttpStatus.CREATED);
-        } catch (Exception ex) {
-            log.error("Error in controller: ", ex);
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
+        Tools newTool = toolsService.createTool(tool);
+
+        log.info("Tool created successfully");
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(newTool);
     }
 
     // Endpoint para obtener todos los Tools

@@ -14,8 +14,8 @@ import java.util.UUID;
 @Table(name = "users")
 
 public class Users {
-    @Column(name = "external_id", unique = true)
-    private String externalId;
+    @Column(name = "kc_sub", unique = true) // Coincide con kc_sub en MySQL
+    private String kcSub;
     @Id
     private String id;
     @Column(name = "username")
@@ -67,11 +67,11 @@ public class Users {
         this.createdAt = createdAt;
     }
 
-    public String getExternalId() {
-        return externalId;
+    public String getKcSub() {
+        return kcSub;
     }
 
-    public void setExternalId(String externalId) {
-        this.externalId = externalId;
+    public void setKcSub(String kcSub) {
+        this.kcSub = kcSub;
     }
 }

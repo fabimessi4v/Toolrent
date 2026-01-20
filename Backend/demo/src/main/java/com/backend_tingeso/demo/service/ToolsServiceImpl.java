@@ -4,7 +4,8 @@ import com.backend_tingeso.demo.dto.ToolRankingDTO;
 import com.backend_tingeso.demo.entity.Tools;
 import com.backend_tingeso.demo.entity.Users;
 import com.backend_tingeso.demo.repository.ToolsRepository;
-import com.backend_tingeso.demo.repository.UsersRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -48,7 +49,12 @@ public class ToolsServiceImpl implements ToolsService {
 
 //Crea herramienta, siguiendo reglas de negocio
     @Override
+    @Transactional
     public Tools createTool(Tools tool) {
+        // 1. Limpieza de datos
+        if (tool.getName() != null) {
+            tool.setName(tool.getName().trim()); // Quita espacios al inicio y final
+        }
         if (tool.getId() == null) {
             String id = UUID.randomUUID().toString();
             tool.setId(id);
@@ -59,10 +65,16 @@ public class ToolsServiceImpl implements ToolsService {
                 tool.getReplacementValue() == null) {
             throw new IllegalArgumentException("Nombre, categoría y valor de reposición son obligatorios");
         }
-        validarEstado(tool.getStatus());
-        // el nuevo registro de una herramienta, genera movimiento en el kardex
-        Tools savedTool = toolsRepository.save(tool);
+        // 3. Validación lógica previa
+        // 1. PRIMERA CAPA: Validación manual (Debe funcionar el 99% de las veces)
+        if (toolsRepository.existsByNameIgnoreCase(tool.getName())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe: " + tool.getName());
+        }
 
+        validarEstado(tool.getStatus());
+
+        // 2. SEGUNDA CAPA: El guardado forzado
+        Tools savedTool = toolsRepository.saveAndFlush(tool);
         // Obtener usuario actual
         Users currentUser = authService.getCurrentUser();
         if (currentUser == null) {
@@ -92,7 +104,8 @@ public class ToolsServiceImpl implements ToolsService {
         }
 
         try {
-            UUID uuid = UUID.fromString(id);
+            // validar que el id tenga formato UUID
+            UUID.fromString(id);
             if (toolsRepository.existsById(id)) {
                 toolsRepository.deleteById(id);
                 return true;
