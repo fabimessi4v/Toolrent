@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { 
+import {
   Card, CardContent
 } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
-import { 
+import {
   Search, Plus, Filter, Calendar, User,
   Clock, DollarSign, AlertTriangle, CheckCircle2, XCircle
 } from "lucide-react";
@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { getAllLoans, createLoan, returnLoan } from "../services/loansService.js"; // <--- importar returnLoan
 import { getTools } from "../services/toolService.js";
 import { getAllCustomers } from "../services/customerService.js";
-import keycloak from "../keycloak";
+import keycloak from "../services/keycloak";
 
 // Helper para formatear fecha
 function formatDate(dateStr) {
@@ -128,55 +128,55 @@ export function LoansManagement({ onNavigate }) {
   };
 
   // Crear préstamo llamando al backend
- // Crear préstamo llamando al backend
-const handleCreateLoan = async () => {
-  if (!form.clientId || !form.toolId || !form.startDate || !form.endDate) {
-    alert("Completa todos los campos requeridos.");
-    return;
-  }
-  setCreating(true);
-
-  try {
-    const payload = {
-      toolId: form.toolId,
-      customerId: form.clientId,
-      deliveryDate: form.startDate,
-      dueDate: form.endDate
-    };
-    await createLoan(payload);
-    alert("Préstamo creado con éxito");
-    // En lugar de añadir la respuesta, recargamos la lista completa
-    fetchLoans();
-    setDialogOpen(false);
-    setForm({ clientId: "", toolId: "", startDate: "", endDate: "", notes: "" });
-  } catch (e) {
-    alert("Error al crear préstamo: " + (e.response?.data || e.message));
-  } finally {
-    setCreating(false);
-  }
-};
-  // Acción para devolver préstamo
- // Acción para devolver préstamo
-const handleReturnLoan = async (loanId) => {
-  try {
-    const response = await returnLoan(loanId);
-    const loanDevuelto = response.data;
-    
-    // Mensaje personalizado basado en si hay multa o no
-    if (loanDevuelto.fine && loanDevuelto.fine > 0) {
-      alert(`Préstamo devuelto correctamente.\nMulta por atraso: $${loanDevuelto.fine.toLocaleString()}`);
-    } else {
-      alert("Préstamo devuelto correctamente. No hay multa.");
+  // Crear préstamo llamando al backend
+  const handleCreateLoan = async () => {
+    if (!form.clientId || !form.toolId || !form.startDate || !form.endDate) {
+      alert("Completa todos los campos requeridos.");
+      return;
     }
-    
-    fetchLoans(); // Recargar la lista actualizada
-  } catch (e) {
-    alert("Error al devolver préstamo: " + 
-      (typeof e.response?.data === "string"
-        ? e.response.data
-        : e.response?.data?.message || e.message));
-  }
-};
+    setCreating(true);
+
+    try {
+      const payload = {
+        toolId: form.toolId,
+        customerId: form.clientId,
+        deliveryDate: form.startDate,
+        dueDate: form.endDate
+      };
+      await createLoan(payload);
+      alert("Préstamo creado con éxito");
+      // En lugar de añadir la respuesta, recargamos la lista completa
+      fetchLoans();
+      setDialogOpen(false);
+      setForm({ clientId: "", toolId: "", startDate: "", endDate: "", notes: "" });
+    } catch (e) {
+      alert("Error al crear préstamo: " + (e.response?.data || e.message));
+    } finally {
+      setCreating(false);
+    }
+  };
+  // Acción para devolver préstamo
+  // Acción para devolver préstamo
+  const handleReturnLoan = async (loanId) => {
+    try {
+      const response = await returnLoan(loanId);
+      const loanDevuelto = response.data;
+
+      // Mensaje personalizado basado en si hay multa o no
+      if (loanDevuelto.fine && loanDevuelto.fine > 0) {
+        alert(`Préstamo devuelto correctamente.\nMulta por atraso: $${loanDevuelto.fine.toLocaleString()}`);
+      } else {
+        alert("Préstamo devuelto correctamente. No hay multa.");
+      }
+
+      fetchLoans(); // Recargar la lista actualizada
+    } catch (e) {
+      alert("Error al devolver préstamo: " +
+        (typeof e.response?.data === "string"
+          ? e.response.data
+          : e.response?.data?.message || e.message));
+    }
+  };
 
   if (!keycloak?.authenticated) {
     return (
@@ -322,7 +322,7 @@ const handleReturnLoan = async (loanId) => {
               <div className="flex gap-4 items-center">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input 
+                  <Input
                     placeholder="Buscar por cliente, herramienta o ID..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -370,11 +370,11 @@ const handleReturnLoan = async (loanId) => {
                           <div>
                             <p className="text-sm font-medium">
                               <span className="font-normal text-muted-foreground">Desde:</span> {formatDate(loan.deliveryDate)}
-                              <br/>
+                              <br />
                               <span className="font-normal text-muted-foreground">Hasta:</span> {formatDate(loan.dueDate)}
                               {loan.returnDate && (
                                 <>
-                                  <br/>
+                                  <br />
                                   <span className="font-normal text-muted-foreground">Devuelto:</span> {formatDate(loan.returnDate)}
                                 </>
                               )}

@@ -3,7 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { ReactKeycloakProvider } from "@react-keycloak/web";
 import App from "./App";
-import keycloak from "./keycloak"; // tu instancia Keycloak
+import keycloak from "./services/keycloak"; // tu instancia Keycloak
 
 const eventLogger = (event, error) => {
   console.log("Keycloak event:", event, error);
@@ -18,8 +18,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     authClient={keycloak}
     initOptions={{
       onLoad: "login-required",   // fuerza login si no hay sesión
-      pkceMethod: "S256",         // obligatorio para clientes públicos
-      checkLoginIframe: false,    // evita errores de iframe
+      pkceMethod: "S256",
+      checkLoginIframe: false,
     }}
     onEvent={eventLogger}         // opcional, para debug
     onTokens={tokenLogger}        // opcional, para debug

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import keycloak from '../keycloak'; // asegúrate de la ruta correcta
+import keycloak from './keycloak'; // asegúrate de la ruta correcta
 
 // Ajusta el puerto/baseURL según tu backend
 const apiClient = axios.create({

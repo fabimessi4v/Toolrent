@@ -4,12 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
-import { 
-  Search, 
-  Plus, 
-  Filter, 
-  Edit3, 
-  Trash2, 
+import {
+  Search,
+  Plus,
+  Filter,
+  Edit3,
+  Trash2,
   Wrench,
   Settings,
   AlertCircle,
@@ -19,7 +19,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "./ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Textarea } from "./ui/textarea";
-import keycloak from "../keycloak";
+import keycloak from "../services/keycloak";
 
 export function ToolsManagement({ onNavigate }) {
   const [tools, setTools] = useState([]);
@@ -55,8 +55,8 @@ export function ToolsManagement({ onNavigate }) {
 
   const filteredTools = tools.filter(tool => {
     const matchesSearch = tool.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         tool.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         tool.model.toLowerCase().includes(searchTerm.toLowerCase());
+      tool.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tool.model.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "all" || tool.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -156,7 +156,7 @@ export function ToolsManagement({ onNavigate }) {
   const hasAdminAccess = () => {
     try {
       const token = keycloak?.tokenParsed;
-      
+
       if (!token || !keycloak?.authenticated) {
         console.log("❌ Usuario no autenticado");
         return false;
@@ -164,10 +164,10 @@ export function ToolsManagement({ onNavigate }) {
 
       // Buscar específicamente en el cliente "toolrent-frontend"
       const toolrentFrontendRoles = token?.resource_access?.["toolrent-frontend"]?.roles || [];
-      
+
       // Verificar si tiene el rol "ADMIN" (en mayúsculas como está en Keycloak)
       const hasAdminRole = toolrentFrontendRoles.includes("ADMIN");
-      
+
       console.log("🔍 Verificación de roles admin:", {
         username: token?.preferred_username,
         email: token?.email,
@@ -183,7 +183,7 @@ export function ToolsManagement({ onNavigate }) {
       }
 
       return hasAdminRole;
-      
+
     } catch (error) {
       console.error("❌ Error verificando acceso admin:", error);
       return false;
@@ -194,14 +194,14 @@ export function ToolsManagement({ onNavigate }) {
   const hasEmployeeAccess = () => {
     try {
       const token = keycloak?.tokenParsed;
-      
+
       if (!token || !keycloak?.authenticated) {
         return false;
       }
 
       const toolrentFrontendRoles = token?.resource_access?.["toolrent-frontend"]?.roles || [];
       return toolrentFrontendRoles.includes("EMPLEADO");
-      
+
     } catch (error) {
       console.error("Error verificando acceso empleado:", error);
       return false;
@@ -281,7 +281,7 @@ export function ToolsManagement({ onNavigate }) {
                   <Input id="stock" type="number" value={form.stock} onChange={handleInputChange} placeholder="0" min="0" />
                 </div>
               </div>
-               <div>
+              <div>
                 <Label htmlFor="status">Estado</Label>
                 <Select value={form.status} onValueChange={handleStatusChange}>
                   <SelectTrigger>
@@ -309,7 +309,7 @@ export function ToolsManagement({ onNavigate }) {
           <div className="flex gap-4 items-center">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input 
+              <Input
                 placeholder="Buscar herramientas..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -349,7 +349,7 @@ export function ToolsManagement({ onNavigate }) {
                       style={{ maxHeight: "100%", maxWidth: "100%" }}
                     />
                   ) : (
-                  <Wrench className="h-12 w-12 text-gray-400" />)}
+                    <Wrench className="h-12 w-12 text-gray-400" />)}
                 </div>
                 <div className="p-4">
                   <div className="flex items-start justify-between mb-2">
@@ -363,7 +363,7 @@ export function ToolsManagement({ onNavigate }) {
                       {getConditionIcon(tool.condition)}
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-muted-foreground">Tarifa arriendo:</span>
