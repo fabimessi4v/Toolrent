@@ -72,14 +72,14 @@ class AuthServiceTest {
         Users newUser = new Users();
         newUser.setId("u2");
         newUser.setUsername("newuser");
-        newUser.setExternalId("sub456");
+        newUser.setKcSub("sub456");
         when(userRepository.save(any(Users.class))).thenReturn(newUser);
 
         Users user = authService.getCurrentUser();
 
         assertEquals("u2", user.getId());
         assertEquals("newuser", user.getUsername());
-        assertEquals("sub456", user.getExternalId());
+        assertEquals("sub456", user.getKcSub());
         verify(userRepository, times(1)).findByUsername("newuser");
         verify(userRepository, times(1)).save(any(Users.class));
     }
