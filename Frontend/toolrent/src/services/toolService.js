@@ -36,6 +36,12 @@ export const createTool = (toolsData) => {
 export const deleteTool = (id) => {
   return apiClient.delete(`/tools/${id}`);
 };
+
+// Función para actualizar una herramienta por ID
+export const updateTool = (id, toolData) => {
+  return apiClient.put(`/tools/${id}`, toolData);
+};
+
 // Función para obtener el ranking de herramientas
 export const getToolsRanking = () => {
   return apiClient.get('/tools/ranking');
