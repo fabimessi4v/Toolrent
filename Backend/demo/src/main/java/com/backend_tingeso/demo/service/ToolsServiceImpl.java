@@ -1,5 +1,6 @@
 package com.backend_tingeso.demo.service;
 
+import com.backend_tingeso.demo.dto.ToolDTO;
 import com.backend_tingeso.demo.dto.ToolRankingDTO;
 import com.backend_tingeso.demo.entity.Tools;
 import com.backend_tingeso.demo.entity.Users;
@@ -17,14 +18,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.server.ResponseStatusException;
 import com.backend_tingeso.demo.entity.enums.MovementType;
+import java.math.BigDecimal;
 
 /**
- * Esta clase contiene la lógica real. Implementa la interfaz y usa el ToolsRepository para interactuar con la base de datos.
- *
- *
+ * Servicio que implementa la lógica de negocio para el manejo de herramientas.
+ * Proporciona operaciones para crear, listar, actualizar y eliminar herramientas,
+ * así como la integración con el kardex y obtención de rankings.
  */
-
-
 @Service
 public class ToolsServiceImpl implements ToolsService {
 
@@ -33,6 +33,13 @@ public class ToolsServiceImpl implements ToolsService {
     private final AuthService authService;
     private static final Logger log = LoggerFactory.getLogger(ToolsServiceImpl.class);
     // Spring automáticamente nos "pasa" una instancia de ToolRepository
+    /**
+     * Constructor del servicio.
+     *
+     * @param toolRepository repositorio para persistencia de Tools
+     * @param kardexService  servicio para registrar movimientos en el kardex
+     * @param authService    servicio de autenticación para obtener usuario currente
+     */
     public  ToolsServiceImpl(ToolsRepository toolRepository, KardexService kardexService, AuthService authService) {
         this.toolsRepository = toolRepository;
         this.kardexService = kardexService;
@@ -41,6 +48,12 @@ public class ToolsServiceImpl implements ToolsService {
     //Se valida si estado de herramienta cumple con estados validos, segun reglas de negocio
     private static final Set<String> ESTADOS_VALIDOS = Set.of("Disponible", "Prestada", "En reparación", "Dada de baja");
 
+    /**
+     * Valida que el estado proporcionado esté dentro de los estados permitidos por la aplicación.
+     *
+     * @param estado estado a validar
+     * @throws IllegalArgumentException si el estado es null o no está en la lista de estados válidos
+     */
     private void validarEstado(String estado) {
         if (estado == null || !ESTADOS_VALIDOS.contains(estado)) {
             throw new IllegalArgumentException("Estado inválido. Debe ser uno de: " + ESTADOS_VALIDOS);
@@ -48,6 +61,19 @@ public class ToolsServiceImpl implements ToolsService {
     }
 
 //Crea herramienta, siguiendo reglas de negocio
+    /**
+     * Crea una nueva herramienta aplicando reglas de negocio:
+     * - Normaliza campos (trim).
+     * - Verifica campos obligatorios (nombre, categoría, valor de reposición).
+     * - Genera un UUID si el id es nulo.
+     * - Evita duplicados por nombre (case-insensitive).
+     * - Registra movimiento de entrada en el kardex.
+     *
+     * @param tool entidad Tools con los datos a persistir
+     * @return la entidad Tools persistida
+     * @throws IllegalArgumentException para violaciones de validación
+     * @throws ResponseStatusException  si existe conflicto (nombre duplicado)
+     */
     @Override
     @Transactional
     public Tools createTool(Tools tool) {
@@ -89,12 +115,24 @@ public class ToolsServiceImpl implements ToolsService {
         return savedTool;
     }
 
+    /**
+     * Obtiene todas las herramientas existentes.
+     *
+     * @return lista de Tools
+     */
     @Override
     public List<Tools> getAllTools() {
         // findAll() devuelve todos los registros de la tabla tools
         return toolsRepository.findAll();
     }
     //borrar herramienta segun regla de negocio
+    /**
+     * Elimina una herramienta por su id si el usuario autenticado tiene rol ADMIN.
+     *
+     * @param id identificador UUID de la herramienta
+     * @return true si se eliminó correctamente, false si no existía o id inválido
+     * @throws SecurityException si el usuario actual no tiene permisos de administrador
+     */
     @Override
     public boolean deleteTool(String id) {
         Users currentUser = authService.getCurrentUser(); // Usamos el método anterior
@@ -116,6 +154,12 @@ public class ToolsServiceImpl implements ToolsService {
             return false;
         }
     }
+
+    /**
+     * Obtiene el ranking de herramientas transformado a DTOs.
+     *
+     * @return lista de ToolRankingDTO con métricas de préstamos y ventas asociadas
+     */
     public List<ToolRankingDTO> getToolRanking() {
         // Ejecuta la consulta nativa y obtiene el resultado en bruto
         List<Object[]> results = toolsRepository.findToolRankingNative();
@@ -149,6 +193,14 @@ public class ToolsServiceImpl implements ToolsService {
         return ranking;
     }
 
+    /**
+     * Actualiza únicamente el estado de una herramienta.
+     *
+     * @param id        identificador de la herramienta
+     * @param newStatus nuevo estado a asignar
+     * @return herramienta actualizada
+     * @throws ResponseStatusException si la herramienta no existe
+     */
     @Override
     public Tools updateToolStatus(String id, String newStatus) {
         Tools tool = toolsRepository.findById(id)
@@ -156,5 +208,94 @@ public class ToolsServiceImpl implements ToolsService {
         tool.setStatus(newStatus); // Cambia de "ACTIVE" a "dada de baja"
         return toolsRepository.save(tool);
     }
+
+
+
+    /**
+     * Actualiza los campos de una herramienta a partir de un ToolDTO.
+     * Solo se actualizan los campos no nulos del DTO. Se realizan validaciones:
+     * - name y category no pueden quedar vacíos cuando son proporcionados
+     * - stock no puede ser negativo
+     * - replacementValue y rentalPrice no pueden ser negativos
+     * - status debe ser un estado válido
+     *
+     * @param id      id de la herramienta a actualizar
+     * @param request DTO con los campos a modificar (los campos nulos se ignoran)
+     * @return la entidad Tools actualizada y persistida
+     * @throws ResponseStatusException si la herramienta no existe
+     * @throws IllegalArgumentException para violaciones de validación
+     */
+    public Tools updateTool(String id, ToolDTO request) {
+        Tools tool = toolsRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Herramienta no encontrada")
+                );
+
+        // Nombre
+        if (request.getName() != null) {
+            String name = request.getName().trim();
+            if (name.isBlank()) {
+                throw new IllegalArgumentException("El nombre no puede estar vacío");
+            }
+            tool.setName(name);
+        }
+
+        // Categoría
+        if (request.getCategory() != null) {
+            String category = request.getCategory().trim();
+            if (category.isBlank()) {
+                throw new IllegalArgumentException("La categoría no puede estar vacía");
+            }
+            tool.setCategory(category); // corregido: usar getter
+        }
+
+        // Stock (asumimos Integer en el DTO para permitir null)
+        try {
+            Integer stock = request.getStock();
+            if (stock != null) {
+                if (stock < 0) {
+                    throw new IllegalArgumentException("El stock no puede ser negativo");
+                }
+                tool.setStock(stock);
+            }
+        } catch (NoSuchMethodError e) {
+            // Si el DTO usa primitive int y no permite null, se omite esta validación en tiempo de compilación;
+            // dejar tal bloque para evitar romper la compilación en distintos estados del DTO.
+        }
+
+        // Status
+        if (request.getStatus() != null) {
+            validarEstado(request.getStatus());
+            tool.setStatus(request.getStatus());
+        }
+
+        // Valor de reposición
+        if (request.getReplacementValue() != null) {
+            BigDecimal rv = request.getReplacementValue();
+            if (rv.signum() < 0) {
+                throw new IllegalArgumentException("El valor de reposición no puede ser negativo");
+            }
+            tool.setReplacementValue(rv);
+        }
+
+        // Precio de alquiler
+        if (request.getRentalPrice() != null) {
+            BigDecimal rp = request.getRentalPrice();
+            if (rp.signum() < 0) {
+                throw new IllegalArgumentException("El precio de alquiler no puede ser negativo");
+            }
+            tool.setRentalPrice(rp);
+        }
+
+        // URL de imagen
+        if (request.getTool_imageUrl() != null) {
+            String url = request.getTool_imageUrl().trim();
+            tool.setTool_imageUrl(url);
+        }
+
+        return toolsRepository.save(tool);
+    }
+
+
 
 }

@@ -1,5 +1,6 @@
 package com.backend_tingeso.demo.controller;
 
+import com.backend_tingeso.demo.dto.ToolDTO;
 import com.backend_tingeso.demo.dto.ToolRankingDTO;
 import com.backend_tingeso.demo.entity.Tools;
 import com.backend_tingeso.demo.service.ToolsService;
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -79,6 +81,20 @@ public class ToolsController {
         } catch (IllegalArgumentException e) {
             log.error("Error updating tool status: ", e);
             return ResponseEntity.badRequest().body(e.getMessage());
-}
+            }
+            }
+    // Endpoint para actualizar herramienta (usa ToolDTO en el body)
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateTool(@PathVariable String id, @RequestBody ToolDTO request) {
+        try {
+            Tools updatedTool = toolsService.updateTool(id, request);
+            return ResponseEntity.ok(updatedTool);
+        } catch (IllegalArgumentException e) {
+            log.error("Error updating tool: ", e);
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (ResponseStatusException e) {
+            log.error("Error updating tool: ", e);
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
     }
 }

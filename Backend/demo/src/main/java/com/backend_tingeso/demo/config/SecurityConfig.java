@@ -43,8 +43,8 @@ public class SecurityConfig {
                         // 1. Liberar Swagger para que no pida token
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
 
-                        // 2. Proteger tus endpoints (como /tools)
-                        .requestMatchers("/tools/**").authenticated()
+                        // 2. Proteger tus endpoints
+                        .requestMatchers("/api/v1/tools/**").authenticated()
 
                         // 3. Cualquier otra cosa requiere login
                         .anyRequest().authenticated()

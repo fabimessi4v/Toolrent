@@ -20,8 +20,6 @@ public class Users {
     private String id;
     @Column(name = "username")
     private String username;
-    @Column(name = "password")
-    private String password;
     @Column(name = "role")
     private String role;
     @CreationTimestamp
@@ -43,13 +41,6 @@ public class Users {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     public String getRole() {
         return role;

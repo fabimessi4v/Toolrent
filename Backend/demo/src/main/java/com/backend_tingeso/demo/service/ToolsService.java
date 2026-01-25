@@ -1,5 +1,6 @@
 package com.backend_tingeso.demo.service;
 
+import com.backend_tingeso.demo.dto.ToolDTO;
 import com.backend_tingeso.demo.dto.ToolRankingDTO;
 import com.backend_tingeso.demo.entity.Tools;
 import org.springframework.stereotype.Service;
@@ -23,4 +24,6 @@ public interface ToolsService {
     List<ToolRankingDTO> getToolRanking();
     //Actualizar estado de  herramienta
     Tools updateToolStatus(String id, String newStatus);
+    //Actualizar herramienta
+    Tools updateTool(String id, ToolDTO request);
 }
