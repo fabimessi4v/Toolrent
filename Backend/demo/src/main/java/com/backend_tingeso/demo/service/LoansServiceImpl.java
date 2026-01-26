@@ -2,6 +2,7 @@ package com.backend_tingeso.demo.service;
 
 import com.backend_tingeso.demo.dto.CustomerDTO;
 import com.backend_tingeso.demo.entity.*;
+import com.backend_tingeso.demo.entity.enums.MovementType;
 import com.backend_tingeso.demo.repository.FeeRepository;
 import com.backend_tingeso.demo.repository.KardexRepository;
 import com.backend_tingeso.demo.repository.LoansRepository;
@@ -91,6 +92,10 @@ public class LoansServiceImpl implements LoansService {
         if (dueDate.before(deliveryDate)) {
             throw new IllegalArgumentException("La fecha de devolución no puede ser anterior a la fecha de entrega.");
         }
+        // Validar que la el status de la herramienta sea "AVAILABLE"
+        if (!"AVAILABLE".equalsIgnoreCase(tool.getStatus())) {
+            throw new IllegalArgumentException("La herramienta no está disponible para préstamo.");
+        }
         // Descontar el stock
         tool.setStock(tool.getStock() - 1); // Resta 1 al campo de stock
         toolsRepository.save(tool); // Guarda el nuevo valor en la base de datos
@@ -112,10 +117,10 @@ public class LoansServiceImpl implements LoansService {
         Kardex kardex = new Kardex();
         kardex.setId(UUID.randomUUID().toString());
         kardex.setCreatedAt(LocalDateTime.now());
-        kardex.setType("LOAN");
+        kardex.setType(MovementType.DEVOLUCION);
         kardex.setTool(tool);
-        kardex.setUsers(user);
-        kardex.setLoans(nuevoPrestamo);
+        kardex.setUser(user);
+        kardex.setLoan(nuevoPrestamo);
         kardex.setMovementDate(java.time.LocalDate.now());
         kardex.setQuantity(1);
         kardexRepository.save(kardex);
@@ -163,9 +168,9 @@ public class LoansServiceImpl implements LoansService {
         kardex.setId(UUID.randomUUID().toString());
         kardex.setCreatedAt(LocalDateTime.now());
         kardex.setMovementDate(LocalDate.now());
-        kardex.setType("RETURN");
+        kardex.setType(MovementType.DEVOLUCION);
         kardex.setTool(tool);
-        kardex.setUsers(loan.getClient());
+        kardex.setUser(loan.getClient());
         kardex.setQuantity(1);
         kardexRepository.save(kardex);
 

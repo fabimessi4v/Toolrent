@@ -35,3 +35,18 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# Local env files (contienen secretos)
+.env
+.env.local
+.env.*.local
+.env.prod
+
+# Keystores and credentials
+*.keystore
+*.jks
+*.p12
+
+# IDE / OS files
+.DS_Store
+Thumbs.db

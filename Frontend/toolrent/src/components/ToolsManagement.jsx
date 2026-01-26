@@ -46,6 +46,9 @@ export function ToolsManagement({ onNavigate }) {
     stock: "",
   });
   const [adding, setAdding] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingTool, setEditingTool] = useState(null);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     async function fetchTools() {
@@ -161,6 +164,50 @@ export function ToolsManagement({ onNavigate }) {
       console.error("Error backend:", err.response?.data);
     } finally {
       setAdding(false);
+    }
+  };
+
+  const handleEditTool = (tool) => {
+    setEditingTool(tool);
+    setEditDialogOpen(true);
+  };
+
+  const handleUpdateTool = async () => {
+    if (!editingTool?.name?.trim() || !editingTool?.category?.trim()) {
+      alert("Nombre y categoría son obligatorios");
+      return;
+    }
+    if (!editingTool.replacementValue || isNaN(editingTool.replacementValue)) {
+      alert("El valor de reposición es obligatorio y debe ser un número");
+      return;
+    }
+
+    setUpdating(true);
+    try {
+      const payload = {
+        name: editingTool.name.trim(),
+        category: editingTool.category.trim(),
+        replacementValue: Number(editingTool.replacementValue),
+        rentalPrice: editingTool.rentalPrice ? Number(editingTool.rentalPrice) : 0,
+        stock: editingTool.stock ? parseInt(editingTool.stock) : 0,
+        status: validarEstado(editingTool.status || "Disponible"),
+      };
+      console.log("Payload actualización:", payload);
+
+      await updateTool(editingTool.id, payload);
+
+      setEditDialogOpen(false);
+      setEditingTool(null);
+
+      setLoading(true);
+      const response = await getTools();
+      setTools(response.data || []);
+      setLoading(false);
+    } catch (err) {
+      alert("Error al actualizar herramienta: " + (err.response?.data?.message || err.message));
+      console.error("Error backend:", err.response?.data);
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -328,18 +375,20 @@ export function ToolsManagement({ onNavigate }) {
                 className="pl-10"
               />
             </div>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-48">
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas las categorías</SelectItem>
-                {categories.slice(1).map(category => (
-                  <SelectItem key={category} value={category}>{category}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div>
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-full">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas las categorías</SelectItem>
+                  {categories.slice(1).map(category => (
+                    <SelectItem key={category} value={category}>{category}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -404,7 +453,7 @@ export function ToolsManagement({ onNavigate }) {
                   </div>
 
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="flex-1">
+                    <Button variant="outline" size="sm" className="flex-1" onClick={() => handleEditTool(tool)}>
                       <Edit3 className="h-4 w-4 mr-2" />
                       Editar
                     </Button>
@@ -420,10 +469,6 @@ export function ToolsManagement({ onNavigate }) {
                         Dar de Baja
                       </Button>
                     )}
-                    <Button variant="outline" size="sm" className="flex-1">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Kardex
-                    </Button>
                   </div>
                 </div>
               </CardContent>
@@ -475,6 +520,105 @@ export function ToolsManagement({ onNavigate }) {
           </details>
         </div>
       )}
+
+      {/* Dialog de Edición */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar Herramienta</DialogTitle>
+          </DialogHeader>
+          {editingTool && (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-name">Nombre de la herramienta</Label>
+                <Input
+                  id="edit-name"
+                  value={editingTool.name || ""}
+                  onChange={(e) => setEditingTool({ ...editingTool, name: e.target.value })}
+                  placeholder="Ej: Taladro Percutor Bosch"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-category">Categoría</Label>
+                <Select
+                  value={editingTool.category || ""}
+                  onValueChange={(value) => setEditingTool({ ...editingTool, category: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar categoría" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Manual">Manual</SelectItem>
+                    <SelectItem value="Electrica">Electrica</SelectItem>
+                    <SelectItem value="Equipo de Seguridad">Equipo de Seguridad</SelectItem>
+                    <SelectItem value="Soldadura">Soldadura</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="edit-rentalPrice">Tarifa arriendo/día ($)</Label>
+                  <Input
+                    id="edit-rentalPrice"
+                    type="number"
+                    value={editingTool.rentalPrice || ""}
+                    onChange={(e) => setEditingTool({ ...editingTool, rentalPrice: e.target.value })}
+                    placeholder="450"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="edit-replacementValue">Valor de reposición ($)</Label>
+                <Input
+                  id="edit-replacementValue"
+                  type="number"
+                  value={editingTool.replacementValue || ""}
+                  onChange={(e) => setEditingTool({ ...editingTool, replacementValue: e.target.value })}
+                  placeholder="85000"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="edit-stock">Stock</Label>
+                  <Input
+                    id="edit-stock"
+                    type="number"
+                    value={editingTool.stock || ""}
+                    onChange={(e) => setEditingTool({ ...editingTool, stock: e.target.value })}
+                    placeholder="0"
+                    min="0"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="edit-status">Estado</Label>
+                <Select
+                  value={editingTool.status || ""}
+                  onValueChange={(value) => setEditingTool({ ...editingTool, status: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Disponible">Disponible</SelectItem>
+                    <SelectItem value="Prestada">Prestada</SelectItem>
+                    <SelectItem value="En reparación">En reparación</SelectItem>
+                    <SelectItem value="Dada de baja">Dada de baja</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex-1" onClick={() => setEditDialogOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button className="flex-1" onClick={handleUpdateTool} disabled={updating}>
+                  {updating ? "Actualizando..." : "Guardar Cambios"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

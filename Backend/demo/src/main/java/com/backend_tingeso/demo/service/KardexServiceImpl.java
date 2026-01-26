@@ -1,18 +1,20 @@
 package com.backend_tingeso.demo.service;
 
+import com.backend_tingeso.demo.dto.KardexDTO;
 import com.backend_tingeso.demo.entity.Kardex;
 import com.backend_tingeso.demo.entity.Loans;
 import com.backend_tingeso.demo.entity.Tools;
 import com.backend_tingeso.demo.entity.Users;
+import com.backend_tingeso.demo.entity.enums.MovementType;
 import com.backend_tingeso.demo.repository.KardexRepository;
 import com.backend_tingeso.demo.repository.UsersRepository;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.Date;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,34 +28,13 @@ public class KardexServiceImpl implements KardexService {
         this.usersRepository = usersRepository;
     }
 
-    // DTO interno
-    public static class KardexDTO {
-        public String id;
-        public String toolName;
-        public String userName;
-        public String type;
-        public Integer quantity;
-        public LocalDate movementDate;
-        public String comments;
-
-        public KardexDTO(String id, String toolName, String userName, String type, Integer quantity, LocalDate movementDate, String comments) {
-            this.id = id;
-            this.toolName = toolName;
-            this.userName = userName;
-            this.type = type;
-            this.quantity = quantity;
-            this.movementDate = movementDate;
-            this.comments = comments;
-        }
-    }
-
     // Método privado para mapear entidad a DTO
     private KardexDTO toDTO(Kardex kardex) {
         return new KardexDTO(
                 kardex.getId(),
                 kardex.getTool() != null ? kardex.getTool().getName() : null,
-                kardex.getUsers() != null ? kardex.getUsers().getUsername() : null,
-                kardex.getType(),
+                kardex.getUser() != null ? kardex.getUser().getUsername() : null,
+                kardex.getType() != null ? kardex.getType().name() : null,
                 kardex.getQuantity(),
                 kardex.getMovementDate(),
                 kardex.getComments()
@@ -62,25 +43,28 @@ public class KardexServiceImpl implements KardexService {
 
     // Método para crear kardex
     @Override
-    public void createKardex(Tools tool, Users user, Loans loan, String type, Integer quantity, String comments) {
-        if (tool == null || user == null || type == null || type.isEmpty() || quantity == null || quantity <= 0) {
-            throw new IllegalArgumentException("Tool, User, type y quantity no pueden ser nulos o vacíos, y quantity debe ser mayor que 0");
+    public void createKardex(Tools tool, Users user, Loans loan, MovementType type, Integer quantity, String comments) {
+        if (tool == null || user == null || type == null || quantity == null || quantity <= 0) {
+            throw new IllegalArgumentException("Tool, User, type y quantity no pueden ser nulos, y quantity debe ser mayor que 0");
         }
+
         // Verificar que el usuario existe en BD y tiene ID
-        if (user.getId() == null) {
-            log.warn("Usuario sin ID, guardando: {}", user.getUsername());
+        if (user.getId() == null || user.getId().isEmpty()) {
+            log.warn("Usuario sin ID, guardando:  {}", user.getUsername());
             user = usersRepository.save(user);
         }
+
         if (user.getId() == null) {
             throw new IllegalStateException("No se pudo obtener ID del usuario después de guardarlo");
         }
+
         log.info("Creando kardex para usuario ID: {}, username: {}", user.getId(), user.getUsername());
 
         Kardex kardex = new Kardex();
         kardex.setId(UUID.randomUUID().toString());
         kardex.setTool(tool);
-        kardex.setUsers(user);
-        kardex.setLoans(loan);
+        kardex.setUser(user);
+        kardex.setLoan(loan);
         kardex.setType(type);
         kardex.setQuantity(quantity);
         kardex.setMovementDate(LocalDate.now());

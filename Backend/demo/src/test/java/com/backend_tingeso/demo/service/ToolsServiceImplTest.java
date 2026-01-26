@@ -3,11 +3,14 @@ package com.backend_tingeso.demo.service;
 import com.backend_tingeso.demo.entity.Tools;
 import com.backend_tingeso.demo.entity.Users;
 import com.backend_tingeso.demo.dto.ToolRankingDTO;
+import com.backend_tingeso.demo.entity.enums.MovementType;
 import com.backend_tingeso.demo.repository.ToolsRepository;
 import com.backend_tingeso.demo.repository.UsersRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -31,10 +34,9 @@ class ToolsServiceImplTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-
     @Test
     void createTool_validaDatosYGuardaTool() {
-        // Arrange (Data preparation)
+        // Arrange
         Tools tool = new Tools();
         tool.setName("Martillo");
         tool.setCategory("Manuales");
@@ -47,14 +49,25 @@ class ToolsServiceImplTest {
         user.setRole("ADMIN");
 
         when(authService.getCurrentUser()).thenReturn(user);
-        when(toolsRepository.save(any(Tools.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(toolsRepository.saveAndFlush(any(Tools.class))).thenAnswer(invocation -> {
+            Tools t = invocation.getArgument(0);
+            if (t.getId() == null) t.setId("generated-id");
+            return t;
+        });
 
         // Act
         Tools result = toolsService.createTool(tool);
 
-        // Assert (Result verification)
+        // Assert
         assertNotNull(result.getId());
-        verify(kardexService).createKardex(any(Tools.class), eq(user), isNull(), eq("Registro nuevo"), eq(1), eq(""));
+        verify(kardexService).createKardex(
+                any(Tools.class),
+                eq(user),
+                isNull(),
+                eq(MovementType.ENTRADA),  // Usar el tipo enum correcto según tu lógica
+                eq(1),
+                eq("")
+        );
     }
 
     @Test
@@ -157,5 +170,60 @@ class ToolsServiceImplTest {
         assertEquals(0.0, tool2.getTotalRevenue());
         assertEquals(0.0, tool2.getTotalFines());
     }
-    
+
+    @Test
+    void createTool_lanzaExcepcionSiYaExisteMismoNombre() {
+        // Llenamos los datos para que pase la validación de "campos obligatorios"
+        Tools toolRepetida = new Tools();
+        toolRepetida.setName("Martillo");
+        toolRepetida.setCategory("Manuales");
+        toolRepetida.setReplacementValue(BigDecimal.valueOf(10000));
+
+        // Mockeamos que el nombre YA existe
+        when(toolsRepository.existsByNameIgnoreCase("Martillo")).thenReturn(true);
+        //Se guarda excepcion en variable ex, para luego ser verificada mas abajo
+        ResponseStatusException ex = assertThrows(
+                ResponseStatusException.class,
+                () -> toolsService.createTool(toolRepetida)
+        );
+        assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
+        assertTrue(ex.getReason().contains("Ya existe"));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

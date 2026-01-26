@@ -14,14 +14,12 @@ import java.util.UUID;
 @Table(name = "users")
 
 public class Users {
-    @Column(name = "external_id", unique = true)
-    private String externalId;
+    @Column(name = "kc_sub", unique = true) // Coincide con kc_sub en MySQL
+    private String kcSub;
     @Id
     private String id;
     @Column(name = "username")
     private String username;
-    @Column(name = "password")
-    private String password;
     @Column(name = "role")
     private String role;
     @CreationTimestamp
@@ -43,13 +41,6 @@ public class Users {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     public String getRole() {
         return role;
@@ -67,11 +58,11 @@ public class Users {
         this.createdAt = createdAt;
     }
 
-    public String getExternalId() {
-        return externalId;
+    public String getKcSub() {
+        return kcSub;
     }
 
-    public void setExternalId(String externalId) {
-        this.externalId = externalId;
+    public void setKcSub(String kcSub) {
+        this.kcSub = kcSub;
     }
 }

@@ -1,9 +1,9 @@
 import axios from 'axios';
-import keycloak from '../keycloak'; // asegúrate de la ruta correcta
+import keycloak from './keycloak'; // asegúrate de la ruta correcta
 
 // Configuración del cliente Axios
 const apiClient = axios.create({
-  baseURL: 'https://toolrent.duckdns.org/api/v1',
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
   }
@@ -36,6 +36,12 @@ export const createTool = (toolsData) => {
 export const deleteTool = (id) => {
   return apiClient.delete(`/tools/${id}`);
 };
+
+// Función para actualizar una herramienta por ID
+export const updateTool = (id, toolData) => {
+  return apiClient.put(`/tools/${id}`, toolData);
+};
+
 // Función para obtener el ranking de herramientas
 export const getToolsRanking = () => {
   return apiClient.get('/tools/ranking');

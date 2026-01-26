@@ -1,4 +1,5 @@
 package com.backend_tingeso.demo.controller;
+import com.backend_tingeso.demo.dto.KardexDTO;
 
 import com.backend_tingeso.demo.service.KardexServiceImpl;
 import com.backend_tingeso.demo.service.KardexService;
@@ -17,7 +18,7 @@ public class KardexController {
     }
 
     @GetMapping
-    public List<KardexServiceImpl.KardexDTO> getAllKardex() {
+    public List<KardexDTO>getAllKardex() {
         return kardexService.getAllKardex();
     }
 }

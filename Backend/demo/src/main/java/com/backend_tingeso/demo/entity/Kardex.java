@@ -1,6 +1,8 @@
 package com.backend_tingeso.demo.entity;
 
 
+import com.backend_tingeso.demo.entity.enums.MovementType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -13,29 +15,48 @@ import java.util.UUID;
 @Table(name = "kardex")
 public class Kardex {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    // Relación ManyToOne: Una herramienta puede tener muchos movimientos (kardex)
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+
+    // 1. FECHA DEL MOVIMIENTO
+    @Column(name = "movement_date", nullable = false)
+    private LocalDate movementDate;
+
+    // 2. TIPO ej: INGRESO, EGRESO, AJUSTE, BAJA, COMPRA
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private MovementType type;
+
+    // 3. HERRAMIENTA
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tool_id", nullable = false)
     private Tools tool;
-    // Relación ManyToOne: Un usuario registrar muchos movimientos en el kardex
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private Users users;
-    // Relación ManyToOne: Un prestamo puede generar varios movimientos en el kardex
-    @ManyToOne(fetch = FetchType.EAGER, optional = true)
-    @JoinColumn(name = "loans_id", nullable = true)
-    private Loans loans;
-    private String type;
-    @Column(name = "quantity")
+
+    // 4. CANTIDAD
+    @Column(name = "quantity", nullable = false)
     private Integer quantity;
-    @Column(name = "movement_date")
-    private LocalDate movementDate;
-    @Column(name = "comments")
+
+    // 5. DESCRIPCIÓN
+    @Column(name = "comments") // En BD suele llamarse comments o description
     private String comments;
+
+    // 6. USUARIO
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private Users user;
+
+    // ---  campos que no se usan en front---
+    // Esto es correcto para movimientos como: "Compra de inventario", "Baja por daño", "Ajuste".
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "loan_id", nullable = true)
+    private Loans loan;
+
+    // Auditoría automática (cuándo se insertó el registro real en BD)
     @CreationTimestamp
-    @Column(name = "createdAt", updatable = false) // Cambiar según el nombre real de tu columna
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    // Getters y Setters
 
     public String getId() {
         return id;
@@ -43,6 +64,22 @@ public class Kardex {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public LocalDate getMovementDate() {
+        return movementDate;
+    }
+
+    public void setMovementDate(LocalDate movementDate) {
+        this.movementDate = movementDate;
+    }
+
+    public MovementType getType() {
+        return type;
+    }
+
+    public void setType(MovementType type) {
+        this.type = type;
     }
 
     public Tools getTool() {
@@ -53,30 +90,6 @@ public class Kardex {
         this.tool = tool;
     }
 
-    public Users getUsers() {
-        return users;
-    }
-
-    public void setUsers(Users users) {
-        this.users = users;
-    }
-
-    public Loans getLoans() {
-        return loans;
-    }
-
-    public void setLoans(Loans loans) {
-        this.loans = loans;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public Integer getQuantity() {
         return quantity;
     }
@@ -85,11 +98,28 @@ public class Kardex {
         this.quantity = quantity;
     }
 
-    public LocalDate getMovementDate() {
-        return movementDate;
+    public String getComments() {
+        return comments;
     }
-    public void setMovementDate(LocalDate movementDate) {
-        this.movementDate = movementDate;
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
+    public Users getUser() {
+        return user;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
+    }
+
+    public Loans getLoan() {
+        return loan;
+    }
+
+    public void setLoan(Loans loan) {
+        this.loan = loan;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -98,11 +128,5 @@ public class Kardex {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-    public String getComments() {
-        return comments;
-    }
-    public void setComments(String comments) {
-        this.comments = comments;
     }
 }

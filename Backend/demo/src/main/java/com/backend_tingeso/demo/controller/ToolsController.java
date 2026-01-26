@@ -1,5 +1,6 @@
 package com.backend_tingeso.demo.controller;
 
+import com.backend_tingeso.demo.dto.ToolDTO;
 import com.backend_tingeso.demo.dto.ToolRankingDTO;
 import com.backend_tingeso.demo.entity.Tools;
 import com.backend_tingeso.demo.service.ToolsService;
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -27,18 +29,18 @@ public class ToolsController {
 
     // Endpoint para crear un nuevo Tool
     @PostMapping
-    public ResponseEntity<?> createTool(@RequestBody Tools tool) {
+    public ResponseEntity<Tools> createTool(@RequestBody Tools tool) {
+
         log.info("=== CONTROLLER REACHED ===");
         log.info("Received tool: {}", tool);
 
-        try {
-            Tools newTool = toolsService.createTool(tool);
-            log.info("Tool created successfully");
-            return new ResponseEntity<>(newTool, HttpStatus.CREATED);
-        } catch (Exception ex) {
-            log.error("Error in controller: ", ex);
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
+        Tools newTool = toolsService.createTool(tool);
+
+        log.info("Tool created successfully");
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(newTool);
     }
 
     // Endpoint para obtener todos los Tools
@@ -67,5 +69,31 @@ public class ToolsController {
     @GetMapping("/ranking")
     public List<ToolRankingDTO> getToolRanking() {
         return toolsService.getToolRanking();
+    }
+
+    //Endpoint para actualizar estado de herramienta
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateToolStatus(@PathVariable String id, @RequestParam String newStatus) {
+        try {
+            Tools updatedTool = toolsService.updateToolStatus(id, newStatus);
+            return ResponseEntity.ok(updatedTool);
+        } catch (IllegalArgumentException e) {
+            log.error("Error updating tool status: ", e);
+            return ResponseEntity.badRequest().body(e.getMessage());
+            }
+            }
+    // Endpoint para actualizar herramienta (usa ToolDTO en el body)
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateTool(@PathVariable String id, @RequestBody ToolDTO request) {
+        try {
+            Tools updatedTool = toolsService.updateTool(id, request);
+            return ResponseEntity.ok(updatedTool);
+        } catch (IllegalArgumentException e) {
+            log.error("Error updating tool: ", e);
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (ResponseStatusException e) {
+            log.error("Error updating tool: ", e);
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
     }
 }
