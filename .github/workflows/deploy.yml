@@ -35,17 +35,25 @@ jobs:
     runs-on: ubuntu-latest
     environment: staging
     steps:
-      - name: Deploy to Staging Server
+      - name: Deploy to Local KVM VM
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.STAGING_HOST }}
-          username: ${{ secrets.STAGING_USER }}
-          key: ${{ secrets.STAGING_SSH_KEY }}
+          host: ${{ secrets.SSH_HOST }}      # Tu URL de túnel o IP Tailscale
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}      # El 2222 que configuramos
           script: |
+            # 1. Ir a la carpeta del proyecto
+            cd ~/app
+            
+            # 2. Bajar la nueva imagen (la que acaba de subir el job anterior)
             docker pull ${{ secrets.DOCKER_USERNAME }}/toolrent-app:latest
-            docker stop toolrent-staging || true
-            docker rm toolrent-staging || true
-            docker run -d --name toolrent-staging -p 8081:8080 ${{ secrets.DOCKER_USERNAME }}/toolrent-app:latest
+            
+            # 3. Reiniciar solo el contenedor de la app
+            docker compose up -d app-toolrent
+            
+            # 4. Limpiar imágenes viejas (Vital para tus 10GB de disco)
+            docker image prune -f
 
   # --- ETAPA 3: DEPLOY A PRODUCCIÓN (Con aprobación manual) ---
   deploy-production:
