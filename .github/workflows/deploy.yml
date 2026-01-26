@@ -1,8 +1,10 @@
 name: CI/CD Pipeline Toolrent
 
+
+# Se activa al hacer push a main
 on:
   push:
-    branches: [ main ] # Se activa al hacer push a main
+    branches: [ main ]
 
 jobs:
   # --- ETAPA 1: BUILD & TEST ---
