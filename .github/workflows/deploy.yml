@@ -1,7 +1,7 @@
 name: CI/CD Pipeline Toolrent
 
 
-# Se activa al hacer push a main
+# Se activa al hacer push a main1
 on:
   push:
     branches: [ main ]
