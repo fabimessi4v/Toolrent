@@ -35,24 +35,22 @@ jobs:
     runs-on: ubuntu-latest
     environment: staging
     steps:
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+
       - name: Deploy to Local KVM VM
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_HOST }}      # Tu URL de túnel o IP Tailscale
+          host: ${{ secrets.SSH_HOST }}      # Aquí va la IP 100.x.x.x de la VM
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT }}      # El 2222 que configuramos
+          port: 22                           # ¡OJO! Con Tailscale ya no necesitas el 2222, usa el 22 directo
           script: |
-            # 1. Ir a la carpeta del proyecto
             cd ~/app
-            
-            # 2. Bajar la nueva imagen (la que acaba de subir el job anterior)
             docker pull ${{ secrets.DOCKER_USERNAME }}/toolrent-app:latest
-            
-            # 3. Reiniciar solo el contenedor de la app
             docker compose up -d app-toolrent
-            
-            # 4. Limpiar imágenes viejas (Vital para tus 10GB de disco)
             docker image prune -f
 
   # --- ETAPA 3: DEPLOY A PRODUCCIÓN (Con aprobación manual) ---
