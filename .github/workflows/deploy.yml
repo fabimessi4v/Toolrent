@@ -23,11 +23,13 @@ jobs:
       - name: Make gradlew executable
         # Para que github tenga permiso de ejecucion
         run: chmod +x ./gradlew
+        working-directory: Backend/demo
 
         
       - name: Build with Gradle
         # Comando para compilar y testear en Gradle
         run: ./gradlew build
+        working-directory: Backend/demo
 
       - name: Build Docker Image
         run: |
