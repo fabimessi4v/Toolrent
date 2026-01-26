@@ -52,7 +52,7 @@ jobs:
       - name: Deploy to Local KVM VM
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_HOST }}      # Aquí va la IP 100.x.x.x de la VM
+          host: ${{ vars.SSH_HOST }}      # Aquí va la IP 100.x.x.x de la VM
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: 22                           # ¡OJO! Con Tailscale ya no necesitas el 2222, usa el 22 directo
