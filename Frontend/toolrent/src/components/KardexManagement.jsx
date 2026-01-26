@@ -3,9 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
-import { 
-  Search, 
-  Filter, 
+import {
+  Search,
+  Filter,
   Package,
   ArrowUp,
   ArrowDown,
@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
-import { getAllKardex } from "../services/kardexService"; // ajusta la ruta si es diferente
+import { getAllKardex } from "../services/serviceWrapper";
 
 export function KardexManagement({ onNavigate }) {
   const [movements, setMovements] = useState([]);
@@ -111,38 +111,40 @@ export function KardexManagement({ onNavigate }) {
       </div>
 
       {/* Filters */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex gap-4 items-center">
-            {/* Fecha inicio */}
-            <Input
-              type="date"
-              value={startDate}
-              onChange={e => setStartDate(e.target.value)}
-              className="w-40"
-              placeholder="Fecha inicio"
-            />
-            {/* Fecha fin */}
-            <Input
-              type="date"
-              value={endDate}
-              onChange={e => setEndDate(e.target.value)}
-              className="w-40"
-              placeholder="Fecha fin"
-            />
-            {/* Herramienta */}
-            <Select value={selectedTool} onValueChange={setSelectedTool}>
-              <SelectTrigger className="w-64"><Package className="h-4 w-4 mr-2" /><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas las herramientas</SelectItem>
-                {uniqueTools.map(tool => (
-                  <SelectItem key={tool.name} value={tool.name}>{tool.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="pt-4">
+        <Card>
+          <CardContent className="p-4 pt-6">
+            <div className="flex gap-4 items-center">
+              {/* Fecha inicio */}
+              <Input
+                type="date"
+                value={startDate}
+                onChange={e => setStartDate(e.target.value)}
+                className="w-40"
+                placeholder="Fecha inicio"
+              />
+              {/* Fecha fin */}
+              <Input
+                type="date"
+                value={endDate}
+                onChange={e => setEndDate(e.target.value)}
+                className="w-40"
+                placeholder="Fecha fin"
+              />
+              {/* Herramienta */}
+              <Select value={selectedTool} onValueChange={setSelectedTool}>
+                <SelectTrigger className="w-64"><Package className="h-4 w-4 mr-2" /><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas las herramientas</SelectItem>
+                  {uniqueTools.map(tool => (
+                    <SelectItem key={tool.name} value={tool.name}>{tool.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Movements Table */}
       <Card>

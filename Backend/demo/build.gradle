@@ -43,18 +43,14 @@ tasks.named('test') {
 	// <--- JVM args para permitir el agente en Java 17+
 	jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED'
 }
-
-// ✅ CONFIGURACIÓN CORRECTA: Solo bootJar genera el ejecutable
-springBoot {
-	mainClass = 'com.backend_tingeso.demo.DemoApplication'
-}
-
-tasks.named('bootJar') {
+jar {
 	archiveFileName = "toolrent-backend.jar"
-	enabled = true  // ✅ Habilitar Fat JAR
+	manifest {
+		attributes(
+			'Main-Class': 'com.backend_tingeso.demo.DemoApplication'
+		)
+	}
 }
-
-tasks.named('jar') {
-	archiveFileName = "toolrent-backend-plain.jar"
-	enabled = false  // ✅ Deshabilar JAR simple
+bootJar {
+	archiveFileName = "toolrent-backend.jar"
 }

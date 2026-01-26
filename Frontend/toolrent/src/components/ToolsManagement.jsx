@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import { getTools, createTool, deleteTool, updateTool } from "../services/toolService";
+import { useKeycloak } from "@react-keycloak/web";
+import { useMockKeycloak } from "../auth/MockAuthProvider";
+import { getTools, createTool, deleteTool } from "../services/serviceWrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -19,9 +21,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "./ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Textarea } from "./ui/textarea";
-import keycloak from "../services/keycloak";
+
+// Hook dinámico: usa el real o el mock según el modo
+const useAuth = () => {
+  const USE_KEYCLOAK = import.meta.env.VITE_USE_KEYCLOAK === 'true';
+  if (USE_KEYCLOAK) {
+    return useKeycloak();
+  } else {
+    return useMockKeycloak();
+  }
+};
 
 export function ToolsManagement({ onNavigate }) {
+  const { keycloak } = useAuth();
   const [tools, setTools] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -57,10 +69,9 @@ export function ToolsManagement({ onNavigate }) {
   const categories = ["all", "Taladros", "Sierras", "Soldadoras", "Amoladoras", "Llaves", "Martillos"];
 
   const filteredTools = tools.filter(tool => {
-    const matchesSearch =
-      (tool.name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (tool.brand?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (tool.model?.toLowerCase() || "").includes(searchTerm.toLowerCase());
+    const matchesSearch = tool.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tool.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tool.model.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "all" || tool.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -353,9 +364,9 @@ export function ToolsManagement({ onNavigate }) {
 
       {/* Filters */}
       <Card>
-        <CardContent className="p-6 md:p-6">
-          <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-4 items-center">
-            <div className="relative">
+        <CardContent className="p-4 pt-6">
+          <div className="flex gap-4 items-center">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar herramientas..."

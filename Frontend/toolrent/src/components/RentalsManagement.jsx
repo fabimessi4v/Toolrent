@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useKeycloak } from "@react-keycloak/web";
+import { useMockKeycloak } from "../auth/MockAuthProvider";
 import {
   Card, CardContent
 } from "./ui/card";
@@ -13,10 +15,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "./ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { getAllLoans, createLoan, returnLoan } from "../services/loansService.js"; // <--- importar returnLoan
-import { getTools } from "../services/toolService.js";
-import { getAllCustomers } from "../services/customerService.js";
-import keycloak from "../services/keycloak";
+import { getAllLoans, createLoan, returnLoan } from "../services/serviceWrapper.js";
+import { getTools } from "../services/serviceWrapper.js";
+import { getAllCustomers } from "../services/serviceWrapper.js";
+
+// Hook dinámico: usa el real o el mock según el modo
+const useAuth = () => {
+  const USE_KEYCLOAK = import.meta.env.VITE_USE_KEYCLOAK === 'true';
+  if (USE_KEYCLOAK) {
+    return useKeycloak();
+  } else {
+    return useMockKeycloak();
+  }
+};
 
 // Helper para formatear fecha
 function formatDate(dateStr) {
@@ -26,6 +37,7 @@ function formatDate(dateStr) {
 }
 
 export function LoansManagement({ onNavigate }) {
+  const { keycloak } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [loans, setLoans] = useState([]);
@@ -318,9 +330,9 @@ export function LoansManagement({ onNavigate }) {
         <TabsContent value="all">
           {/* Filters */}
           <Card>
-            <CardContent className="p-4">
+            <CardContent className="p-4 pt-6">
               <div className="flex gap-4 items-center">
-                <div className="relative flex-1">
+                <div className="relative w-full max-w-sm">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Buscar por cliente, herramienta o ID..."
