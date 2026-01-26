@@ -18,10 +18,16 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: 'maven'
+          cache: 'gradle'
 
-      - name: Build with Maven & Run Tests
-        run: mvn clean package # Aquí corren tus tests automáticos
+      - name: Make gradlew executable
+        # Para que github tenga permiso de ejecucion
+        run: chmod +x ./gradlew
+
+        
+      - name: Build with Gradle
+        # Comando para compilar y testear en Gradle
+        run: ./gradlew build
 
       - name: Build Docker Image
         run: |
