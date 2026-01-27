@@ -31,12 +31,21 @@ jobs:
         run: ./gradlew build -x test
         working-directory: Backend/demo
 
-      - name: Build Docker Image
+      - name: Build and Push Backend Image
         run: |
           cd Backend/demo
           docker build -t ${{ secrets.DOCKER_USERNAME }}/toolrent-app:latest .
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
           docker push ${{ secrets.DOCKER_USERNAME }}/toolrent-app:latest
+
+      - name: Build and Push Frontend Image
+        run: |
+          cd Frontend
+          docker build \
+            --build-arg VITE_API_URL=${{ secrets.VITE_API_URL }} \
+            --build-arg VITE_KEYCLOAK_URL=${{ secrets.VITE_KEYCLOAK_URL }} \
+            -t ${{ secrets.DOCKER_USERNAME }}/toolrent-front:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/toolrent-front:latest
 
   # --- ETAPA 2: DEPLOY A STAGING ---
   deploy-staging:
@@ -60,7 +69,8 @@ jobs:
           script: |
             cd ~/app
             docker pull ${{ secrets.DOCKER_USERNAME }}/toolrent-app:latest
-            docker compose up -d app-toolrent
+            docker pull ${{ secrets.DOCKER_USERNAME }}/toolrent-front:latest
+            docker compose up -d
             docker image prune -f
 
   # --- ETAPA 3: DEPLOY A PRODUCCIÓN (Con aprobación manual) ---
