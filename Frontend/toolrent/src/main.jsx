@@ -3,7 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { ReactKeycloakProvider } from "@react-keycloak/web";
 import App from "./App";
-import keycloak from "./keycloak"; // tu instancia Keycloak
+import keycloak from "./services/keycloak"; // tu instancia Keycloak
 import { MockAuthProvider } from "./auth/MockAuthProvider";
 
 // Variable de entorno para activar/desactivar Keycloak
