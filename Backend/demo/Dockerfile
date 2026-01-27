@@ -3,7 +3,7 @@ FROM eclipse-temurin:17-jdk AS build
 
 WORKDIR /build
 COPY . .
-RUN chmod +x gradlew && ./gradlew clean build -x test
+RUN chmod +x gradlew && ./gradlew clean bootJar -x test
 
 # -------- STAGE 2: RUNTIME --------
 FROM eclipse-temurin:17-jre
