@@ -9,7 +9,7 @@ ARG VITE_KEYCLOAK_URL
 
 # Los convertimos en variables de entorno para que Vite los vea
 ENV VITE_API_URL=$VITE_API_URL
-ENV VITE_KEYCLOAK_URL=$VITE_KEYCLOAK_UR
+ENV VITE_KEYCLOAK_URL=$VITE_KEYCLOAK_URL
 
 # Copia los archivos de dependencias desde la subcarpeta toolrent/
 COPY toolrent/package*.json ./
