@@ -7,6 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
+      environment: staging
   # --- ETAPA 1: BUILD & TEST ---
   build-and-test:
     runs-on: ubuntu-latest
@@ -25,8 +26,8 @@ jobs:
         run: |
           cd Frontend
           docker build \
-            --build-arg VITE_API_URL=${{ secrets.VITE_API_URL }} \
-            --build-arg VITE_KEYCLOAK_URL=${{ secrets.VITE_KEYCLOAK_URL }} \
+            --build-arg VITE_API_URL=${{ vars.VITE_API_URL }} \
+            --build-arg VITE_KEYCLOAK_URL=${{ vars.VITE_KEYCLOAK_URL }} \
             -t ${{ secrets.DOCKER_USERNAME }}/toolrent-front:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/toolrent-front:latest
 
