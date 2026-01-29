@@ -3,6 +3,15 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Copia los archivos de dependencias desde la subcarpeta toolrent/
+COPY toolrent/package*.json ./
+
+# Instala las dependencias
+RUN npm ci
+
+# Copia el resto del código fuente desde la subcarpeta toolrent/
+COPY toolrent/. .
+
 # Definimos los argumentos que vienen desde el comando docker build
 ARG VITE_API_URL
 ARG VITE_KEYCLOAK_URL
@@ -15,14 +24,6 @@ ENV VITE_KEYCLOAK_URL=$VITE_KEYCLOAK_URL
 ENV VITE_KEYCLOAK_REALM=$VITE_KEYCLOAK_REALM
 ENV VITE_KEYCLOAK_CLIENT_ID=$VITE_KEYCLOAK_CLIENT_ID
 
-# Copia los archivos de dependencias desde la subcarpeta toolrent/
-COPY toolrent/package*.json ./
-
-# Instala las dependencias
-RUN npm ci
-
-# Copia el resto del código fuente desde la subcarpeta toolrent/
-COPY toolrent/. .
 
 # Compila la aplicación (genera la carpeta dist)
 RUN npm run build
