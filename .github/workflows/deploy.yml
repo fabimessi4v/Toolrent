@@ -25,10 +25,8 @@ jobs:
       - name: Build and Push Frontend Image
         run: |
           cd Frontend
-          echo "Debug: VITE_API_URL is [${{ vars.VITE_API_URL }}]"
-          echo "Debug: VITE_KEYCLOAK_REALM is [${{ vars.VITE_KEYCLOAK_REALM }}]"
           docker build \
-            --build-arg VITE_API_URL=${{ vars.VITE_API_URL }} \
+            --build-arg VITE_API_BASE_URL=${{ vars.VITE_API_URL }} \
             --build-arg VITE_KEYCLOAK_URL=${{ vars.VITE_KEYCLOAK_URL }} \
             --build-arg VITE_KEYCLOAK_REALM=${{ vars.VITE_KEYCLOAK_REALM }} \
             --build-arg VITE_KEYCLOAK_CLIENT_ID=${{ vars.VITE_KEYCLOAK_CLIENT_ID }} \
