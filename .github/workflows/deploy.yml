@@ -1,7 +1,7 @@
 name: CI/CD Pipeline Toolrent
 
 
-# Se activa al hacer push a main4
+# Se activa al hacer push a main5
 on:
   push:
     branches: [ main ]
@@ -28,6 +28,8 @@ jobs:
           docker build \
             --build-arg VITE_API_URL=${{ vars.VITE_API_URL }} \
             --build-arg VITE_KEYCLOAK_URL=${{ vars.VITE_KEYCLOAK_URL }} \
+            --build-arg VITE_KEYCLOAK_REALM=${{ vars.VITE_KEYCLOAK_REALM }} \
+            --build-arg VITE_KEYCLOAK_CLIENT_ID=${{ vars.VITE_KEYCLOAK_CLIENT_ID }} \
             -t ${{ secrets.DOCKER_USERNAME }}/toolrent-front:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/toolrent-front:latest
 
