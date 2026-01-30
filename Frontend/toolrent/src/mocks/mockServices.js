@@ -37,6 +37,19 @@ export const mockToolService = {
         return { data: { message: "Herramienta dada de baja" } };
     },
 
+    updateTool: async (id, payload) => {
+        await delay(500);
+        const index = mockTools.findIndex(t => t.id === id);
+        if (index !== -1) {
+            mockTools[index] = {
+                ...mockTools[index],
+                ...payload
+            };
+            return { data: mockTools[index] };
+        }
+        throw new Error("Herramienta no encontrada");
+    },
+
     getToolsRanking: async () => {
         await delay(300);
         return { data: mockToolRanking };

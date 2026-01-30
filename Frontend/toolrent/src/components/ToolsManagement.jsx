@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useKeycloak } from "@react-keycloak/web";
 import { useMockKeycloak } from "../auth/MockAuthProvider";
-import { getTools, createTool, deleteTool } from "../services/serviceWrapper";
+import { getTools, createTool, deleteTool, updateTool } from "../services/serviceWrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -55,9 +55,19 @@ export function ToolsManagement({ onNavigate }) {
       setLoading(true);
       try {
         const response = await getTools();
-        console.log(response);
-        setTools(response.data || []);
+        console.log("📦 Tools response:", response);
+
+        // Validación robusta para asegurar que siempre sea un array
+        const toolsData = Array.isArray(response?.data)
+          ? response.data
+          : Array.isArray(response)
+            ? response
+            : [];
+
+        console.log("✅ Tools data parsed:", toolsData);
+        setTools(toolsData);
       } catch (err) {
+        console.error("❌ Error fetching tools:", err);
         setTools([]);
       } finally {
         setLoading(false);
@@ -69,9 +79,11 @@ export function ToolsManagement({ onNavigate }) {
   const categories = ["all", "Taladros", "Sierras", "Soldadoras", "Amoladoras", "Llaves", "Martillos"];
 
   const filteredTools = tools.filter(tool => {
-    const matchesSearch = tool.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tool.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tool.model.toLowerCase().includes(searchTerm.toLowerCase());
+    const searchLower = searchTerm.toLowerCase();
+    const matchesSearch =
+      (tool.name || '').toLowerCase().includes(searchLower) ||
+      (tool.brand || '').toLowerCase().includes(searchLower) ||
+      (tool.model || '').toLowerCase().includes(searchLower);
     const matchesCategory = selectedCategory === "all" || tool.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
