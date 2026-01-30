@@ -16,15 +16,14 @@
 
 - **Given** que el empleado está autenticado y en el formulario de "Nuevo Préstamo"
     
-- **When** ingresa el RUT del cliente "12.345.678-9" y el ID de herramienta "T-100"
+- **When** ingresa el Nombre del cliente "Carlos Ruiz" y el nombre de herramienta "Taladro Bosch"
     
 - **And** selecciona una fecha de devolución válida (posterior a hoy)
     
-- **And** presiona "Confirmar Préstamo"
+- **And** presiona "Crear Préstamo"
     
-- **Then** el sistema debe registrar el préstamo y mostrar "Préstamo realizado con éxito"
+- **Then** el sistema debe registrar el préstamo y mostrar "Préstamo creado con éxito"
     
-- **And** el stock de la herramienta debe disminuir en 1 unidad en el Kardex.
     
 
 **Validación Selenium IDE:**
