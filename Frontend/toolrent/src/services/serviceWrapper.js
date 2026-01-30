@@ -40,6 +40,9 @@ export const createTool = (...args) =>
 export const deleteTool = (...args) =>
     tryRealOrMock(realToolService.deleteTool, mockToolService.deleteTool, ...args);
 
+export const updateTool = (...args) =>
+    tryRealOrMock(realToolService.updateTool, mockToolService.updateTool, ...args);
+
 export const getToolsRanking = (...args) =>
     tryRealOrMock(realToolService.getToolsRanking, mockToolService.getToolsRanking, ...args);
 
