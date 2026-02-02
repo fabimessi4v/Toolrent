@@ -2,7 +2,7 @@
   "id": "4121a1ef-eda8-41f8-acd2-536fe70bc8ed",
   "version": "2.0",
   "name": "Toolrent_Pruebas_Funcionales",
-  "url": "https://192.168.122.17",
+  "url": "https://192.168.122.17/",
   "tests": [{
     "id": "14ec50d8-1494-4767-bbb4-9c461f3c4f43",
     "name": "Epica2_Escenario1",
@@ -86,7 +86,7 @@
       "id": "c846aa68-8910-4bff-896c-a434bd1dbecb",
       "comment": "",
       "command": "click",
-      "target": "xpath=//div[@role=\"option\" and normalize-space(.)=\"martillo de oro\"]",
+      "target": "xpath=//div[@role=\"option\" and normalize-space(.)=\"Martillo\"]",
       "targets": [],
       "value": ""
     }, {
@@ -114,23 +114,9 @@
       "id": "e766f318-42fa-4930-abe0-c98b95a697fc",
       "comment": "",
       "command": "waitForElementVisible",
-      "target": "xpath=//*[contains(text(), \"Préstamo creado con éxito\")]",
+      "target": "css=[data-testid=\"toast-success\"]",
       "targets": [],
-      "value": "30000"
-    }, {
-      "id": "e7619131-734b-44b1-afee-80c75c11f533",
-      "comment": "",
-      "command": "assertText",
-      "target": "xpath=//*[contains(text(), \"Préstamo creado con éxito\")]",
-      "targets": [],
-      "value": "Préstamo creado con éxito"
-    }, {
-      "id": "eb81fbe7-68e7-45a6-9987-eaf0e7af549f",
-      "comment": "",
-      "command": "click",
-      "target": "xpath=//button[text()=\"OK\"]",
-      "targets": [],
-      "value": ""
+      "value": "5000"
     }]
   }],
   "suites": [{
@@ -141,6 +127,6 @@
     "timeout": 300,
     "tests": ["14ec50d8-1494-4767-bbb4-9c461f3c4f43"]
   }],
-  "urls": ["https://192.168.122.17/"],
+  "urls": ["https://192.168.122.17/", "http://localhost:5173/"],
   "plugins": []
 }
