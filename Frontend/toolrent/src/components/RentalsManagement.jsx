@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { getAllLoans, createLoan, returnLoan } from "../services/serviceWrapper.js";
 import { getTools } from "../services/serviceWrapper.js";
 import { getAllCustomers } from "../services/serviceWrapper.js";
+import { useToast } from "./ToastProvider";
 
 // Hook dinámico: usa el real o el mock según el modo
 const useAuth = () => {
@@ -38,6 +39,7 @@ function formatDate(dateStr) {
 
 export function LoansManagement({ onNavigate }) {
   const { keycloak } = useAuth();
+  const toast = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [loans, setLoans] = useState([]);
@@ -143,7 +145,7 @@ export function LoansManagement({ onNavigate }) {
   // Crear préstamo llamando al backend
   const handleCreateLoan = async () => {
     if (!form.clientId || !form.toolId || !form.startDate || !form.endDate) {
-      alert("Completa todos los campos requeridos.");
+      toast.warning("Campos incompletos", "Por favor completa todos los campos requeridos.");
       return;
     }
     setCreating(true);
@@ -156,13 +158,19 @@ export function LoansManagement({ onNavigate }) {
         dueDate: form.endDate
       };
       await createLoan(payload);
-      alert("Préstamo creado con éxito");
+      toast.success(
+        "¡Préstamo creado!",
+        "El préstamo se ha registrado correctamente"
+      );
       // En lugar de añadir la respuesta, recargamos la lista completa
       fetchLoans();
       setDialogOpen(false);
       setForm({ clientId: "", toolId: "", startDate: "", endDate: "", notes: "" });
     } catch (e) {
-      alert("Error al crear préstamo: " + (e.response?.data || e.message));
+      toast.error(
+        "Error al crear préstamo",
+        e.response?.data || e.message || "No se pudo crear el préstamo"
+      );
     } finally {
       setCreating(false);
     }
@@ -176,17 +184,26 @@ export function LoansManagement({ onNavigate }) {
 
       // Mensaje personalizado basado en si hay multa o no
       if (loanDevuelto.fine && loanDevuelto.fine > 0) {
-        alert(`Préstamo devuelto correctamente.\nMulta por atraso: $${loanDevuelto.fine.toLocaleString()}`);
+        toast.warning(
+          "Préstamo devuelto",
+          `Multa por atraso: $${loanDevuelto.fine.toLocaleString()}`
+        );
       } else {
-        alert("Préstamo devuelto correctamente. No hay multa.");
+        toast.success(
+          "¡Préstamo devuelto!",
+          "El préstamo se devolvió correctamente. No hay multa."
+        );
       }
 
       fetchLoans(); // Recargar la lista actualizada
     } catch (e) {
-      alert("Error al devolver préstamo: " +
-        (typeof e.response?.data === "string"
-          ? e.response.data
-          : e.response?.data?.message || e.message));
+      const errorMessage = typeof e.response?.data === "string"
+        ? e.response.data
+        : e.response?.data?.message || e.message;
+      toast.error(
+        "Error al devolver préstamo",
+        errorMessage || "No se pudo devolver el préstamo"
+      );
     }
   };
 

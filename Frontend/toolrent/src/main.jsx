@@ -5,6 +5,7 @@ import { ReactKeycloakProvider } from "@react-keycloak/web";
 import App from "./App";
 import keycloak from "./services/keycloak"; // tu instancia Keycloak
 import { MockAuthProvider } from "./auth/MockAuthProvider";
+import { ToastProvider } from "./components/ToastProvider";
 
 // Variable de entorno para activar/desactivar Keycloak
 const USE_KEYCLOAK = import.meta.env.VITE_USE_KEYCLOAK === 'true';
@@ -33,7 +34,9 @@ const AppWrapper = () => {
         onEvent={eventLogger}         // opcional, para debug
         onTokens={tokenLogger}        // opcional, para debug
       >
-        <App />
+        <ToastProvider>
+          <App />
+        </ToastProvider>
       </ReactKeycloakProvider>
     );
   } else {
@@ -41,7 +44,9 @@ const AppWrapper = () => {
     console.log("🚧 Running in DEV mode (Mock Auth)");
     return (
       <MockAuthProvider>
-        <App />
+        <ToastProvider>
+          <App />
+        </ToastProvider>
       </MockAuthProvider>
     );
   }
