@@ -25,7 +25,15 @@ async function tryRealOrMock(realFn, mockFn, ...args) {
     try {
         return await realFn(...args);
     } catch (error) {
-        console.warn('⚠️ Backend error, falling back to MOCK data:', error.message);
+        // Si es un error 4xx (error del cliente/validación), NO usar mock
+        // Estos errores deben mostrarse al usuario
+        if (error.response && error.response.status >= 400 && error.response.status < 500) {
+            console.warn('⚠️ Backend validation error:', error.response.status, error.message);
+            throw error; // Propagar el error para que el componente lo maneje
+        }
+
+        // Para errores de conectividad o 5xx, usar mock como fallback
+        console.warn('⚠️ Backend connectivity error, falling back to MOCK data:', error.message);
         return mockFn(...args);
     }
 }

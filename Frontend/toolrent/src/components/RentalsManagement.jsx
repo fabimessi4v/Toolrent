@@ -141,7 +141,18 @@ export function LoansManagement({ onNavigate }) {
     setForm(prev => ({ ...prev, [field]: value }));
   };
 
-  // Crear préstamo llamando al backend
+  const getErrorMessage = (error) => {
+    if (error.response) {
+      // Backend respondió
+      if (typeof error.response.data === "string") {
+        return error.response.data;
+      }
+      if (error.response.data?.message) {
+        return error.response.data.message;
+      }
+    }
+    return error.message || "Error inesperado";
+  };
   // Crear préstamo llamando al backend
   const handleCreateLoan = async () => {
     if (!form.clientId || !form.toolId || !form.startDate || !form.endDate) {
@@ -167,9 +178,11 @@ export function LoansManagement({ onNavigate }) {
       setDialogOpen(false);
       setForm({ clientId: "", toolId: "", startDate: "", endDate: "", notes: "" });
     } catch (e) {
+      const message = getErrorMessage(e);
+      setDialogOpen(false); // Cerrar el modal para que el toast sea visible
       toast.error(
         "Error al crear préstamo",
-        e.response?.data || e.message || "No se pudo crear el préstamo"
+        message
       );
     } finally {
       setCreating(false);
