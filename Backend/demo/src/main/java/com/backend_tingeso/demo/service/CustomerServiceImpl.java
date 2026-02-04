@@ -107,8 +107,9 @@ public class CustomerServiceImpl implements CustomerService {
 
         // Multa impaga: 1 si tiene multa, 0 si no
         boolean hasUnpaidFine = loans.stream()
-                .anyMatch(loan -> loan.getFine() != null && loan.getFine() > 0 &&
-                        (loan.getStatus().equals("ACTIVE") || loan.getStatus().equals("OVERDUE")));
+                .anyMatch(loan ->
+                        loan.getFine() != null &&
+                                loan.getFine() > 0);
         dto.setUnpaidFines(hasUnpaidFine ? 1 : 0);
 
         return dto;
