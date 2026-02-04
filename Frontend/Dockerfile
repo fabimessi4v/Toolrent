@@ -12,6 +12,19 @@ RUN npm ci
 # Copia el resto del código fuente desde la subcarpeta toolrent/
 COPY toolrent/. .
 
+# Definimos los argumentos que vienen desde el comando docker build
+ARG VITE_API_BASE_URL
+ARG VITE_KEYCLOAK_URL
+ARG VITE_KEYCLOAK_REALM
+ARG VITE_KEYCLOAK_CLIENT_ID
+
+# Los convertimos en variables de entorno para que Vite los vea
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ENV VITE_KEYCLOAK_URL=$VITE_KEYCLOAK_URL
+ENV VITE_KEYCLOAK_REALM=$VITE_KEYCLOAK_REALM
+ENV VITE_KEYCLOAK_CLIENT_ID=$VITE_KEYCLOAK_CLIENT_ID
+
+
 # Compila la aplicación (genera la carpeta dist)
 RUN npm run build
 

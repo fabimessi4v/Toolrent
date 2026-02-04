@@ -1,13 +1,15 @@
-# Usa la imagen oficial de OpenJDK como base
+# -------- STAGE 1: BUILD --------
+FROM eclipse-temurin:17-jdk AS build
+
+WORKDIR /build
+COPY . .
+RUN chmod +x gradlew && ./gradlew clean bootJar -x test
+
+# -------- STAGE 2: RUNTIME --------
 FROM eclipse-temurin:17-jre
 
-# Directorio de trabajo dentro del contenedor
 WORKDIR /app
+COPY --from=build /build/build/libs/*[^plain].jar app.jar
 
-# Copia el JAR generado al contenedor (mismo nivel que Dockerfile)
-COPY demo/build/libs/*.jar toolrent-backend.jar
-# Expone el puerto (por ejemplo, 8080)
 EXPOSE 8080
-
-# Comando para ejecutar la app
-ENTRYPOINT ["java", "-jar", "toolrent-backend.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
