@@ -6,6 +6,7 @@ import App from "./App";
 import keycloak from "./services/keycloak"; // tu instancia Keycloak
 import { MockAuthProvider } from "./auth/MockAuthProvider";
 import { ToastProvider } from "./components/ToastProvider";
+import Clarity from "@microsoft/clarity";
 
 // Variable de entorno para activar/desactivar Keycloak
 const USE_KEYCLOAK = import.meta.env.VITE_USE_KEYCLOAK === 'true';
@@ -51,7 +52,7 @@ const AppWrapper = () => {
     );
   }
 };
-
+Clarity.init("vigvpgirto");
 ReactDOM.createRoot(document.getElementById("root")).render(<AppWrapper />);
 
 
