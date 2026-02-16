@@ -28,11 +28,9 @@
 
 **Validación Selenium IDE:**
 
-- **Command:** `assertText`
+- **Command:** `wait for element visible`
     
-- **Target:** `css=.alert-success`
-    
-- **Value:** `Préstamo realizado con éxito`
+- **Target:** `css=.toast-success`
     
 
 ---
@@ -41,20 +39,20 @@
 
 **Gherkin:**
 
-- **Given** que el cliente "9.876.543-2" tiene una multa impaga de $5.000
+- **Given** que el cliente "Eusebio Rojas" tiene una multa impaga
     
 - **When** el empleado intenta registrar un nuevo préstamo para este cliente
     
 - **Then** el sistema debe impedir la operación
     
-- **And** mostrar el mensaje "Error: Cliente posee multas pendientes".
+- **And** mostrar el mensaje "El cliente tiene multas impagas y no puede solicitar nuevos prestamos".
     
 
 **Validación Selenium IDE:**
 
-- **Command:** `assertElementPresent`
+- **Command:** `wait for element visible`
     
-- **Target:** `xpath=//span[contains(text(), 'multas pendientes')]`
+- **Target:** `css=.toast-error`
     
 
 ---
@@ -74,7 +72,7 @@
 
 ---
 
-### Escenario 4: Cálculo automático de multa por atraso (Automatizado en Selenium)
+### Escenario 4: Cálculo automático de multa por atraso
 
 **Gherkin:**
 
@@ -117,7 +115,7 @@
 
 **Gherkin:**
 
-- **Given** que el cliente "11.222.333-4" ya tiene 5 préstamos activos
+- **Given** que el cliente "Carlos Ruiz" ya tiene 5 préstamos activos
     
 - **When** el empleado intenta registrar el préstamo número 6
     
@@ -128,11 +126,10 @@
 
 **Validación Selenium IDE:**
 
-- **Command:** `verifyText`
     
-- **Target:** `id=error-modal-body`
+- **Command:** `wait for element visible`
     
-- **Value:** `Límite máximo de préstamos alcanzado (5)`
+- **Target:** `css=.toast-error`
     
 
 ---
