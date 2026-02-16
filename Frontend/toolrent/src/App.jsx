@@ -10,6 +10,7 @@ import { KardexManagement } from "./components/KardexManagement";
 import { RatesConfiguration } from "./components/RatesConfiguration";
 import CustomerList from "./components/CustomerList";
 import { ReportsManagement } from "./components/ReportsManagement";
+import { ClarityNavigationTracker } from "./components/ClarityNavigationTracker";
 
 // Hook dinámico: usa el real o el mock según el modo
 const useAuth = () => {
@@ -70,6 +71,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-background flex">
+      {/* Tracker invisible de Clarity para detectar cambios de navegación */}
+      <ClarityNavigationTracker currentSection={currentSection} />
+
       {showSidebar && (
         <Sidebar
           currentSection={currentSection}
