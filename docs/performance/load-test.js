@@ -13,6 +13,9 @@ export const options = {
     { duration: '1m', target: 50 },
     { duration: '1m', target: 100 },
     { duration: '1m', target: 500 },
+    { duration: '1m', target: 1000 },
+    { duration: '1m', target: 2000 },
+    { duration: '1m', target: 4000 }
   ],
 };
 
