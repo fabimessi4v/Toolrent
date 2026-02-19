@@ -15,4 +15,5 @@ public interface CustomerService {
     // Nuevo método para obtener clientes con sus datos calculados
     List<CustomerDTO> getAllCustomersWithCalculations();
     CustomerDTO getCustomerDTOById(String customerId);
+    void deleteCustomer(String customerId);
 }

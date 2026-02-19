@@ -17,7 +17,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "./ui/label";
 
 // IMPORTA EL SERVICIO CON WRAPPER
-import { getAllCustomersDTO, createCustomer } from "../services/serviceWrapper.js";
+import { getAllCustomersDTO, createCustomer, deleteCustomer } from "../services/serviceWrapper.js";
 
 export function ClientsManagement({ onNavigate }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -35,6 +35,7 @@ export function ClientsManagement({ onNavigate }) {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
   // Logs para saber qué pasa en la petición de clientes
   useEffect(() => {
@@ -85,6 +86,27 @@ export function ClientsManagement({ onNavigate }) {
       console.error("Error al crear cliente:", err);
     } finally {
       setCreating(false);
+    }
+  };
+
+  // Elimina un cliente por id
+  const handleDeleteClient = async (id) => {
+    if (!window.confirm("¿Estás seguro de que quieres eliminar este cliente?")) return;
+    setDeletingId(id);
+    try {
+      await deleteCustomer(id);
+      setClients((prev) => prev.filter((c) => c.id !== id));
+    } catch (err) {
+      console.error("Error al eliminar cliente:", err);
+      const message =
+        err.response?.data ||
+        err.response?.data?.message ||
+        err.message ||
+        "No se pudo eliminar el cliente.";
+      alert(message);
+    }
+    finally {
+      setDeletingId(null);
     }
   };
 
@@ -299,7 +321,13 @@ export function ClientsManagement({ onNavigate }) {
                     <Button variant="outline" size="sm">
                       <Edit3 className="h-4 w-4" />
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDeleteClient(client.id)}
+                      disabled={deletingId === client.id}
+                      className="text-red-500 hover:text-red-700 hover:border-red-400"
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>

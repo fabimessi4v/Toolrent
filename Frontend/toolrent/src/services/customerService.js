@@ -33,3 +33,9 @@ export const createCustomer = (customerData) => {
 export const getAllCustomersDTO = () => {
   return apiClient.get('/customers/dto');
 };
+
+
+// Función para eliminar cliente segun el id
+export const deleteCustomer = (id) => {
+  return apiClient.delete(`/customers/${id}`);
+};

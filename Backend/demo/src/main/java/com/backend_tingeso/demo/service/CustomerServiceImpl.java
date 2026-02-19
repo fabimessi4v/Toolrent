@@ -114,5 +114,30 @@ public class CustomerServiceImpl implements CustomerService {
 
         return dto;
     }
+    @Override
+    public void deleteCustomer(String customerId) {
+        if (customerId == null || customerId.isBlank()) {
+            throw new IllegalArgumentException("El id es obligatorio.");
+        }
+
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new IllegalArgumentException("Cliente no existe."));
+
+        // no borrar si tiene préstamos activos
+        List<Loans> loans = loanRepository.findByCustomerId(customerId);
+
+        boolean hasActiveLoans = loans.stream()
+                .anyMatch(l -> "ACTIVE".equals(l.getStatus()));
+
+        if (hasActiveLoans) {
+            throw new IllegalStateException("No se puede eliminar cliente con préstamos activos.");
+        }
+        if (!loans.isEmpty()) {
+            throw new IllegalStateException("No se puede eliminar cliente con préstamos.");
+        }
+
+        customerRepository.delete(customer);
+    }
+
 
 }

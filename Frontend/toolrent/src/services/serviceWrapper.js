@@ -65,6 +65,9 @@ export const createCustomer = (realCustomerService.createCustomer && mockCustome
     ? (...args) => tryRealOrMock(realCustomerService.createCustomer, mockCustomerService.createCustomer, ...args)
     : undefined;
 
+export const deleteCustomer = (...args) =>
+    tryRealOrMock(realCustomerService.deleteCustomer, mockCustomerService.deleteCustomer, ...args);
+
 // ===== LOAN SERVICES =====
 export const getAllLoans = (...args) =>
     tryRealOrMock(realLoansService.getAllLoans, mockLoanService.getAllLoans, ...args);
