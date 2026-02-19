@@ -77,6 +77,15 @@ export const mockCustomerService = {
         };
         mockCustomers.push(newCustomer);
         return { data: newCustomer };
+    },
+
+    deleteCustomer: async (id) => {
+        await delay(300);
+        const index = mockCustomers.findIndex(c => String(c.id) === String(id));
+        if (index !== -1) {
+            mockCustomers.splice(index, 1);
+        }
+        return { data: { message: "Cliente eliminado" } };
     }
 };
 

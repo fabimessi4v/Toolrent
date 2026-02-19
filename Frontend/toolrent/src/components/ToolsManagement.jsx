@@ -13,9 +13,7 @@ import {
   Edit3,
   Trash2,
   Wrench,
-  Settings,
-  AlertCircle,
-  CheckCircle
+  Settings
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Label } from "./ui/label";
@@ -103,18 +101,7 @@ export function ToolsManagement({ onNavigate }) {
     }
   };
 
-  const getConditionIcon = (condition) => {
-    switch (condition) {
-      case "excelente":
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case "bueno":
-        return <CheckCircle className="h-4 w-4 text-blue-600" />;
-      case "regular":
-        return <AlertCircle className="h-4 w-4 text-orange-600" />;
-      default:
-        return <AlertCircle className="h-4 w-4 text-red-600" />;
-    }
-  };
+
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -409,79 +396,75 @@ export function ToolsManagement({ onNavigate }) {
       {loading ? (
         <div className="text-center py-8">Cargando herramientas...</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredTools.map((tool) => (
-            <Card key={tool.id} className="overflow-hidden">
-              <CardContent className="p-0">
-                <div className="aspect-video bg-gray-100 flex items-center justify-center">
-                  {tool.tool_imageUrl ? (
-                    <img
-                      src={tool.tool_imageUrl}
-                      alt={tool.name}
-                      className="object-contain w-full h-full"
-                      style={{ maxHeight: "100%", maxWidth: "100%" }}
-                    />
-                  ) : (
-                    <Wrench className="h-12 w-12 text-gray-400" />)}
-                </div>
-                <div className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex-1">
-                      <h3 className="font-semibold mb-1">{tool.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {tool.brand} - {tool.model}
+            <Card key={tool.id} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-4">
+                {/* Header: ícono pequeño + nombre + badges */}
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2 bg-gray-100 rounded-lg shrink-0">
+                    <Wrench className="h-5 w-5 text-gray-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-sm leading-tight truncate py-2.5">{tool.name}</h3>
+                    {(tool.brand || tool.model) && (
+                      <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                        {[tool.brand, tool.model].filter(Boolean).join(" · ")}
                       </p>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      {getConditionIcon(tool.condition)}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Tarifa arriendo:</span>
-                      <span className="font-semibold">
-                        ${tool.rentalPrice ? tool.rentalPrice.toLocaleString() : "0"}/día
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Valor reposición:</span>
-                      <span className="font-semibold">
-                        ${tool.replacementValue ? tool.replacementValue.toLocaleString() : "0"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Estado:</span>
-                      {getStatusBadge(tool.status)}
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Stock disponible:</span>
-                      <span className="font-semibold">{tool.stock} unidades</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Ubicación:</span>
-                      <span className="text-sm">{tool.location}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="flex-1" onClick={() => handleEditTool(tool)}>
-                      <Edit3 className="h-4 w-4 mr-2" />
-                      Editar
-                    </Button>
-                    {/* Solo muestra el botón "Dar de Baja" si es ADMIN Y la herramienta no está dada de baja */}
-                    {tool.status !== "Dada de baja" && hasAdminAccess() && (
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        className="flex-1"
-                        onClick={() => handleDeleteTool(tool.id)}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Dar de Baja
-                      </Button>
                     )}
                   </div>
+                  <div className="shrink-0 ml-4">
+                    {getStatusBadge(tool.status)}
+                  </div>
+                </div>
+
+                {/* Datos en grilla 2 columnas */}
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm border-t pt-3 mb-3">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Tarifa/día</p>
+                    <p className="font-semibold">
+                      ${tool.rentalPrice ? tool.rentalPrice.toLocaleString("es-CL") : "0"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Valor reposición</p>
+                    <p className="font-semibold">
+                      ${tool.replacementValue ? tool.replacementValue.toLocaleString("es-CL") : "0"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Stock</p>
+                    <p className="font-semibold">{tool.stock ?? 0} uds.</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Categoría</p>
+                    <p className="font-medium truncate">{tool.category || "—"}</p>
+                  </div>
+                  {tool.location && (
+                    <div className="col-span-2">
+                      <p className="text-xs text-muted-foreground">Ubicación</p>
+                      <p className="text-sm truncate">{tool.location}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Acciones */}
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="flex-1" onClick={() => handleEditTool(tool)}>
+                    <Edit3 className="h-4 w-4 mr-1.5" />
+                    Editar
+                  </Button>
+                  {tool.status !== "Dada de baja" && hasAdminAccess() && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => handleDeleteTool(tool.id)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-1.5" />
+                      Dar de Baja
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
