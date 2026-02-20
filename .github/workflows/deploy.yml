@@ -30,6 +30,7 @@ jobs:
             --build-arg VITE_KEYCLOAK_URL=${{ vars.VITE_KEYCLOAK_URL }} \
             --build-arg VITE_KEYCLOAK_REALM=${{ vars.VITE_KEYCLOAK_REALM }} \
             --build-arg VITE_KEYCLOAK_CLIENT_ID=${{ vars.VITE_KEYCLOAK_CLIENT_ID }} \
+            --build-arg VITE_USE_MOCK_DATA=false \
             -t ${{ secrets.DOCKER_USERNAME }}/toolrent-front:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/toolrent-front:latest
 
