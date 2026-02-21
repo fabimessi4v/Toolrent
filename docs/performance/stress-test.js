@@ -9,11 +9,11 @@ const PASSWORD = __ENV.PASSWORD;
 
 export const options = {
   stages: [
-    { duration: '1m', target: 10 },
-    { duration: '1m', target: 50 },
-    { duration: '1m', target: 100 },
-    { duration: '1m', target: 500 },
-    { duration: '1m', target: 1000 }
+    { duration: '3m', target: 2000 }, // Carga alta pero segura (Base de comparación)
+    { duration: '5m', target: 3500 }, // Acercándose al límite lentamente (Stress inicial)
+    { duration: '2m', target: 3600 }, // EL LIMITE: Para ver estabilidad
+    { duration: '2m', target: 4000 }, // SOBRECARGA: Forzar el error y ver el colapso
+    { duration: '5m', target: 0 },    // RECUPERACIÓN: Ver si el sistema sobrevive solo
   ],
 };
 
