@@ -5,6 +5,7 @@ import com.backend_tingeso.demo.entity.Customer;
 import com.backend_tingeso.demo.entity.Loans;
 import com.backend_tingeso.demo.entity.Tools;
 import com.backend_tingeso.demo.entity.Users;
+import com.backend_tingeso.demo.entity.enums.ToolCondition;
 import com.backend_tingeso.demo.repository.CustomerRepository;
 import com.backend_tingeso.demo.repository.LoansRepository;
 import com.backend_tingeso.demo.repository.ToolsRepository;
@@ -133,10 +134,10 @@ public class LoansController {
         return ResponseEntity.ok(loansList);
     }
     @PutMapping("/{loanId}/return")
-    public ResponseEntity<?> returnLoan(@PathVariable String loanId) {
+    public ResponseEntity<?> returnLoan(@PathVariable String loanId, @RequestParam(required = false, defaultValue = "OK") ToolCondition condition) {
         try {
             Date returnDate = new Date(); // fecha actual
-            Loans updatedLoan = loansService.registerReturn(loanId, returnDate);
+            Loans updatedLoan = loansService.registerReturn(loanId, returnDate, condition);
 
             // Mapeo a DTO (puedes extraer a un método si quieres)
             LoansServiceImpl.LoansDTO dto = new LoansServiceImpl.LoansDTO(

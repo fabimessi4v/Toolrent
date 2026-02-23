@@ -44,9 +44,16 @@ export function ToolsManagement({ onNavigate }) {
     stock: "",
   });
   const [adding, setAdding] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingTool, setEditingTool] = useState(null);
   const [updating, setUpdating] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3500);
+  };
 
   useEffect(() => {
     async function fetchTools() {
@@ -74,7 +81,7 @@ export function ToolsManagement({ onNavigate }) {
     fetchTools();
   }, []);
 
-  const categories = ["all", "Taladros", "Sierras", "Soldadoras", "Amoladoras", "Llaves", "Martillos"];
+  const categories = ["all", "Manual", "Electrica", "Equipo de Seguridad", "Soldadura"];
 
   const filteredTools = tools.filter(tool => {
     const searchLower = searchTerm.toLowerCase();
@@ -123,11 +130,11 @@ export function ToolsManagement({ onNavigate }) {
 
   const handleAddTool = async () => {
     if (!form.name?.trim() || !form.category?.trim()) {
-      alert("Nombre y categoría son obligatorios");
+      showToast("Nombre y categoría son obligatorios", "error");
       return;
     }
     if (!form.replacementValue || isNaN(form.replacementValue)) {
-      alert("El valor de reposición es obligatorio y debe ser un número");
+      showToast("El valor de reposición es obligatorio y debe ser un número", "error");
       return;
     }
 
@@ -145,21 +152,16 @@ export function ToolsManagement({ onNavigate }) {
 
       await createTool(payload);
 
-      setForm({
-        name: "",
-        category: "",
-        replacementValue: "",
-        rentalPrice: "",
-        stock: "",
-        status: ""
-      });
+      setForm({ name: "", category: "", replacementValue: "", rentalPrice: "", stock: "", status: "" });
+      setAddDialogOpen(false);
+      showToast(`Herramienta "${payload.name}" creada exitosamente`);
 
       setLoading(true);
       const response = await getTools();
       setTools(response.data || []);
       setLoading(false);
     } catch (err) {
-      alert("Error al agregar herramienta: " + (err.response?.data?.message || err.message));
+      showToast("Error al agregar herramienta: " + (err.response?.data?.message || err.message), "error");
       console.error("Error backend:", err.response?.data);
     } finally {
       setAdding(false);
@@ -293,9 +295,9 @@ export function ToolsManagement({ onNavigate }) {
             Administra tu inventario de herramientas
           </p>
         </div>
-        <Dialog>
+        <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="gap-2">
+            <Button className="gap-2" onClick={() => setAddDialogOpen(true)}>
               <Plus className="h-4 w-4" />
               Agregar Herramienta
             </Button>
@@ -614,6 +616,40 @@ export function ToolsManagement({ onNavigate }) {
           )}
         </DialogContent>
       </Dialog>
+      {/* Toast notification */}
+      {toast && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "24px",
+            right: "18px",
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            padding: "14px 20px",
+            borderRadius: "10px",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.13)",
+            background: toast.type === "error" ? "#fef2f2" : "#f0fdf4",
+            border: `1px solid ${toast.type === "error" ? "#fecaca" : "#bbf7d0"}`,
+            color: toast.type === "error" ? "#991b1b" : "#166534",
+            fontWeight: 500,
+            fontSize: "0.92rem",
+            minWidth: "260px",
+            maxWidth: "420px",
+            animation: "slideUp 0.25s ease",
+          }}
+        >
+          <span style={{ fontSize: "1.1rem" }}></span>
+          <span>{toast.message}</span>
+        </div>
+      )}
+      <style>{`
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }

@@ -31,6 +31,6 @@ export const createLoan = (loanData) => {
   return apiClient.post('/loans', loanData);
 };
 // Devolver un préstamo
-export const returnLoan = (loanId) => {
-  return apiClient.put(`/loans/${loanId}/return`);
+export const returnLoan = (loanId, condition = "OK") => {
+  return apiClient.put(`/loans/${loanId}/return?condition=${condition}`);
 };

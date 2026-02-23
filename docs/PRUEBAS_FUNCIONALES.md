@@ -65,9 +65,10 @@
     
 - **When** el empleado intenta seleccionarla para un préstamo
     
-- **Then** el sistema debe mostrar la herramienta como "No Disponible"
+- **Then** el sistema debe impedir la operación
     
-- **And** el botón de confirmación debe estar deshabilitado.
+- **And** mostrar el mensaje "La herramienta no tiene stock disponible para este prestamo".
+    
     
 
 ---
