@@ -86,6 +86,16 @@ public class LoansServiceImpl implements LoansService {
         if (prestamosActivos >= 5) {
             throw new IllegalStateException("El cliente ya tiene 5 préstamos activos y no puede solicitar uno nuevo.");
         }
+
+        boolean alreadyHasThisTool =
+                loansRepository.existsActiveLoanForTool(customer.getId(), tool.getId().toString());
+
+        if (alreadyHasThisTool) {
+            throw new IllegalStateException(
+                    "El cliente ya tiene esta herramienta en préstamo activo"
+            );
+        }
+
         if (!validateAvailability(tool.getId().toString())) {
             throw new IllegalStateException("La herramienta no tiene stock disponible para préstamo.");
         }
@@ -108,7 +118,12 @@ public class LoansServiceImpl implements LoansService {
         loan.setCustomer(customer);
         loan.setDeliveryDate(deliveryDate);
         loan.setDueDate(dueDate);
-        loan.setStatus("ACTIVE");
+        Date now = new Date();
+        if (dueDate.before(now)) {
+            loan.setStatus("EXPIRED");
+        } else {
+            loan.setStatus("ACTIVE");
+        }
         loan.setFine(0f);
 
         // 2. Guardar en la base de datos
