@@ -73,13 +73,14 @@ public class CustomerServiceImpl implements CustomerService {
             dto.setStatus(customer.getStatus());
 
             // Obtiene todos los préstamos (loans) asociados al cliente
-            List<Loans> loans = loanRepository.findByCustomerId(customer.getId());
+            List<Loans> loans = loanRepository.findByCustomer_Id(customer.getId());
             // Total de préstamos
             dto.setTotalLoans(loans.size());
             // Préstamos activos
             dto.setActiveLoans((int) loans.stream().filter(l -> l.getStatus().equals("ACTIVE")).count());
             // Revisar si alguno de los préstamos tiene una multa asociada (fine != null)
-            boolean hasFine = loans.stream().anyMatch(loan -> loan.getFine() != null);
+            boolean hasFine = loans.stream().anyMatch(loan -> loan.getFine() != null &&
+                    loan.getFine() > 0);
             // Si tiene multa, asigna 1, si no, 0
             dto.setUnpaidFines(hasFine ? 1 : 0);
 
@@ -101,7 +102,7 @@ public class CustomerServiceImpl implements CustomerService {
         dto.setStatus(customer.getStatus());
 
         // Préstamos y cálculos
-        List<Loans> loans = loanRepository.findByCustomerId(customer.getId());
+        List<Loans> loans = loanRepository.findByCustomer_Id(customer.getId());
         dto.setTotalLoans(loans.size());
         dto.setActiveLoans((int) loans.stream().filter(l -> l.getStatus().equals("ACTIVE")).count());
 
@@ -124,7 +125,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .orElseThrow(() -> new IllegalArgumentException("Cliente no existe."));
 
         // no borrar si tiene préstamos activos
-        List<Loans> loans = loanRepository.findByCustomerId(customerId);
+        List<Loans> loans = loanRepository.findByCustomer_Id(customerId);
 
         boolean hasActiveLoans = loans.stream()
                 .anyMatch(l -> "ACTIVE".equals(l.getStatus()));

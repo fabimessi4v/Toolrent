@@ -152,8 +152,8 @@ class CustomerServiceImplTest {
         l3.setStatus("ACTIVE");
         l3.setFine(null);
 
-        when(loanRepository.findByCustomerId("c1")).thenReturn(Arrays.asList(l1, l2));
-        when(loanRepository.findByCustomerId("c2")).thenReturn(List.of(l3));
+        when(loanRepository.findByCustomer_Id("c1")).thenReturn(Arrays.asList(l1, l2));
+        when(loanRepository.findByCustomer_Id("c2")).thenReturn(List.of(l3));
 
         List<CustomerDTO> dtos = customerService.getAllCustomersWithCalculations();
         assertEquals(2, dtos.size());
@@ -196,7 +196,7 @@ class CustomerServiceImplTest {
         l2.setStatus("RETURNED");
         l2.setFine(null);
 
-        when(loanRepository.findByCustomerId("c1")).thenReturn(Arrays.asList(l1, l2));
+        when(loanRepository.findByCustomer_Id("c1")).thenReturn(Arrays.asList(l1, l2));
 
         CustomerDTO dto = customerService.getCustomerDTOById("c1");
         assertNotNull(dto);

@@ -241,7 +241,7 @@
 
 ---
 
-### Escenario 6: Exportación de reporte a PDF (Validación de interfaz)
+### Escenario 6: Exportación de reporte a PDF (Validación de interfaz) //cambiar
 
 **Gherkin:**
 
@@ -254,7 +254,7 @@
 
 ---
 
-### Escenario 7: Validación de rol para acceso a reportes (Automatizado en Selenium)
+### Escenario 7: Validación de rol para acceso a reportes (Automatizado en Selenium)  //implementar
 
 **Gherkin:**
 
