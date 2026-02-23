@@ -65,9 +65,10 @@
     
 - **When** el empleado intenta seleccionarla para un préstamo
     
-- **Then** el sistema debe mostrar la herramienta como "No Disponible"
+- **Then** el sistema debe impedir la operación
     
-- **And** el botón de confirmación debe estar deshabilitado.
+- **And** mostrar el mensaje "La herramienta no tiene stock disponible para este prestamo".
+    
     
 
 ---
@@ -144,6 +145,7 @@
     
 - **Then** el sistema debe bloquear la transacción por regla de "Unidad única por herramienta".
     
+- **And** Muestra mensaje "La herramienta ya existe"
 
 ---
 
@@ -157,7 +159,7 @@
     
 - **When** el usuario accede al reporte de "Préstamos Activos"
     
-- **And** filtra por estado "Atrasados"
+- **And** filtra por estado "Vencidos"
     
 - **Then** la tabla debe mostrar únicamente los registros con fecha vencida.
     
@@ -234,7 +236,7 @@
     
 - **When** el administrador consulta el reporte de movimientos (Kardex)
     
-- **Then** debe aparecer un movimiento tipo "Devolución" con la fecha y hora exacta de la operación.
+- **Then** debe aparecer un movimiento tipo "Devolución" con la fecha exacta de la operación.
     
 
 ---
@@ -256,7 +258,7 @@
 
 **Gherkin:**
 
-- **Given** que un usuario con rol "Cliente" intenta acceder a la URL `/admin/reports`
+- **Given** que un usuario con rol "Empleado" intenta acceder a la URL `/admin/reports`
     
 - **When** el sistema procesa la solicitud
     

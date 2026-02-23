@@ -3,6 +3,7 @@ package com.backend_tingeso.demo.service;
 import com.backend_tingeso.demo.dto.CustomerDTO;
 import com.backend_tingeso.demo.entity.*;
 import com.backend_tingeso.demo.entity.enums.MovementType;
+import com.backend_tingeso.demo.entity.enums.ToolCondition;
 import com.backend_tingeso.demo.repository.FeeRepository;
 import com.backend_tingeso.demo.repository.KardexRepository;
 import com.backend_tingeso.demo.repository.LoansRepository;
@@ -144,7 +145,7 @@ public class LoansServiceImpl implements LoansService {
     }
 
     @Override
-    public Loans registerReturn(String loanId, Date returnDate) {
+    public Loans registerReturn(String loanId, Date returnDate, ToolCondition condition) {
         Loans loan = loansRepository.findById(loanId)
                 .orElseThrow(() -> new IllegalArgumentException("El préstamo no existe"));
         // Validar que la fecha de devolución no sea anterior a la de entrega
@@ -161,7 +162,25 @@ public class LoansServiceImpl implements LoansService {
         loansRepository.save(loan);
 
         Tools tool = loan.getTool();
-        tool.setStock(tool.getStock() + 1);
+
+        if (condition == ToolCondition.IRREPARABLE) {
+            // no vuelve al stock
+            tool.setStatus("BAJA");
+
+            // multa = valor reposición
+            loan.setFine(tool.getReplacementValue().floatValue());
+
+        } else {
+
+            // vuelve al stock
+            tool.setStock(tool.getStock() + 1);
+
+            if (condition == ToolCondition.DAMAGED) {
+                tool.setStatus("DAMAGED");
+            } else {
+                tool.setStatus("Disponible");
+            }
+        }
         toolsRepository.save(tool);
 
         Kardex kardex = new Kardex();

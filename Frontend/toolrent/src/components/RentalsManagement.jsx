@@ -55,6 +55,12 @@ export function LoansManagement({ onNavigate }) {
   const [tools, setTools] = useState([]);
   const [clients, setClients] = useState([]);
 
+  // Modal de devolución
+  const [returnModalOpen, setReturnModalOpen] = useState(false);
+  const [selectedLoanId, setSelectedLoanId] = useState(null);
+  const [returnCondition, setReturnCondition] = useState("OK");
+  const [returning, setReturning] = useState(false);
+
   useEffect(() => {
     getTools().then(response => {
       setTools(response.data);
@@ -188,14 +194,21 @@ export function LoansManagement({ onNavigate }) {
       setCreating(false);
     }
   };
-  // Acción para devolver préstamo
-  // Acción para devolver préstamo
-  const handleReturnLoan = async (loanId) => {
-    try {
-      const response = await returnLoan(loanId);
-      const loanDevuelto = response.data;
+  // Abrir modal de devolución
+  const openReturnModal = (loanId) => {
+    setSelectedLoanId(loanId);
+    setReturnCondition("OK");
+    setReturnModalOpen(true);
+  };
 
-      // Mensaje personalizado basado en si hay multa o no
+  // Confirmar devolución con la condición seleccionada
+  const confirmReturn = async () => {
+    setReturning(true);
+    try {
+      const response = await returnLoan(selectedLoanId, returnCondition);
+      const loanDevuelto = response.data;
+      setReturnModalOpen(false);
+
       if (loanDevuelto.fine && loanDevuelto.fine > 0) {
         toast.warning(
           "Préstamo devuelto",
@@ -208,15 +221,18 @@ export function LoansManagement({ onNavigate }) {
         );
       }
 
-      fetchLoans(); // Recargar la lista actualizada
+      fetchLoans();
     } catch (e) {
       const errorMessage = typeof e.response?.data === "string"
         ? e.response.data
         : e.response?.data?.message || e.message;
+      setReturnModalOpen(false);
       toast.error(
         "Error al devolver préstamo",
         errorMessage || "No se pudo devolver el préstamo"
       );
+    } finally {
+      setReturning(false);
     }
   };
 
@@ -231,6 +247,37 @@ export function LoansManagement({ onNavigate }) {
 
   return (
     <div className="space-y-6">
+      {/* Modal de devolución */}
+      <Dialog open={returnModalOpen} onOpenChange={setReturnModalOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Devolver préstamo</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Selecciona el estado en que se devuelve la herramienta:
+            </p>
+            <Select value={returnCondition} onValueChange={setReturnCondition}>
+              <SelectTrigger>
+                <SelectValue placeholder="Estado de la herramienta" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="OK">Devuelta en buen estado</SelectItem>
+                <SelectItem value="DAMAGED">Devuelta con daños</SelectItem>
+                <SelectItem value="IRREPARABLE">Daño irreparable (requiere reposición)</SelectItem>
+              </SelectContent>
+            </Select>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setReturnModalOpen(false)} disabled={returning}>
+                Cancelar
+              </Button>
+              <Button onClick={confirmReturn} disabled={returning}>
+                {returning ? "Procesando..." : "Confirmar devolución"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -440,27 +487,18 @@ export function LoansManagement({ onNavigate }) {
                     <div className="flex gap-2 ml-4">
                       {loan.status?.toUpperCase() === "ACTIVE" && (
                         <>
-                          <Button variant="outline" size="sm" onClick={() => handleReturnLoan(loan.id)}>
+                          <Button variant="outline" size="sm" className="mt-2" onClick={() => openReturnModal(loan.id)}>
                             Devolver
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            Extender
                           </Button>
                         </>
                       )}
                       {loan.status?.toUpperCase() === "EXPIRED" && (
                         <>
-                          <Button variant="destructive" size="sm">
-                            Contactar
-                          </Button>
-                          <Button variant="outline" size="sm" onClick={() => handleReturnLoan(loan.id)}>
+                          <Button variant="outline" size="sm" className="mt-2" onClick={() => openReturnModal(loan.id)}>
                             Devolver
                           </Button>
                         </>
                       )}
-                      <Button variant="outline" size="sm">
-                        Ver Detalles
-                      </Button>
                     </div>
                   </div>
                 </CardContent>
@@ -483,7 +521,7 @@ export function LoansManagement({ onNavigate }) {
                       </p>
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={() => handleReturnLoan(loan.id)}>
+                      <Button variant="outline" size="sm" onClick={() => openReturnModal(loan.id)}>
                         Devolver
                       </Button>
                       <Button variant="outline" size="sm">Extender</Button>
@@ -515,7 +553,7 @@ export function LoansManagement({ onNavigate }) {
                     </div>
                     <div className="flex gap-2">
                       <Button variant="destructive" size="sm">Contactar</Button>
-                      <Button variant="outline" size="sm" onClick={() => handleReturnLoan(loan.id)}>
+                      <Button variant="outline" size="sm" onClick={() => openReturnModal(loan.id)}>
                         Devolver
                       </Button>
                     </div>
