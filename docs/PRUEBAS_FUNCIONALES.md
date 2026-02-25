@@ -234,20 +234,7 @@
 
 ---
 
-### Escenario 6: Exportación de reporte a PDF (Validación de interfaz) //cambiar
-
-**Gherkin:**
-
-- **Given** que se ha generado un reporte de préstamos activos
-    
-- **When** el usuario hace clic en el botón "Exportar PDF"
-    
-- **Then** el sistema debe iniciar la descarga del archivo con los datos visibles en pantalla.
-    
-
----
-
-### Escenario 7: Disminución del total de préstamos activos tras devolución (Automatizado en Selenium)
+### Escenario 6: Disminución del total de préstamos activos tras devolución (Automatizado en Selenium)
 
 **Gherkin:**
 
@@ -266,4 +253,27 @@
     
 - **Target:** `Acceso Denegado`
     
+
+    
+
+---
+
+### Escenario 7: Validación de rol para acceso a Herramientas (Automatizado en Selenium)  //implementar
+
+**Gherkin:**
+
+- **Given** que un usuario con rol "Empleado" intenta crear una herramienta, en la seccion **Herramientas**`
+    
+- **When** el sistema procesa la solicitud
+    
+- **Then** el sistema debe denegar el acceso
+    
+- **And** redirigir a una página de error 403 o al Home.
+    
+
+**Validación Selenium IDE:**
+
+- **Command:** `assertTitle`
+    
+- **Target:** `Acceso Denegado`
 
