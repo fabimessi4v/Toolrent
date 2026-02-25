@@ -247,18 +247,18 @@
 
 ---
 
-### Escenario 7: Validación de rol para acceso a reportes (Automatizado en Selenium)  //implementar
+### Escenario 7: Disminución del total de préstamos activos tras devolución (Automatizado en Selenium)
 
 **Gherkin:**
 
-- **Given** que un usuario con rol "Empleado" intenta acceder a la URL `/admin/reports`
+- **Given** que existe un préstamo activo
     
-- **When** el sistema procesa la solicitud
+- **And** el reporte muestra el total de préstamos activos
+
+- **When** el empleado registra la devolución del préstamo"
     
-- **Then** el sistema debe denegar el acceso
-    
-- **And** redirigir a una página de error 403 o al Home.
-    
+- **Then** el el total de préstamos activos debe disminuir en 1.
+
 
 **Validación Selenium IDE:**
 
