@@ -232,35 +232,20 @@ public class ToolsServiceImpl implements ToolsService {
                 );
 
         // Nombre
-        if (request.getName() != null) {
-            String name = request.getName().trim();
-            if (name.isBlank()) {
-                throw new IllegalArgumentException("El nombre no puede estar vacío");
-            }
-            tool.setName(name);
+        if (request.getName() != null && !request.getName().trim().isBlank()) {
+            tool.setName(request.getName().trim());
         }
 
         // Categoría
-        if (request.getCategory() != null) {
-            String category = request.getCategory().trim();
-            if (category.isBlank()) {
-                throw new IllegalArgumentException("La categoría no puede estar vacía");
-            }
-            tool.setCategory(category); // corregido: usar getter
+        if (request.getCategory() != null && !request.getCategory().trim().isBlank()) {
+            tool.setCategory(request.getCategory().trim());
         }
 
         // Stock (asumimos Integer en el DTO para permitir null)
-        try {
-            Integer stock = request.getStock();
-            if (stock != null) {
-                if (stock < 0) {
-                    throw new IllegalArgumentException("El stock no puede ser negativo");
-                }
-                tool.setStock(stock);
-            }
-        } catch (NoSuchMethodError e) {
-            // Si el DTO usa primitive int y no permite null, se omite esta validación en tiempo de compilación;
-            // dejar tal bloque para evitar romper la compilación en distintos estados del DTO.
+        Integer stock = request.getStock();
+        if (stock != null) {
+            if (stock < 0) throw new IllegalArgumentException("El stock no puede ser negativo");
+            tool.setStock(stock);
         }
 
         // Status

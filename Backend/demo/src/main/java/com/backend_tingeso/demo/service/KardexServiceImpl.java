@@ -79,6 +79,6 @@ public class KardexServiceImpl implements KardexService {
         log.info("Obtenidos {} registros de Kardex", kardexList.size());
         return kardexList.stream()
                 .map(this::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class CustomerServiceImpl implements CustomerService {
+    private static final String STATUS_ACTIVE = "ACTIVE";
     private final CustomerRepository customerRepository;
     private final LoansRepository loanRepository;
 
@@ -77,7 +78,7 @@ public class CustomerServiceImpl implements CustomerService {
             // Total de préstamos
             dto.setTotalLoans(loans.size());
             // Préstamos activos
-            dto.setActiveLoans((int) loans.stream().filter(l -> l.getStatus().equals("ACTIVE")).count());
+            dto.setActiveLoans((int) loans.stream().filter(l -> l.getStatus().equals(STATUS_ACTIVE)).count());
             // Revisar si alguno de los préstamos tiene una multa asociada (fine != null)
             boolean hasFine = loans.stream().anyMatch(loan -> loan.getFine() != null &&
                     loan.getFine() > 0);
@@ -86,7 +87,7 @@ public class CustomerServiceImpl implements CustomerService {
 
             // Devuelve el DTO para este cliente
             return dto;
-        }).collect(Collectors.toList()); // Convierte el stream de DTOs en una lista
+        }).toList(); // Convierte el stream de DTOs en una lista
     }
 
     @Override
@@ -104,7 +105,7 @@ public class CustomerServiceImpl implements CustomerService {
         // Préstamos y cálculos
         List<Loans> loans = loanRepository.findByCustomer_Id(customer.getId());
         dto.setTotalLoans(loans.size());
-        dto.setActiveLoans((int) loans.stream().filter(l -> l.getStatus().equals("ACTIVE")).count());
+        dto.setActiveLoans((int) loans.stream().filter(l -> l.getStatus().equals(STATUS_ACTIVE)).count());
 
         // Multa impaga: 1 si tiene multa, 0 si no
         boolean hasUnpaidFine = loans.stream()
@@ -128,7 +129,7 @@ public class CustomerServiceImpl implements CustomerService {
         List<Loans> loans = loanRepository.findByCustomer_Id(customerId);
 
         boolean hasActiveLoans = loans.stream()
-                .anyMatch(l -> "ACTIVE".equals(l.getStatus()));
+                .anyMatch(l -> STATUS_ACTIVE.equals(l.getStatus()));
 
         if (hasActiveLoans) {
             throw new IllegalStateException("No se puede eliminar cliente con préstamos activos.");

@@ -16,6 +16,7 @@ public class ToolRankingDTO {
         this.totalLoans = totalLoans;
         this.activeLoans = activeLoans;
         this.totalRevenue = totalRevenue;
+        this.totalFines = totalFines;
     }
 
     public String getId() {
