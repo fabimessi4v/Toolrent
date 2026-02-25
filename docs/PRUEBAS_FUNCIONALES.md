@@ -86,13 +86,6 @@
 - **And** mostrar el monto total a pagar antes de cerrar la devolución.
     
 
-**Validación Selenium IDE:**
-
-- **Command:** `assertValue`
-    
-- **Target:** `id=total-fine-display`
-    
-- **Value:** `3000` (Asumiendo tarifa de 1500/día)
     
 
 ---
