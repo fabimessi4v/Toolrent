@@ -234,7 +234,7 @@
 
 ---
 
-### Escenario 6: Disminución del total de préstamos activos tras devolución (Automatizado en Selenium)
+### Escenario 6: Disminución del total de préstamos activos tras devolución
 
 **Gherkin:**
 
@@ -258,11 +258,11 @@
 
 ---
 
-### Escenario 7: Validación de rol para acceso a Herramientas (Automatizado en Selenium)  //implementar
+### Escenario 7: Validación de rol para acceso a Herramientas (Automatizado en Selenium)
 
 **Gherkin:**
 
-- **Given** que un usuario con rol "Empleado" intenta crear una herramienta, en la seccion **Herramientas**`
+- **Given** que un usuario con rol "Empleado" intenta acceder a la seccion **Herramientas**`
     
 - **When** el sistema procesa la solicitud
     

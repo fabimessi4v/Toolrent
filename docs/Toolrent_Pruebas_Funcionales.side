@@ -118,6 +118,414 @@
       "targets": [],
       "value": "5000"
     }]
+  }, {
+    "id": "1195b328-c9ef-4e2e-806f-fffd1b4a9ffc",
+    "name": "Epica2_Escenario2",
+    "commands": [{
+      "id": "6d6c5c01-6970-43de-abf2-cc8a3c982a91",
+      "comment": "",
+      "command": "open",
+      "target": "/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "30e96175-43be-4680-b5d1-2dbe8310dd43",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1090x809",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "0e09fd50-604c-41b2-8178-9e208d51b4ba",
+      "comment": "",
+      "command": "click",
+      "target": "css=.bg-primary:nth-child(2)",
+      "targets": [
+        ["css=.bg-primary:nth-child(2)", "css:finder"],
+        ["xpath=//button[@type='button']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/button", "xpath:idRelative"],
+        ["xpath=//main/div/div/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Nuevo Préstamo')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "f44450b5-859f-46df-8878-99487f491c4a",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[.//text()[normalize-space(.)=\"Nuevo Préstamo\"]]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "abcee014-a53f-4151-8bb8-cdc4214b880a",
+      "comment": "",
+      "command": "waitForElementVisible",
+      "target": "xpath=//button[.//span[normalize-space(.)=\"Seleccionar cliente\"]]",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "03bcc1b6-dc39-45b5-87ba-7a9413a1d70d",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[.//span[normalize-space(.)=\"Seleccionar cliente\"]]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "b5621f2b-2a70-451b-b5bb-e39834e2ba68",
+      "comment": "",
+      "command": "waitForElementVisible",
+      "target": "xpath=//div[@role=\"option\" and normalize-space(.)=\"Eusebio Rojas\"]",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "2d750f99-0b12-49a4-b128-371450c2e003",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//div[@role=\"option\" and normalize-space(.)=\"Eusebio Rojas\"]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "b84929c3-fb84-4eae-a150-f977a05d954b",
+      "comment": "",
+      "command": "waitForElementVisible",
+      "target": "xpath=//button[.//span[normalize-space(.)=\"Seleccionar herramienta\"]]",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "6cf3c0cf-385f-4ad7-bbef-93f7ca9845eb",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[.//span[normalize-space(.)=\"Seleccionar herramienta\"]]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "e15eaaac-1500-488e-9e45-053b968dc4d3",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//div[@role=\"option\" and normalize-space(.)=\"Martillo\"]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "9fa005aa-8ac4-4541-8e11-58987d5c207d",
+      "comment": "",
+      "command": "type",
+      "target": "id=start-date",
+      "targets": [],
+      "value": "2026-02-02"
+    }, {
+      "id": "433e0c40-213d-4754-82f3-61f70acde291",
+      "comment": "",
+      "command": "type",
+      "target": "id=end-date",
+      "targets": [],
+      "value": "2026-03-02"
+    }, {
+      "id": "44785445-0ee1-47f3-8ff3-863b60b0751c",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[normalize-space(.)=\"Crear Préstamo\"]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "b20a0cd9-fda7-43ca-804e-0d10101bdc29",
+      "comment": "",
+      "command": "waitForElementVisible",
+      "target": "css=[data-testid=\"toast-error\"]",
+      "targets": [],
+      "value": "5000"
+    }]
+  }, {
+    "id": "ef3200cb-b38c-4285-8fa8-1ad16f80071c",
+    "name": "Epica2_Escenario6",
+    "commands": [{
+      "id": "74f4802b-7527-47ff-b1b7-1ebf58ab182f",
+      "comment": "",
+      "command": "open",
+      "target": "/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "4f88a02a-cfb3-4e74-be1e-b182f3d79fa9",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1090x809",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "ea3c510e-b09b-4a4d-a289-ddbca4810c7f",
+      "comment": "",
+      "command": "click",
+      "target": "css=.bg-primary:nth-child(2)",
+      "targets": [
+        ["css=.bg-primary:nth-child(2)", "css:finder"],
+        ["xpath=//button[@type='button']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/button", "xpath:idRelative"],
+        ["xpath=//main/div/div/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Nuevo Préstamo')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "fb929f61-5bcc-4fe8-8d7a-560f61c833f9",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[.//text()[normalize-space(.)=\"Nuevo Préstamo\"]]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "a8402739-101b-4ba4-b1e8-c865d840676d",
+      "comment": "",
+      "command": "waitForElementVisible",
+      "target": "xpath=//button[.//span[normalize-space(.)=\"Seleccionar cliente\"]]",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "1374843b-4ed6-42dd-810d-4ee1459bdddb",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[.//span[normalize-space(.)=\"Seleccionar cliente\"]]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7e021192-57e4-49d1-a200-d00fc5ffabe5",
+      "comment": "",
+      "command": "waitForElementVisible",
+      "target": "xpath=//div[@role=\"option\" and normalize-space(.)=\"Carlos Ruiz\"]",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "2cc6c79f-dc6b-401b-b999-db3814d42a9a",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//div[@role=\"option\" and normalize-space(.)=\"Carlos Ruiz\"]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "2e201cc9-49d5-481f-b42b-a8b1138b64b4",
+      "comment": "",
+      "command": "waitForElementVisible",
+      "target": "xpath=//button[.//span[normalize-space(.)=\"Seleccionar herramienta\"]]",
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "a91223f0-1a73-42f0-8aaf-7fb4d2e547ab",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[.//span[normalize-space(.)=\"Seleccionar herramienta\"]]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "91d3015b-d92e-42ed-8aad-1917c6e4698d",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//div[@role=\"option\" and normalize-space(.)=\"Pistola calafateo\"]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1e542ad5-8576-49e3-b4e0-44c98e351c78",
+      "comment": "",
+      "command": "type",
+      "target": "id=start-date",
+      "targets": [],
+      "value": "2026-02-02"
+    }, {
+      "id": "ec2d8889-f36d-4c15-baf9-cf693ec25ef3",
+      "comment": "",
+      "command": "type",
+      "target": "id=end-date",
+      "targets": [],
+      "value": "2026-03-02"
+    }, {
+      "id": "0b7af45f-85e0-44a1-9510-6d23ee9ff6a1",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[normalize-space(.)=\"Crear Préstamo\"]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "b21deb6d-5125-4f51-afb2-df0cd56b8bdf",
+      "comment": "",
+      "command": "waitForElementVisible",
+      "target": "css=[data-testid=\"toast-error\"]",
+      "targets": [],
+      "value": "5000"
+    }]
+  }, {
+    "id": "818ddec2-b593-447f-a6c9-07fb44d56d1d",
+    "name": "Epica6_Escenario1",
+    "commands": [{
+      "id": "6669aeb8-8ce5-4102-9b70-a1fd0328dcb9",
+      "comment": "",
+      "command": "open",
+      "target": "/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "9a79b64a-5870-4b2f-a065-04a148f91835",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1090x809",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "22960555-5cc3-430b-9373-77a453e0e18e",
+      "comment": "",
+      "command": "click",
+      "target": "css=.bg-primary:nth-child(2)",
+      "targets": [
+        ["css=.bg-primary:nth-child(2)", "css:finder"],
+        ["xpath=//button[@type='button']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/button", "xpath:idRelative"],
+        ["xpath=//main/div/div/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Nuevo Préstamo')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "f23d2ae6-c672-4c42-977e-2e365736521b",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[normalize-space()='Vencidos']",
+      "targets": [
+        ["css=.bg-primary:nth-child(2)", "css:finder"],
+        ["xpath=//button[@type='button']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/button", "xpath:idRelative"],
+        ["xpath=//main/div/div/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Nuevo Préstamo')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "69c2bc57-ee69-47b9-928a-3ced2dad6fdf",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "css=div.border-red-200",
+      "targets": [],
+      "value": ""
+    }]
+  }, {
+    "id": "ea2aca74-5595-45a6-9c1b-6dae64df5417",
+    "name": "Epica6_Escenario2",
+    "commands": [{
+      "id": "641e8059-4346-47bc-873f-c62ab1936714",
+      "comment": "",
+      "command": "open",
+      "target": "/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "3b6a1df0-2067-4640-a4e8-f70493a81872",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1910x1070",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "08cab269-e650-42d0-8fe6-2eafcc28e3af",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[.//p[normalize-space()='Reportes']]",
+      "targets": [
+        ["css=.bg-primary:nth-child(2)", "css:finder"],
+        ["xpath=//button[@type='button']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/button", "xpath:idRelative"],
+        ["xpath=//main/div/div/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Nuevo Préstamo')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "1dc1aa9d-beaf-4397-b0b0-a1bdfd247cbd",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Ranking de Herramientas')]",
+      "targets": [
+        ["css=.bg-primary:nth-child(2)", "css:finder"],
+        ["xpath=//button[@type='button']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/button", "xpath:idRelative"],
+        ["xpath=//main/div/div/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Nuevo Préstamo')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "779f07c8-72a0-43a2-a175-866d1d9dd26b",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "xpath=//table[@role='table']",
+      "targets": [],
+      "value": ""
+    }]
+  }, {
+    "id": "d9116779-8b4c-431b-af54-d32f70910ec4",
+    "name": "Epica6_Escenario4",
+    "commands": [{
+      "id": "794f8f8d-8a90-4268-b33a-0304ce83a38e",
+      "comment": "",
+      "command": "open",
+      "target": "/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "f0472e5c-ad7c-48ae-87ba-38ac03eee66c",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1910x1070",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "2721c018-8f76-45ae-9171-58e1382b8512",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[.//p[normalize-space()='Reportes']]",
+      "targets": [
+        ["css=.bg-primary:nth-child(2)", "css:finder"],
+        ["xpath=//button[@type='button']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/button", "xpath:idRelative"],
+        ["xpath=//main/div/div/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Nuevo Préstamo')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "44e0c6ec-1e52-4b58-b477-69dd1debfa47",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//button[contains(.,'Clientes con Atrasos')]",
+      "targets": [
+        ["css=.bg-primary:nth-child(2)", "css:finder"],
+        ["xpath=//button[@type='button']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/button", "xpath:idRelative"],
+        ["xpath=//main/div/div/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Nuevo Préstamo')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "d374a144-32f6-497d-a08f-b7b72bbeb360",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "xpath=//table[@role='table']",
+      "targets": [],
+      "value": ""
+    }]
+  }, {
+    "id": "99dda3af-072d-40b2-ae8b-6eac17bfbe2e",
+    "name": "Epica6_Escenario7",
+    "commands": [{
+      "id": "e307fec5-1aad-4532-aa04-3a197edbda85",
+      "comment": "",
+      "command": "open",
+      "target": "/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "65553815-fe6f-4777-8779-1291b0cfba00",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1910x1070",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "9f87de0d-0964-44a7-b6b8-9269b9128a8c",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "css=div.bg-red-50",
+      "targets": [],
+      "value": ""
+    }]
   }],
   "suites": [{
     "id": "c4985220-3234-46ea-9e5f-7472f49d5813",
