@@ -31,7 +31,6 @@ public class LoansController {
     private final LoansService loansService;
     private final ToolsRepository toolsRepository;
     private final CustomerRepository customerRepository;
-    private final AuthService authService;
     private final LoansRepository loansRepository;
     private final UsersRepository usersRepository;
 
@@ -39,12 +38,11 @@ public class LoansController {
             LoansService loansService,
             ToolsRepository toolsRepository,
             CustomerRepository customerRepository,
-            AuthService authService, LoansRepository loansRepository,
+             LoansRepository loansRepository,
             UsersRepository usersRepository) {
         this.loansService = loansService;
         this.toolsRepository = toolsRepository;
         this.customerRepository = customerRepository;
-        this.authService = authService;
         this.loansRepository = loansRepository;
         this.usersRepository = usersRepository;
     }
@@ -58,7 +56,7 @@ public class LoansController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createLoan(@RequestBody LoanRequestDto loanRequest) {
+    public ResponseEntity<Object> createLoan(@RequestBody LoanRequestDto loanRequest) {
         log.info("=== MODO DESARROLLO: Saltando Seguridad ===");
 
         try {
@@ -94,7 +92,7 @@ public class LoansController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllLoans() {
+    public ResponseEntity<Object> getAllLoans() {
         log.info("===> Iniciando obtención de loans...");
         List<Loans> loans;
         try {
@@ -134,7 +132,7 @@ public class LoansController {
         return ResponseEntity.ok(loansList);
     }
     @PutMapping("/{loanId}/return")
-    public ResponseEntity<?> returnLoan(@PathVariable String loanId, @RequestParam(required = false, defaultValue = "OK") ToolCondition condition) {
+    public ResponseEntity<Object> returnLoan(@PathVariable String loanId, @RequestParam(required = false, defaultValue = "OK") ToolCondition condition) {
         try {
             Date returnDate = new Date(); // fecha actual
             Loans updatedLoan = loansService.registerReturn(loanId, returnDate, condition);
@@ -167,7 +165,7 @@ public class LoansController {
         }
     }
     @GetMapping("/{id}")
-    public ResponseEntity<?> getLoanById(@PathVariable String id) {
+    public ResponseEntity<Object> getLoanById(@PathVariable String id) {
         try {
             Loans loan = loansRepository.findById(id).orElse(null);
             if (loan == null) return ResponseEntity.notFound().build();
@@ -185,7 +183,7 @@ public class LoansController {
 
             // Aquí puedes logear el DTO también si lo usas
             LoansServiceImpl.LoansDTO dto = loansService.toDTO(loan);
-            log.info("DTO: " + dto);
+            log.info("DTO: {}", dto);
 
             return ResponseEntity.ok(dto);
         } catch (Exception ex) {

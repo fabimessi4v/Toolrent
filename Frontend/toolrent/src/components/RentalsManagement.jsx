@@ -552,7 +552,6 @@ export function LoansManagement({ onNavigate }) {
                       )}
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="destructive" size="sm">Contactar</Button>
                       <Button variant="outline" size="sm" onClick={() => openReturnModal(loan.id)}>
                         Devolver
                       </Button>

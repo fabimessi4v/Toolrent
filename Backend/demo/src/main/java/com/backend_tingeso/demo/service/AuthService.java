@@ -19,7 +19,6 @@ import java.util.Map;
 @Service
 public class AuthService {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     private final UsersRepository usersRepository;
 
@@ -52,7 +51,6 @@ public class AuthService {
         return usersRepository.findByKcSub(kcSub).orElseGet(() -> {
             // Si llegamos aquí, es que NO existía en la BD local.
             // Entonces lo creamos y lo guardamos antes de que falle el resto del programa.
-            System.out.println("!!!! SINCRONIZANDO NUEVO USUARIO: " + username);
 
             Users newUser = new Users();
             newUser.setId(java.util.UUID.randomUUID().toString());

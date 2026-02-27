@@ -10,14 +10,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/login")
 public class UsersController {
-
+    private static final String PREFERRED_USERNAME = "preferred_username";
     /**
      * Endpoint accesible por cualquier usuario autenticado
      */
     @GetMapping("/me")
     public Map<String, Object> getCurrentUser(@AuthenticationPrincipal Jwt jwt) {
         return Map.of(
-                "username", jwt.getClaim("preferred_username"),
+                "username", jwt.getClaim(PREFERRED_USERNAME),
                 "email", jwt.getClaim("email"),
                 "roles", jwt.getClaim("realm_access") // roles dentro de realm_access
         );
@@ -28,7 +28,7 @@ public class UsersController {
      */
     @GetMapping("/user")
     public String userAccess(@AuthenticationPrincipal Jwt jwt) {
-        return "Hola " + jwt.getClaim("preferred_username") + ", tienes acceso como USER!";
+        return "Hola " + jwt.getClaim(PREFERRED_USERNAME) + ", tienes acceso como USER!";
     }
 
     /**
@@ -36,7 +36,7 @@ public class UsersController {
      */
     @GetMapping("/admin")
     public String adminAccess(@AuthenticationPrincipal Jwt jwt) {
-        return "Hola " + jwt.getClaim("preferred_username") + ", tienes acceso como ADMIN!";
+        return "Hola " + jwt.getClaim(PREFERRED_USERNAME) + ", tienes acceso como ADMIN!";
     }
 
     /**

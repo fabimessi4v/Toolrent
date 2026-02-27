@@ -3,9 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { 
-  DollarSign, 
-  Save, 
+import {
+  DollarSign,
+  Save,
   Settings,
   CheckCircle,
   AlertTriangle
@@ -48,13 +48,7 @@ export function RatesConfiguration({ onNavigate }) {
   const [globalSuccessMsg, setGlobalSuccessMsg] = useState("");
   const [globalErrorMsg, setGlobalErrorMsg] = useState("");
 
-  // (Si más adelante vuelves a usar estas tarifas específicas)
-  const [toolSpecificRates, setToolSpecificRates] = useState([
-    { id: "T001", name: "Taladro Percutor Bosch GSB 120", category: "Taladros", dailyRentalRate: 450, dailyFineRate: 45, replacementValue: 85000, lastUpdated: "2025-08-20", updatedBy: "admin" },
-    { id: "T002", name: "Sierra Circular Makita 5007MG", category: "Sierras", dailyRentalRate: 380, dailyFineRate: 38, replacementValue: 65000, lastUpdated: "2025-08-18", updatedBy: "admin" },
-    { id: "T003", name: "Soldadora Lincoln Electric", category: "Soldadoras", dailyRentalRate: 750, dailyFineRate: 75, replacementValue: 150000, lastUpdated: "2025-08-15", updatedBy: "admin" },
-    { id: "T004", name: "Amoladora DeWalt DWE402", category: "Amoladoras", dailyRentalRate: 280, dailyFineRate: 28, replacementValue: 45000, lastUpdated: "2025-08-22", updatedBy: "admin" }
-  ]);
+
 
   const handleUpdateGlobalRates = async () => {
     setSavingGlobal(true);
@@ -114,7 +108,7 @@ export function RatesConfiguration({ onNavigate }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Label htmlFor="global-fine">Tarifa diaria de multa (Late Fee) ($)</Label>
-              <Input 
+              <Input
                 id="global-fine"
                 type="number"
                 value={globalRates.dailyFineRate}
@@ -152,8 +146,8 @@ export function RatesConfiguration({ onNavigate }) {
                   {globalErrorMsg}
                 </div>
               )}
-              <Button 
-                onClick={handleUpdateGlobalRates} 
+              <Button
+                onClick={handleUpdateGlobalRates}
                 className="gap-2"
                 disabled={savingGlobal}
               >

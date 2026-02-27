@@ -25,6 +25,16 @@ export const MockAuthProvider = ({ children }) => {
             preferred_username: 'dev_user',
             email: 'dev@toolrent.com',
             name: 'Developer User',
+            // ─── Realm roles (cambiar a ["EMPLEADO"] para testear acceso restringido) ───
+            realm_access: {
+                roles: ['ADMIN'],
+            },
+            // ─── Client roles (mantener para compatibilidad con ToolsManagement) ───
+            resource_access: {
+                'toolrent-frontend': {
+                    roles: ['ADMIN'],
+                },
+            },
         },
         token: 'mock_jwt_token_for_development',
         refreshToken: 'mock_refresh_token',

@@ -79,56 +79,78 @@ class KardexServiceImplTest {
     }
 
     @Test
-    void createKardex_errorSiToolONulo() {
+    void createKardex_errorSiToolNulo() { // Nombre sugerido según el código
         Users user = new Users();
         user.setId("u1");
         user.setUsername("admin");
         Loans loan = new Loans();
 
+        // 1. Preparamos los parámetros FUERA del assertThrows
+        MovementType type = MovementType.valueOf("LOAN");
+
+        // 2. El assertThrows ahora solo tiene una invocación
         Exception ex = assertThrows(IllegalArgumentException.class, () ->
-                kardexService.createKardex(null, user, loan, MovementType.valueOf("LOAN"), 1, "Prueba")
+                kardexService.createKardex(null, user, loan, type, 1, "Prueba")
         );
+
         assertTrue(ex.getMessage().contains("Tool, User, type y quantity"));
     }
 
     @Test
     void createKardex_errorSiUserONulo() {
+        // 1. Arrange (Organizar): Preparamos todo fuera del assert
         Tools tool = new Tools();
         tool.setId("t1");
         tool.setName("Martillo");
         Loans loan = new Loans();
+        MovementType type = MovementType.valueOf("LOAN"); // <--- Sacamos esto del lambda
 
+        // 2. Act (Actuar): El assert solo contiene la llamada al servicio
         Exception ex = assertThrows(IllegalArgumentException.class, () ->
-                kardexService.createKardex(tool, null, loan, MovementType.valueOf("LOAN"), 1, "Prueba")
+                kardexService.createKardex(tool, null, loan, type, 1, "Prueba")
         );
+
+        // 3. Assert (Verificar)
         assertTrue(ex.getMessage().contains("Tool, User, type y quantity"));
     }
 
     @Test
     void createKardex_errorSiTypeVacio() {
+        // 1. Arrange (Preparación)
         Tools tool = new Tools();
         tool.setId("t1");
         Users user = new Users();
         user.setId("u1");
         Loans loan = new Loans();
 
+        // Si realmente quieres probar qué pasa cuando el tipo es nulo o inválido en tu servicio,
+        // es mejor pasar directamente el valor problemático al servicio.
+
+        // 2. Act (Acción) - Solo una invocación dentro de la lambda
         Exception ex = assertThrows(IllegalArgumentException.class, () ->
-                kardexService.createKardex(tool, user, loan, MovementType.valueOf(""), 1, "Prueba")
+                kardexService.createKardex(tool, user, loan, null, 1, "Prueba")
         );
+
+        // 3. Assert (Verificación)
         assertTrue(ex.getMessage().contains("Tool, User, type y quantity"));
     }
 
     @Test
     void createKardex_errorSiQuantityMenorOIgualACero() {
+        // 1. Arrange: Preparamos los objetos y el Enum fuera
         Tools tool = new Tools();
         tool.setId("t1");
         Users user = new Users();
         user.setId("u1");
         Loans loan = new Loans();
+        MovementType type = MovementType.valueOf("LOAN"); // <--- Fuera de la lambda
 
+        // 2. Act: Solo el llamado al servicio dentro del assertThrows
         Exception ex = assertThrows(IllegalArgumentException.class, () ->
-                kardexService.createKardex(tool, user, loan, MovementType.valueOf("LOAN"), 0, "Prueba")
+                kardexService.createKardex(tool, user, loan, type, 0, "Prueba")
         );
+
+        // 3. Assert: Verificamos el mensaje
         assertTrue(ex.getMessage().contains("Tool, User, type y quantity"));
     }
 

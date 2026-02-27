@@ -83,6 +83,12 @@ export function KardexManagement({ onNavigate }) {
 
   const uniqueTools = [...new Set(movements.map(m => m.toolName))].map(name => ({ name }));
 
+
+  const getQuantityStyle = (quantity) => {
+    if (quantity > 0) return 'text-green-600';
+    if (quantity < 0) return 'text-red-600';
+    return 'text-gray-600';
+  };
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -176,7 +182,9 @@ export function KardexManagement({ onNavigate }) {
                     <TableCell>
                       <p className="font-medium">{m.toolName}</p>
                     </TableCell>
-                    <TableCell className={`font-semibold ${m.quantity > 0 ? 'text-green-600' : m.quantity < 0 ? 'text-red-600' : 'text-gray-600'}`}>{m.quantity > 0 ? '+' : ''}{m.quantity}</TableCell>
+                    <TableCell className={`font-semibold ${getQuantityStyle(m.quantity)}`}>
+                      {m.quantity > 0 ? '+' : ''}{m.quantity}
+                    </TableCell>
                     <TableCell className="max-w-xs text-sm">{m.comments}</TableCell>
                     <TableCell className="text-sm">{m.userName}</TableCell>
                   </TableRow>

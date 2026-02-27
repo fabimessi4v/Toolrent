@@ -13,6 +13,9 @@ export const useToast = () => {
 
 export const ToastProvider = ({ children }) => {
     const [toasts, setToasts] = useState([]);
+    const removeToast = useCallback((id) => {
+        setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    }, []);
 
     const showToast = useCallback(({ title, description, type = 'info', duration = 5000 }) => {
         const id = Date.now();
@@ -20,13 +23,10 @@ export const ToastProvider = ({ children }) => {
 
         setToasts((prev) => [...prev, newToast]);
 
-        // Auto-remove toast after duration
-        setTimeout(() => {
-            setToasts((prev) => prev.filter((toast) => toast.id !== id));
-        }, duration);
+        setTimeout(() => removeToast(id), duration);
 
         return id;
-    }, []);
+    }, [removeToast]);
 
     const success = useCallback((title, description) => {
         return showToast({ title, description, type: 'success' });
@@ -43,10 +43,6 @@ export const ToastProvider = ({ children }) => {
     const info = useCallback((title, description) => {
         return showToast({ title, description, type: 'info' });
     }, [showToast]);
-
-    const removeToast = useCallback((id) => {
-        setToasts((prev) => prev.filter((toast) => toast.id !== id));
-    }, []);
 
     const value = {
         showToast,

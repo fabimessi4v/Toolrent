@@ -9,6 +9,9 @@ import com.backend_tingeso.demo.repository.KardexRepository;
 import com.backend_tingeso.demo.repository.LoansRepository;
 import com.backend_tingeso.demo.repository.ToolsRepository;
 import org.springframework.stereotype.Service;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,6 +36,9 @@ public class LoansServiceImpl implements LoansService {
         this.customerService = customerService;
     }
     // DTO para préstamo
+    @Data // Genera getters, setters, toString, etc.
+    @NoArgsConstructor // Requerido por muchos frameworks
+    @AllArgsConstructor
     public static class LoansDTO {
         public String id;
         public String toolName;
@@ -44,18 +50,7 @@ public class LoansServiceImpl implements LoansService {
         public String status;
         public Float fine;
 
-        public LoansDTO(String id, String toolName, String customerName, String userName,
-                        Date deliveryDate, Date dueDate, Date returnDate, String status, Float fine) {
-            this.id = id;
-            this.toolName = toolName;
-            this.customerName = customerName;
-            this.userName = userName;
-            this.deliveryDate = deliveryDate;
-            this.dueDate = dueDate;
-            this.returnDate = returnDate;
-            this.status = status;
-            this.fine = fine;
-        }
+
     }
 
     // Mapear entidad Loans a DTO (ahora es público)
@@ -240,7 +235,7 @@ public class LoansServiceImpl implements LoansService {
         return loansRepository.findAll()
                 .stream()
                 .map(this::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
 

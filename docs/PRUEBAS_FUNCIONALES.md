@@ -86,13 +86,6 @@
 - **And** mostrar el monto total a pagar antes de cerrar la devolución.
     
 
-**Validación Selenium IDE:**
-
-- **Command:** `assertValue`
-    
-- **Target:** `id=total-fine-display`
-    
-- **Value:** `3000` (Asumiendo tarifa de 1500/día)
     
 
 ---
@@ -241,24 +234,35 @@
 
 ---
 
-### Escenario 6: Exportación de reporte a PDF (Validación de interfaz) //cambiar
+### Escenario 6: Disminución del total de préstamos activos tras devolución (Automatizado en Selenium)
 
 **Gherkin:**
 
-- **Given** que se ha generado un reporte de préstamos activos
+- **Given** que existe un préstamo activo
     
-- **When** el usuario hace clic en el botón "Exportar PDF"
+- **And** el reporte muestra el total de préstamos activos
+
+- **When** el empleado registra la devolución del préstamo"
     
-- **Then** el sistema debe iniciar la descarga del archivo con los datos visibles en pantalla.
+- **Then** el el total de préstamos activos debe disminuir en 1.
+
+
+**Validación Selenium IDE:**
+
+- **Command:** `assertTitle`
+    
+- **Target:** `Acceso Denegado`
+    
+
     
 
 ---
 
-### Escenario 7: Validación de rol para acceso a reportes (Automatizado en Selenium)  //implementar
+### Escenario 7: Validación de rol para acceso a Herramientas (Automatizado en Selenium)  //implementar
 
 **Gherkin:**
 
-- **Given** que un usuario con rol "Empleado" intenta acceder a la URL `/admin/reports`
+- **Given** que un usuario con rol "Empleado" intenta crear una herramienta, en la seccion **Herramientas**`
     
 - **When** el sistema procesa la solicitud
     
@@ -272,5 +276,4 @@
 - **Command:** `assertTitle`
     
 - **Target:** `Acceso Denegado`
-    
 

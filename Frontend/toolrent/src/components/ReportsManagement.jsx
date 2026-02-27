@@ -126,6 +126,19 @@ export function ReportsManagement({ onNavigate }) {
   // Si quieres filtrar clientes por fecha de creación, usa el campo "createdAt". Si no, usa la lista completa.
   const filteredOverdueClients = filterDataByDate(overdueClients, "createdAt");
 
+  const getRankingBadgeStyle = (index) => {
+    switch (index) {
+      case 0:
+        return 'bg-yellow-100 text-yellow-800'; // Oro
+      case 1:
+        return 'bg-gray-100 text-gray-800';   // Plata
+      case 2:
+        return 'bg-orange-100 text-orange-800'; // Bronce
+      default:
+        return 'bg-blue-100 text-blue-800';    // Resto
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -317,7 +330,7 @@ export function ReportsManagement({ onNavigate }) {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => onNavigate && onNavigate('clients')}
+                              onClick={() => onNavigate?.('clients')}
                             >
                               Ver Detalle
                             </Button>
@@ -365,11 +378,7 @@ export function ReportsManagement({ onNavigate }) {
                         <TableRow key={tool.id}>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium ${index === 0 ? 'bg-yellow-100 text-yellow-800' :
-                                  index === 1 ? 'bg-gray-100 text-gray-800' :
-                                    index === 2 ? 'bg-orange-100 text-orange-800' :
-                                      'bg-blue-100 text-blue-800'
-                                }`}>
+                              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium ${getRankingBadgeStyle(index)}`}>
                                 {index + 1}
                               </div>
                             </div>

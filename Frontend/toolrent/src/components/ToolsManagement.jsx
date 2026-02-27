@@ -61,14 +61,12 @@ export function ToolsManagement({ onNavigate }) {
       try {
         const response = await getTools();
         console.log("📦 Tools response:", response);
-
-        // Validación robusta para asegurar que siempre sea un array
-        const toolsData = Array.isArray(response?.data)
-          ? response.data
-          : Array.isArray(response)
-            ? response
-            : [];
-
+        let toolsData = [];
+        if (Array.isArray(response?.data)) {
+          toolsData = response.data;
+        } else if (Array.isArray(response)) {
+          toolsData = response;
+        }
         console.log("✅ Tools data parsed:", toolsData);
         setTools(toolsData);
       } catch (err) {

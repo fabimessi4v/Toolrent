@@ -73,7 +73,7 @@ public class ToolsController {
 
     //Endpoint para actualizar estado de herramienta
     @PutMapping("/{id}/status")
-    public ResponseEntity<?> updateToolStatus(@PathVariable String id, @RequestParam String newStatus) {
+    public ResponseEntity<Object> updateToolStatus(@PathVariable String id, @RequestParam String newStatus) {
         try {
             Tools updatedTool = toolsService.updateToolStatus(id, newStatus);
             return ResponseEntity.ok(updatedTool);
@@ -84,7 +84,7 @@ public class ToolsController {
             }
     // Endpoint para actualizar herramienta (usa ToolDTO en el body)
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateTool(@PathVariable String id, @RequestBody ToolDTO request) {
+    public ResponseEntity<Object> updateTool(@PathVariable String id, @RequestBody ToolDTO request) {
         try {
             Tools updatedTool = toolsService.updateTool(id, request);
             return ResponseEntity.ok(updatedTool);

@@ -17,16 +17,17 @@ public class FeeController {
     }
 
     @PutMapping("/{type}")
-    public ResponseEntity<?> upsert(
+    public ResponseEntity<Object> upsert(
             @PathVariable String type,
             @RequestBody ValueRequest body
     ) {
-        try {
             FeeServiceImpl.FeeDto existing = null;
             try {
                 existing = feeService.getByType(type);
-            } catch (Exception ignored) { }
-
+            } catch (Exception ignored) {
+                // El error se ignora intencionalmente: si no existe, existing queda como null
+            }
+            try {
             FeeServiceImpl.FeeDto fee = feeService.upsert(type, body.getValue());
             boolean existed = existing != null;
 
@@ -42,7 +43,7 @@ public class FeeController {
     }
 
     @GetMapping("/{type}")
-    public ResponseEntity<?> getByType(@PathVariable String type) {
+    public ResponseEntity<Object> getByType(@PathVariable String type) {
         try {
             return ResponseEntity.ok(feeService.getByType(type));
         } catch (IllegalArgumentException ex) {

@@ -11,6 +11,8 @@ import { RatesConfiguration } from "./components/RatesConfiguration";
 import CustomerList from "./components/CustomerList";
 import { ReportsManagement } from "./components/ReportsManagement";
 import { ClarityNavigationTracker } from "./components/ClarityNavigationTracker";
+import { AccessDenied } from "./components/AccessDenied";
+import { useRoles } from "./auth/useRoles";
 
 // Hook dinámico: usa el real o el mock según el modo
 const useAuth = () => {
@@ -25,6 +27,7 @@ const useAuth = () => {
 
 export default function App() {
   const { keycloak, initialized } = useAuth();
+  const { canAccess } = useRoles();
 
   // Debug auth state
   console.log("Auth instance:", keycloak);
@@ -32,10 +35,10 @@ export default function App() {
   console.log("Authenticated:", keycloak?.authenticated);
 
   const [currentSection, setCurrentSection] = useState("dashboard");
-  const [showSidebar, setShowSidebar] = useState(true);
+  const [showSidebar] = useState(true);
 
   if (!initialized) {
-    return <div>Cargando autenticación...</div>; // Espera hasta que termine de inicializar
+    return <div>Cargando autenticación...</div>;
   }
 
   if (!keycloak.authenticated) {
@@ -55,17 +58,30 @@ export default function App() {
   const handleNavigate = (section) => setCurrentSection(section);
   const handleLogout = () => keycloak.logout();
 
+  // Wrapper que protege cada sección según el realm role del usuario
+  const Protected = ({ section, children }) =>
+    canAccess(section) ? children : <AccessDenied section={section} />;
+
   const renderContent = () => {
     switch (currentSection) {
-      case "dashboard": return <Dashboard onNavigate={handleNavigate} onLogout={handleLogout} />;
-      case "tools": return <ToolsManagement onNavigate={handleNavigate} />;
-      case "loans": return <LoansManagement onNavigate={handleNavigate} />;
-      case "clients": return <ClientsManagement onNavigate={handleNavigate} />;
-      case "kardex": return <KardexManagement onNavigate={handleNavigate} />;
-      case "rates": return <RatesConfiguration onNavigate={handleNavigate} />;
-      case "customers": return <CustomerList />;
-      case "reports": return <ReportsManagement onNavigate={handleNavigate} />;
-      default: return <Dashboard onNavigate={handleNavigate} onLogout={handleLogout} />;
+      case "dashboard":
+        return <Protected section="dashboard"><Dashboard onNavigate={handleNavigate} onLogout={handleLogout} /></Protected>;
+      case "tools":
+        return <Protected section="tools"><ToolsManagement onNavigate={handleNavigate} /></Protected>;
+      case "loans":
+        return <Protected section="loans"><LoansManagement onNavigate={handleNavigate} /></Protected>;
+      case "clients":
+        return <Protected section="clients"><ClientsManagement onNavigate={handleNavigate} /></Protected>;
+      case "kardex":
+        return <Protected section="kardex"><KardexManagement onNavigate={handleNavigate} /></Protected>;
+      case "rates":
+        return <Protected section="rates"><RatesConfiguration onNavigate={handleNavigate} /></Protected>;
+      case "customers":
+        return <Protected section="customers"><CustomerList /></Protected>;
+      case "reports":
+        return <Protected section="reports"><ReportsManagement onNavigate={handleNavigate} /></Protected>;
+      default:
+        return <Protected section="dashboard"><Dashboard onNavigate={handleNavigate} onLogout={handleLogout} /></Protected>;
     }
   };
 
