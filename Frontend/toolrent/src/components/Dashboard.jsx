@@ -1,12 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { 
-  Wrench, 
-  Users, 
-  Calendar, 
-  DollarSign, 
-  TrendingUp, 
+import {
+  Wrench,
+  Users,
+  Calendar,
+  DollarSign,
+  TrendingUp,
   AlertTriangle,
   Plus
 } from "lucide-react";
@@ -83,6 +83,11 @@ export function Dashboard({ onNavigate }) {
       type: "urgent"
     }
   ];
+  const getBadgeVariant = (status) => {
+    if (status === "Activo") return "default";
+    if (status === "Vencido") return "destructive";
+    return "secondary";
+  };
 
   return (
     <div className="space-y-6">
@@ -102,10 +107,10 @@ export function Dashboard({ onNavigate }) {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => {
+        {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <Card key={index}>
+            <Card key={stat.title}>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
@@ -146,15 +151,7 @@ export function Dashboard({ onNavigate }) {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="font-medium">{loan.tool}</span>
-                      <Badge
-                        variant={
-                          loan.status === "Activo"
-                            ? "default"
-                            : loan.status === "Vencido"
-                            ? "destructive"
-                            : "secondary"
-                        }
-                      >
+                      <Badge variant={getBadgeVariant(loan.status)}>
                         {loan.status}
                       </Badge>
                     </div>
@@ -192,21 +189,19 @@ export function Dashboard({ onNavigate }) {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {alertItems.map((alert, index) => (
+              {alertItems.map((alert) => (
                 <div
-                  key={index}
-                  className={`p-3 rounded-lg ${
-                    alert.type === "urgent"
-                      ? "bg-red-50 border border-red-200"
-                      : "bg-orange-50 border border-orange-200"
-                  }`}
+                  key={alert.id || alert.message}
+                  className={`p-3 rounded-lg ${alert.type === "urgent"
+                    ? "bg-red-50 border border-red-200"
+                    : "bg-orange-50 border border-orange-200"
+                    }`}
                 >
                   <p
-                    className={`text-sm ${
-                      alert.type === "urgent"
-                        ? "text-red-700"
-                        : "text-orange-700"
-                    }`}
+                    className={`text-sm ${alert.type === "urgent"
+                      ? "text-red-700"
+                      : "text-orange-700"
+                      }`}
                   >
                     {alert.message}
                   </p>

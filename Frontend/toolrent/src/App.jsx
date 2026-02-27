@@ -35,7 +35,7 @@ export default function App() {
   console.log("Authenticated:", keycloak?.authenticated);
 
   const [currentSection, setCurrentSection] = useState("dashboard");
-  const [showSidebar, setShowSidebar] = useState(true);
+  const [showSidebar] = useState(true);
 
   if (!initialized) {
     return <div>Cargando autenticación...</div>;

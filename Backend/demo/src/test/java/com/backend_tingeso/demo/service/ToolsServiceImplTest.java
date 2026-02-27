@@ -101,11 +101,18 @@ class ToolsServiceImplTest {
 
     @Test
     void deleteTool_usuarioNoAdmin_lanzaExcepcion() {
+        // 1. Arrange (Preparación)
         Users user = new Users();
         user.setRole("USER");
         when(authService.getCurrentUser()).thenReturn(user);
 
-        assertThrows(SecurityException.class, () -> toolsService.deleteTool(UUID.randomUUID().toString()));
+        // Sacamos la generación del ID fuera de la lambda
+        String toolId = UUID.randomUUID().toString();
+
+        // 2. Act & Assert (Acción y Verificación)
+        assertThrows(SecurityException.class, () ->
+                toolsService.deleteTool(toolId)
+        );
     }
 
     @Test

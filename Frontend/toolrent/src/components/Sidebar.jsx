@@ -1,4 +1,4 @@
-import { 
+import {
   Home,
   Wrench,
   Calendar,
@@ -45,22 +45,26 @@ export function Sidebar({ currentSection, onNavigate, onLogout }) {
 
       {/* Overlay en móvil */}
       {!isCollapsed && (
-        <div
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+        <button
+          type="button"
+          aria-label="Cerrar menú"
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden cursor-default w-full h-full border-none"
           onClick={() => setIsCollapsed(true)}
         />
       )}
 
       {/* Sidebar */}
-      <div
+      <aside
+        aria-label="Barra lateral de navegación"
         className={`
           flex flex-col w-64 fixed lg:static inset-y-0 left-0 z-40
           transition-transform duration-300 ease-in-out bg-white
           ${isCollapsed ? '-translate-x-full lg:translate-x-0' : 'translate-x-0'}
         `}
-        onClick={e => e.stopPropagation()}
       >
-        <Card className="h-full rounded-none border-l-0 border-t-0 border-b-0">
+        <Card className="h-full rounded-none border-l-0 border-t-0 border-b-0"
+          onClick={e => e.stopPropagation()}
+        >
           <div className="flex flex-col h-full">
             {/* Header */}
             <div className="p-6 border-b relative">
@@ -151,7 +155,7 @@ export function Sidebar({ currentSection, onNavigate, onLogout }) {
             </div>
           </div>
         </Card>
-      </div>
+      </aside>
     </>
   );
 }
