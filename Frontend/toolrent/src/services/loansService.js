@@ -34,3 +34,12 @@ export const createLoan = (loanData) => {
 export const returnLoan = (loanId, condition = "OK") => {
   return apiClient.put(`/loans/${loanId}/return?condition=${condition}`);
 };
+// Obtenener ingresos mensuales
+export const getMonthlyRevenue = (year, month) => {
+  return apiClient.get('/loans/stats/monthly-revenue', {
+    params: {
+      year,
+      month
+    }
+  });
+};

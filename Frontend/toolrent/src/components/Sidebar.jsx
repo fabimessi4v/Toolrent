@@ -57,7 +57,7 @@ export function Sidebar({ currentSection, onNavigate, onLogout }) {
       <aside
         aria-label="Barra lateral de navegación"
         className={`
-          flex flex-col w-64 fixed lg:static inset-y-0 left-0 z-40
+          flex flex-col w-64 fixed lg:sticky lg:top-0 lg:h-screen inset-y-0 left-0 z-40
           transition-transform duration-300 ease-in-out bg-white
           ${isCollapsed ? '-translate-x-full lg:translate-x-0' : 'translate-x-0'}
         `}
