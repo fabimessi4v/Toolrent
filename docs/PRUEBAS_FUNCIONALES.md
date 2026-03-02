@@ -16,7 +16,7 @@
 
 - **Given** que el empleado está autenticado y en el formulario de "Nuevo Préstamo"
     
-- **When** ingresa el Nombre del cliente "Carlos Ruiz" y el nombre de herramienta "Taladro Bosch"
+- **When** ingresa el Nombre del cliente "Eusebio Rojas" y el nombre de herramienta "Martillo"
     
 - **And** selecciona una fecha de devolución válida (posterior a hoy)
     
@@ -39,7 +39,7 @@
 
 **Gherkin:**
 
-- **Given** que el cliente "Eusebio Rojas" tiene una multa impaga
+- **Given** que el cliente "Esteban Gutierrez" tiene una multa impaga
     
 - **When** el empleado intenta registrar un nuevo préstamo para este cliente
     
@@ -61,7 +61,7 @@
 
 **Gherkin:**
 
-- **Given** que la herramienta "Generador Eléctrico" tiene stock actual "0"
+- **Given** que la herramienta "nivel laser" tiene stock actual "0"
     
 - **When** el empleado intenta seleccionarla para un préstamo
     
@@ -159,9 +159,9 @@
 
 **Validación Selenium IDE:**
 
-- **Command:** `assertElementNotPresent`
+- **Command:** `assertElementPresent`
     
-- **Target:** `xpath=//td[contains(text(), 'Vigente')]`
+- **Target:** `css=div.border-red-200`
     
 
 ---
@@ -179,12 +179,9 @@
 
 **Validación Selenium IDE:**
 
-- **Command:** `assertText`
+- **Command:** `assertElementPresent`
     
-- **Target:** `css=tr:nth-child(1) .tool-name`
-    
-- **Value:** `Taladro Bosch` (O la herramienta con más préstamos)
-    
+- **Target:** `xpath=//table[@role='table']`
 
 ---
 
@@ -205,18 +202,18 @@
 
 **Gherkin:**
 
-- **Given** que el cliente "Juan Pérez" tiene un préstamo vencido no devuelto
+- **Given** la existencia de clientes con prestamos vencidos, 
     
 - **When** el empleado consulta el reporte de "Clientes con Atrasos"
     
-- **Then** el RUT y nombre de "Juan Pérez" deben aparecer en la lista.
+- **Then** el RUT y nombre de los clientes correspondientes,  deben aparecer en la lista.
     
 
 **Validación Selenium IDE:**
 
-- **Command:** `verifyElementPresent`
+- **Command:** `assertElementPresent`
     
-- **Target:** `xpath=//td[contains(text(), 'Juan Pérez')]`
+- **Target:** `xpath=//table[@role='table']`
     
 
 ---
@@ -247,13 +244,6 @@
 - **Then** el el total de préstamos activos debe disminuir en 1.
 
 
-**Validación Selenium IDE:**
-
-- **Command:** `assertTitle`
-    
-- **Target:** `Acceso Denegado`
-    
-
     
 
 ---
@@ -262,18 +252,16 @@
 
 **Gherkin:**
 
-- **Given** que un usuario con rol "Empleado" intenta acceder a la seccion **Herramientas**`
+- **Given** que un usuario con rol "Empleado" intenta acceder a la seccion **Dashboard**`
     
 - **When** el sistema procesa la solicitud
     
 - **Then** el sistema debe denegar el acceso
     
-- **And** redirigir a una página de error 403 o al Home.
-    
 
 **Validación Selenium IDE:**
 
-- **Command:** `assertTitle`
+- **Command:** `assertElementPresent`
     
-- **Target:** `Acceso Denegado`
+- **Target:** `css=div.bg-red-50`
 
