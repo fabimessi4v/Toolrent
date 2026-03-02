@@ -18,10 +18,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/loans")
@@ -191,5 +190,31 @@ public class LoansController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
+
+
+    @GetMapping("/stats/monthly-revenue")
+    public ResponseEntity<Object> getMonthlyRevenue(
+            @RequestParam int year,
+            @RequestParam int month) {
+
+        // Primer día del mes
+        LocalDate startLocal = LocalDate.of(year, month, 1);
+        LocalDate endLocal = startLocal.plusMonths(1);
+
+        Date startDate = Date.from(startLocal.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(endLocal.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        Double revenue = loansRepository.calculateMonthlyRevenue(startDate, endDate);
+
+        return ResponseEntity.ok(
+                Map.of("monthlyRevenue", revenue != null ? revenue : 0)
+        );
+    }
+
+
+
+
+
+
 
 }

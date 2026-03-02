@@ -81,3 +81,8 @@ export const returnLoan = (...args) =>
 // ===== KARDEX SERVICES =====
 export const getAllKardex = (...args) =>
     tryRealOrMock(realKardexService.getAllKardex, mockKardexService.getAllKardex, ...args);
+
+// ===== DASHBOARD SERVICES =====
+export const getMonthlyRevenue = (...args) =>
+    realLoansService.getMonthlyRevenue(...args);
+
