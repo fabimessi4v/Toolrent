@@ -1,0 +1,72 @@
+services:
+  app-toolrent: # El Backend
+    image: ${DOCKER_USERNAME}/toolrent-app:latest
+    container_name: toolrent-backend
+    environment:
+      - SPRING_APPLICATION_NAME=${SPRING_APPLICATION_NAME}
+      - DB_URL=jdbc:mysql://db-toolrent:3306/toolrentdb
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DRIVER=${DB_DRIVER}
+      - SERVER_PORT=8080
+      - JWK_SET_URI=http://toolrent-keycloak:8080/realms/toolrent/protocol/openid-connect/certs
+      - JWK_ISSUER_URI=https://192.168.122.17/realms/toolrent
+      - KEYCLOAK_AUTH_SERVER_URL=https://192.168.122.17
+      - CORS_ALLOWED_ORIGINS=https://192.168.122.17
+      - SERVER_FORWARD_HEADERS_STRATEGY=native
+    depends_on:
+      - db-toolrent
+    ports:
+      - "8081:8080"
+
+  front-toolrent: # El Frontend
+    image: ${DOCKER_USERNAME}/toolrent-front:latest
+    container_name: toolrent_frontend
+    expose:
+      - "80"
+    depends_on:
+      - app-toolrent
+
+  db-toolrent: # Base de Datos
+    image: mysql:8.0
+    container_name: toolrent-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: toolrentdb
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./bd:/docker-entrypoint-initdb.d
+
+  keycloak: # <-- AQUÍ estaba el error, ahora está alineado con los otros servicios
+    image: quay.io/keycloak/keycloak:26.5.1
+    container_name: toolrent-keycloak
+    command: start-dev --import-realm
+    environment:
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+      - KC_HTTP_ENABLED=true
+      - KC_PROXY_HEADERS=xforwarded
+      - KC_HOSTNAME_STRICT=false
+      - KC_HOSTNAME=192.168.122.17
+      - KC_HOSTNAME_STRICT_HTTPS=false
+      - KC_SPI_LOGIN_PROTOCOL_OPENID_CONNECT_DISABLE_3RD_PARTY_COOKIE_CHECK=true
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm.json:ro
+      - keycloak_data:/opt/keycloak/data/
+  nginx-https:
+    image: nginx:alpine
+    container_name: toolrent-nginx-https
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - front-toolrent 
+
+volumes: # <-- Este bloque debe ir al final, fuera de 'services'
+  mysql_data:
+  keycloak_data:
