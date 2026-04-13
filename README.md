@@ -296,7 +296,7 @@ services:
 
 
 ## Demo Video
-[Coming soon]
+https://github.com/user-attachments/assets/ddef39f8-4d9a-4d6e-a90c-1e16c5ee30a4
 
 ---
 
